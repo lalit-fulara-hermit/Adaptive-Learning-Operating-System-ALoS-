@@ -45,9 +45,9 @@
 
   .book{overflow-y:auto; scroll-behavior:smooth}
   .book::-webkit-scrollbar{width:10px}.book::-webkit-scrollbar-thumb{background:#1a2238;border-radius:8px}
-  .col{max-width:660px; margin:0 auto; padding:0 28px 44vh}
+  .col{max-width:780px; margin:0 auto; padding:0 28px 44vh}
   .topbar{position:sticky; top:0; z-index:20; backdrop-filter:blur(8px); background:linear-gradient(180deg,rgba(10,15,24,.94),rgba(10,15,24,.5)); border-bottom:1px solid var(--line-soft)}
-  .topbar-in{max-width:660px; margin:0 auto; padding:12px 28px; display:flex; align-items:center; justify-content:space-between; gap:14px}
+  .topbar-in{max-width:none; margin:0; padding:12px 26px; display:flex; align-items:center; justify-content:space-between; gap:14px}
   .iconbtn{background:#0e1826; border:1px solid var(--line); color:var(--ink-soft); border-radius:9px; padding:5px 10px; font-size:12px; font-weight:600; cursor:pointer; font-family:var(--sans)}
   .iconbtn:hover{border-color:var(--gold-soft); color:var(--gold)}
   .act-tag{font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); white-space:nowrap}
@@ -240,6 +240,88 @@
 .fbfab:hover{background:rgba(59,157,255,.12);color:var(--ink)}
 @media (max-width:820px){.fbfab{bottom:14px;right:12px;padding:8px 12px;font-size:11.5px}}
 </style>
+<style>
+.brandbtn{background:none;border:none;cursor:pointer;font-family:var(--sans);display:flex;align-items:baseline;gap:3px;padding:4px 8px 4px 2px}
+.brandbtn b{color:var(--gold);font-weight:800;font-size:17px;letter-spacing:.02em}
+.brandbtn:hover b{filter:brightness(1.18)}
+.menubtn{background:none;border:1px solid var(--line);color:var(--ink-soft);border-radius:9px;font-size:15px;line-height:1;padding:7px 11px;cursor:pointer;flex:0 0 auto}
+.menubtn:hover{border-color:var(--gold-soft);color:var(--ink)}
+.menupanel{position:fixed;top:52px;right:12px;z-index:200;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px;min-width:214px;box-shadow:0 18px 44px -16px #000}
+.menupanel.hidden{display:none}
+.menupanel button{display:flex;width:100%;align-items:center;gap:11px;background:none;border:none;color:var(--ink);font-family:var(--sans);font-size:13.5px;text-align:left;padding:10px 12px;border-radius:8px;cursor:pointer}
+.menupanel button:hover{background:rgba(255,255,255,.05)}
+.menupanel .mi-ic{width:16px;text-align:center;opacity:.85;color:var(--gold)}
+.menupanel .menu-sep{height:1px;background:var(--line);margin:5px 6px}
+.menupanel .menu-about{font-size:11px;color:var(--ink-faint);padding:8px 12px 4px}
+.helpfab{display:none !important}
+/* phase-clustered constellation map */
+#maplist{overflow-y:auto}
+.mapsvg{display:block;margin:0 auto}
+.mphase-t{fill:var(--gold);font-size:10px;letter-spacing:.1em;font-family:var(--sans);opacity:.92;font-weight:600}
+.mnode-g{cursor:pointer}
+.mnode-g .node{fill:#38d0ff;fill-opacity:.5;stroke:#40507e;stroke-width:1.4;transition:.18s}
+.mnode-g.locked .node{fill:#141b2e;fill-opacity:1;stroke:#232c46}
+.mnode-g.cur .node{stroke:#38d0ff;stroke-width:2.4}
+.mnode-g .glow{fill:#38d0ff;opacity:.16}
+.mnode-g .deepring{fill:none;stroke:#34d399;stroke-opacity:.45;stroke-width:1;stroke-dasharray:2 3}
+.mnode-g .node-label{fill:var(--ink-soft);font-size:12.5px;font-family:var(--sans);transition:.15s}
+.mnode-g.locked .node-label{fill:var(--ink-faint)}
+.mnode-g.cur .node-label{fill:#fff;font-weight:600}
+.mnode-g:hover .node-label{fill:#fff;font-size:14.5px;font-weight:600}
+.mnode-g:hover .node{fill-opacity:.9}
+/* animated how-it-works */
+.hiw{max-width:600px}
+.hiw-sub{color:var(--ink-soft);font-size:14px;margin:0 0 18px}
+.hiw-loop{position:relative;display:flex;justify-content:space-between;align-items:flex-start;margin:8px 6px 24px;padding-top:4px}
+.hiw-track{position:absolute;left:11%;right:11%;top:27px;height:2px;background:var(--line)}
+.hiw-pulse{position:absolute;top:22px;left:11%;width:12px;height:12px;border-radius:50%;background:var(--glow);box-shadow:0 0 14px var(--glow);animation:hiwpulse 6s linear infinite}
+@keyframes hiwpulse{0%{left:11%}100%{left:89%}}
+.hiw-node{position:relative;z-index:1;width:22%;text-align:center}
+.hiw-node .hd{width:48px;height:48px;margin:0 auto 8px;border-radius:50%;background:var(--panel);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:20px}
+.hiw-node .hl{font-size:11.5px;color:var(--ink-soft);line-height:1.3}
+.hiw-node.n1 .hd{animation:hiwlit 6s linear infinite}
+.hiw-node.n2 .hd{animation:hiwlit 6s linear infinite;animation-delay:1.5s}
+.hiw-node.n3 .hd{animation:hiwlit 6s linear infinite;animation-delay:3s}
+.hiw-node.n4 .hd{animation:hiwlit 6s linear infinite;animation-delay:4.5s}
+@keyframes hiwlit{0%,22%{border-color:var(--line);color:var(--ink-soft);box-shadow:none}4%,16%{border-color:var(--glow);color:#fff;box-shadow:0 0 16px -2px var(--glow)}}
+.hiw-meters{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:0 6px 20px}
+.hiw-mlab{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px}
+.hiw-bar{height:10px;background:var(--line);border-radius:6px;overflow:hidden}
+.hiw-bar>i{display:block;height:100%;width:14%;background:linear-gradient(90deg,var(--gold),var(--glow));animation:hiwfill 6s ease-in-out infinite}
+@keyframes hiwfill{0%{width:12%}45%{width:40%}72%{width:66%}100%{width:88%}}
+.hiw-pace{display:flex;gap:6px}
+.hiw-pace span{flex:1;text-align:center;font-size:11.5px;padding:6px 4px;border-radius:8px;background:var(--panel);border:1px solid var(--line);color:var(--ink-faint)}
+.hiw-pace span[data-t=support]{animation:hiwpace 6s linear infinite}
+.hiw-pace span[data-t=standard]{animation:hiwpace 6s linear infinite;animation-delay:2s}
+.hiw-pace span[data-t=fast]{animation:hiwpace 6s linear infinite;animation-delay:4s}
+@keyframes hiwpace{0%,34%{border-color:var(--line);color:var(--ink-faint);background:var(--panel)}4%,30%{border-color:var(--gold-soft);color:#fff;background:rgba(59,157,255,.12)}}
+.hiw-lines p{font-size:13.5px;color:var(--ink-soft);line-height:1.5;margin:0 0 8px}
+.hiw-lines b{color:#fff}
+@media (max-width:820px){.hiw-meters{grid-template-columns:1fr}.brandbtn b{font-size:16px}}
+</style>
+<style>
+#maplist{overflow-y:auto;padding:8px 12px 18px}
+#maplist .mphase{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:16px 4px 4px;opacity:.92;font-weight:700}
+#maplist .mphase:first-child{margin-top:2px}
+#maplist .mgroup{position:relative}
+#maplist .mrow{display:flex;align-items:center;gap:10px;padding:5px 8px;border-radius:9px;cursor:pointer;position:relative}
+#maplist .mrow:hover{background:rgba(255,255,255,.05)}
+#maplist .mrow.cur{background:rgba(59,157,255,.11)}
+#maplist .mrail{position:relative;width:14px;flex:0 0 14px;align-self:stretch;display:flex;justify-content:center}
+#maplist .mline{position:absolute;top:0;bottom:0;width:2px;background:var(--line)}
+#maplist .mrail.first .mline{top:50%}
+#maplist .mrail.last .mline{bottom:50%}
+#maplist .mdot{position:relative;width:11px;height:11px;border-radius:50%;margin:auto 0;background:var(--glow);box-shadow:0 0 8px var(--glow);z-index:1;transition:.15s}
+#maplist .mrow.locked .mdot{background:var(--ink-faint);box-shadow:none}
+#maplist .mrow.cur .mdot{background:#fff;box-shadow:0 0 13px var(--glow)}
+#maplist .mlab{flex:1;font-size:13.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#maplist .mrow.locked .mlab{color:var(--ink-faint)}
+#maplist .mrow.cur .mlab{color:#fff;font-weight:600}
+#maplist .mrow:hover .mlab{color:#fff}
+#maplist .mbadge{font-size:8.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--green);border:1px solid rgba(52,211,153,.42);border-radius:5px;padding:1px 5px;flex:0 0 auto}
+#maplist .mpct{font-size:10.5px;color:var(--ink-faint);font-family:var(--mono,ui-monospace,monospace);min-width:24px;text-align:right;flex:0 0 auto}
+.act-tag{flex:0 0 auto}
+</style>
 </head>
 <body>
 <div class="app">
@@ -247,15 +329,16 @@
     <div class="rail-head"><div class="brand"><b>ALOS</b><span>Adaptive Learning OS</span></div>
       <div class="rail-sub">The whole journey — computing to autonomous agents — as one continuous book. 34 concepts across 14 Acts. Hover any node to see its depth; click to explore.</div></div>
     <div class="constellation" id="maplist"></div>
-    <div class="rail-foot"><label class="devtoggle"><input type="checkbox" id="devchk" title="Shows the internal knowledge-tracing model: a 0\u20131 estimate of how well you know each concept, which drives your pace, unlocking, and the mastery %."/> Peek under the hood \u00b7 the mastery model</label><div class="bkt-readout" id="bkt"></div></div>
+    <div class="rail-foot"><label class="devtoggle"><input type="checkbox" id="devchk" title="Shows the internal knowledge-tracing model: a 0\u20131 estimate of how well you know each concept, which drives your pace, unlocking, and the mastery %."/> Peek under the hood · the mastery model</label><div class="bkt-readout" id="bkt"></div></div>
   </aside>
   <main class="book" id="book">
     <div class="topbar"><div class="topbar-in">
+      <button class="brandbtn" id="brandBtn" title="What ALOS is · how it works"><b>ALOS</b></button>
       <button class="iconbtn" id="mapBtn">&#9096; Map</button>
-      <button class="mtier" id="mTier">Pace: <b>Standard</b></button>
       <span class="act-tag" id="acttag">Act 1 · Foundations</span>
       <span class="ep-title" id="eptitle">Computing — The Machine</span>
       <span class="prog"><i id="progbar"></i></span>
+      <button class="menubtn" id="menuBtn" aria-label="Menu" title="Menu">&#9776;</button>
     </div></div>
     <div class="col" id="col"></div>
   </main>
@@ -337,16 +420,24 @@ function isUnlocked(id){return concepts[id].prereq.every(function(p){return conc
 
 var svg=document.getElementById('graph');var NS="http://www.w3.org/2000/svg";
 function el(t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);return e;}
-function renderGraph(){var host=document.getElementById('maplist');if(host){var h='';
-  PHASES.forEach(function(ph){h+='<div class="mphase">'+ph.t+'</div>';
-    ph.ids.forEach(function(id){var c=concepts[id];if(!c)return;var unlocked=isUnlocked(id),cur=(id===ACTIVE),pct=Math.round(c.p*100),deep=(c.depth==='deep');
-      var tip=(c.label+' \u2014 '+(deep?'deep dive':'preview')+' \u00b7 '+pct+'% mastered'+(unlocked?'':' \u00b7 locked')).replace(/"/g,'&quot;');
-      h+='<div class="mnode'+(cur?' cur':'')+(unlocked?'':' locked')+'" data-k="'+id+'" title="'+tip+'"><span class="mdot" style="opacity:'+(0.2+0.8*c.p).toFixed(2)+'"></span><span class="mlab">'+c.label+'</span>'+(deep?'<span class="mbadge">deep</span>':'')+'<span class="mpct">'+(c.p>0.02?pct+'%':'')+'</span></div>';
-    });});
-  host.innerHTML=h;host.querySelectorAll('.mnode').forEach(function(n){n.onclick=function(){onNodeClick(n.dataset.k);};});}
+function renderGraph(){var host=document.getElementById('maplist');
+  if(host){var h='';
+    PHASES.forEach(function(ph){h+='<div class="mphase">'+ph.t+'</div><div class="mgroup">';
+      ph.ids.forEach(function(id,i){var c=concepts[id];if(!c)return;var unlocked=isUnlocked(id),cur=(id===ACTIVE),deep=(c.depth==='deep'),pct=Math.round(c.p*100);
+        var first=(i===0),last=(i===ph.ids.length-1);
+        var tip=(c.label+' — '+(deep?'deep dive':'preview')+' · '+pct+'% mastered'+(unlocked?'':' · locked')).replace(/"/g,'&quot;');
+        h+='<div class="mrow'+(cur?' cur':'')+(unlocked?'':' locked')+'" data-k="'+id+'" title="'+tip+'">'
+          +'<span class="mrail'+(first?' first':'')+(last?' last':'')+'"><span class="mline"></span><span class="mdot" style="transform:scale('+(0.7+0.6*c.p).toFixed(2)+')"></span></span>'
+          +'<span class="mlab">'+c.label+'</span>'
+          +(deep?'<span class="mbadge">deep</span>':'')
+          +'<span class="mpct">'+(c.p>0.02?pct+'%':'')+'</span></div>';
+      });
+      h+='</div>';});
+    host.innerHTML=h;
+    host.querySelectorAll('.mrow').forEach(function(n){n.onclick=function(){onNodeClick(n.dataset.k);};});}
   var jb=document.getElementById('journeybox');if(jb){var tot=0,dn=0,k;for(k in concepts){tot++;if(concepts[k].p>=UNLOCK)dn++;}var here=concepts[ACTIVE]?concepts[ACTIVE].label:'';
-    var nextId=null;for(var i=0;i<PLAYABLE.length;i++){if(concepts[PLAYABLE[i]].p<UNLOCK){nextId=PLAYABLE[i];break;}}
-    jb.innerHTML='<div class="jb-h">Your journey</div><div class="jb-bar"><i style="width:'+Math.round(dn/tot*100)+'%"></i></div><div class="jb-t">'+dn+' / '+tot+' concepts mastered</div><div class="jb-now">Now: <b>'+here+'</b></div>'+(nextId&&nextId!==ACTIVE?'<button class="jb-next" data-k="'+nextId+'">Next up: '+concepts[nextId].label+' \u2192</button>':'');
+    var nextId=null;for(var j=0;j<PLAYABLE.length;j++){if(concepts[PLAYABLE[j]].p<UNLOCK){nextId=PLAYABLE[j];break;}}
+    jb.innerHTML='<div class="jb-h">Your journey</div><div class="jb-bar"><i style="width:'+Math.round(dn/tot*100)+'%"></i></div><div class="jb-t">'+dn+' / '+tot+' concepts mastered</div><div class="jb-now">Now: <b>'+here+'</b></div>'+(nextId&&nextId!==ACTIVE?'<button class="jb-next" data-k="'+nextId+'">Next up: '+concepts[nextId].label+' →</button>':'');
     var nb=jb.querySelector('.jb-next');if(nb)nb.onclick=function(){loadEpisode(nb.dataset.k);};}
 }
 function onNodeClick(id){if(PLAYABLE.indexOf(id)>=0){if(id!==ACTIVE)loadEpisode(id);}}
@@ -373,7 +464,7 @@ function revealNext(){if(beatIdx>=beats.length)return;var b=beats[beatIdx];var w
   document.getElementById('progbar').style.width=Math.min(100,(beatIdx/beats.length)*100)+'%';
   setTimeout(function(){wrap.scrollIntoView({behavior:'smooth',block:'start'});},120);}
 function inlineContinue(host){var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn">Continue &darr;</button>';host.appendChild(c);c.querySelector('button').onclick=function(){c.remove();beatIdx++;revealNext();};}
-function chooser(host,msg){var c=document.createElement('div');c.className='continue';var idx=PLAYABLE.indexOf(ACTIVE),nxt=PLAYABLE[idx+1];var html='<div class="hint" style="margin-bottom:10px">'+(msg||'Where next?')+'</div><div class="btnrow">';if(nxt)html+='<button class="btn" data-k="'+nxt+'">'+(concepts[nxt]?concepts[nxt].label:nxt)+' &rarr;</button>';html+='<button class="btn ghost" data-map="1">&#9096; Open the map</button></div>';c.innerHTML=html;host.appendChild(c);c.querySelectorAll('button').forEach(function(btn){btn.onclick=function(){if(btn.dataset.map){var r=document.querySelector('.rail');if(r)r.classList.add('open');}else{loadEpisode(btn.dataset.k);}};});}
+function chooser(host,msg){var c=document.createElement('div');c.className='continue';var idx=PLAYABLE.indexOf(ACTIVE),nxt=PLAYABLE[idx+1];var html='<div class="hint" style="margin-bottom:10px">'+(msg||'Where next?')+'</div><div class="btnrow">';if(nxt)html+='<button class="btn" data-k="'+nxt+'">'+(concepts[nxt]?concepts[nxt].label:nxt)+' &rarr;</button>';if(typeof PRACTICE!=='undefined'&&practiceRemaining(ACTIVE)>0)html+='<button class="btn ghost" data-prac="1">&#43; Practice this ('+practiceRemaining(ACTIVE)+')</button>';html+='<button class="btn ghost" data-map="1">&#9096; Open the map</button></div>';c.innerHTML=html;host.appendChild(c);c.querySelectorAll('button').forEach(function(btn){btn.onclick=function(){if(btn.dataset.map){var r=document.querySelector('.rail');if(r)r.classList.add('open');}else if(btn.dataset.prac){c.remove();servePractice(ACTIVE,col);}else{loadEpisode(btn.dataset.k);}};});}
 
 function questionBeat(add,cfg){
   add('<div class="q"><div class="qk">'+cfg.k+'</div><div class="qtext">'+cfg.q+'</div>'+cfg.opts.map(function(o){return '<button class="opt" data-k="'+o.k+'">'+o.t+'</button>';}).join('')+'<div class="feedback" id="fb"></div></div>',
@@ -398,6 +489,264 @@ function offerDepth(key){var c=ACTIVE;var recFast=concepts[c].p>0.5||LEARNER.tie
 
 /* ===== EPISODES ===== */
 function lensBeat(add,so,tell,move){add('<div class="card lens"><div class="lskick">Strategist\u2019s Lens \u00b7 second-order &amp; business</div><div class="ls-row"><div class="ls-h">Second-order effect</div><div class="ls-b">'+so+'</div></div><div class="ls-row"><div class="ls-h">The tell \u2014 what to listen for</div><div class="ls-b">'+tell+'</div></div><div class="ls-row"><div class="ls-h">Your presales / solution-architecture move</div><div class="ls-b">'+move+'</div></div></div>');}
+
+var PRACTICE={
+computing:[
+ {q:"Which resource holds what a program is actively working on right now?",o:[["a","Storage (disk)"],["b","Memory (RAM)"],["c","The network card"]],c:"b",why:"RAM is the fast, temporary workspace; storage keeps data when the power is off."},
+ {q:"A cloud bill mostly decomposes into…",o:[["a","screen size and colour"],["b","compute, memory, storage and network"],["c","the number of apps installed"]],c:"b",why:"Every higher abstraction still bills back to these primitives."},
+ {q:"What does the CPU actually do?",o:[["a","stores files permanently"],["b","executes instructions one after another, very fast"],["c","connects to the internet"]],c:"b",why:"The processor runs the instructions that make up code."},
+ {q:"Why is RAM described as ‘volatile’?",o:[["a","it is dangerous"],["b","its contents vanish when power is lost"],["c","it never changes"]],c:"b",why:"RAM is temporary working memory; storage is the permanent copy."},
+ {q:"Doubling a workload usually means buying more…",o:[["a","monitors"],["b","compute/memory/storage"],["c","keyboards"]],c:"b",why:"Scaling any workload is ultimately buying more of the three primitives."}
+],
+networks:[
+ {q:"What turns a name like google.com into a machine address?",o:[["a","HTTP"],["b","DNS"],["c","RAM"]],c:"b",why:"DNS is the phone book mapping names to IP addresses."},
+ {q:"‘Latency’ refers to…",o:[["a","how much data per second"],["b","the round-trip time for a message"],["c","storage capacity"]],c:"b",why:"Latency is time; bandwidth is throughput."},
+ {q:"The web’s core pattern is…",o:[["a","client request → server response"],["b","server begs client for data"],["c","peers with no addresses"]],c:"a",why:"A client sends a request; a server returns a response, over HTTP."},
+ {q:"Why does geography matter for a real-time app?",o:[["a","it doesn’t"],["b","distance adds latency, capped partly by physics"],["c","servers dislike travel"]],c:"b",why:"Data can’t outrun light; co-locating reduces round-trip time."},
+ {q:"A message is sent across a network as…",o:[["a","one giant blob"],["b","labelled packets that are reassembled"],["c","sound waves"]],c:"b",why:"Packets are addressed and reassembled at the destination."}
+],
+servers:[
+ {q:"A server is fundamentally…",o:[["a","a special unbreakable machine"],["b","a computer whose job is to answer requests, always on"],["c","a type of network cable"]],c:"b",why:"It’s an ordinary computer dedicated to serving many requests."},
+ {q:"The operating system’s role is to…",o:[["a","design websites"],["b","referee many processes sharing one machine"],["c","store passwords only"]],c:"b",why:"The OS schedules processes so one machine serves many at once."},
+ {q:"Why is sizing a server ‘for peak’ wasteful?",o:[["a","peaks never happen"],["b","capacity sits idle most of the time"],["c","big servers are cheap"]],c:"b",why:"Idle capacity bought for rare peaks is the waste cloud solves."},
+ {q:"A ‘service’ is best described as…",o:[["a","a one-off script"],["b","a long-running process waiting to answer requests"],["c","a physical cable"]],c:"b",why:"Services stay running, listening for work."},
+ {q:"Concurrency on one machine is achieved by…",o:[["a","the OS switching between processes rapidly"],["b","adding more monitors"],["c","turning it off and on"]],c:"a",why:"Fast switching makes one machine feel like it does many things at once."}
+],
+virt:[
+ {q:"A container is lighter than a VM because it…",o:[["a","uses special hardware"],["b","shares the host OS and ships just the app"],["c","has no code"]],c:"b",why:"VMs carry a whole OS each; containers share the kernel."},
+ {q:"What problem do container images solve?",o:[["a","slow internet"],["b","‘it works on my machine’ — reproducible, portable deploys"],["c","weak passwords"]],c:"b",why:"Images package app + environment so it runs the same everywhere."},
+ {q:"A hypervisor is the layer that…",o:[["a","keeps virtual machines isolated on one box"],["b","designs logos"],["c","stores backups"]],c:"a",why:"It lets many VMs share hardware while staying isolated."},
+ {q:"Containers are the modern unit of…",o:[["a","deployment"],["b","email"],["c","spreadsheets"]],c:"a",why:"CI/CD, orchestration and even agent sandboxes assume containers."},
+ {q:"Compared to a container, a VM offers…",o:[["a","less isolation"],["b","stronger isolation but more weight"],["c","no isolation"]],c:"b",why:"VMs virtualize hardware — heavier but more isolated."}
+],
+cloud:[
+ {q:"The cloud’s core economic shift is…",o:[["a","bigger up-front hardware buys"],["b","capex → opex: pay for what you use"],["c","never thinking about cost"]],c:"b",why:"Elastic, usage-based billing replaces owning peak capacity."},
+ {q:"In IaaS vs PaaS vs SaaS, moving ‘up’ means…",o:[["a","more to manage"],["b","less to manage, less control"],["c","no difference"]],c:"b",why:"Higher up the stack you rent more managed surface."},
+ {q:"The second-order risk of elasticity is…",o:[["a","servers get bored"],["b","spend can scale without a ceiling"],["c","nothing"]],c:"b",why:"The knob that scales capacity also scales the bill."},
+ {q:"Regions and zones exist mainly to…",o:[["a","place capacity near users and add resilience"],["b","make billing harder"],["c","slow things down"]],c:"a",why:"Geography gives locality and fault isolation."},
+ {q:"The shared-responsibility model splits…",o:[["a","the electricity bill"],["b","security duties between provider and customer"],["c","the source code"]],c:"b",why:"A frequent gap: knowing what you must secure vs the provider."}
+],
+gcp:[
+ {q:"For a simple stateless service that should scale itself, start with…",o:[["a","GKE"],["b","Cloud Run"],["c","a physical server"]],c:"b",why:"Cloud Run gives scale without orchestration overhead."},
+ {q:"Which is Google Cloud’s analytics warehouse?",o:[["a","Cloud Storage"],["b","BigQuery"],["c","Compute Engine"]],c:"b",why:"BigQuery analyses huge tables; Cloud Storage holds objects/files."},
+ {q:"IAM in GCP is about…",o:[["a","who can do what (least privilege)"],["b","image editing"],["c","billing discounts"]],c:"a",why:"Identity and access management enforces least privilege."},
+ {q:"The compute ladder from least to most hands-on ops is…",o:[["a","Compute Engine → Cloud Run → GKE"],["b","Cloud Run → GKE → Compute Engine"],["c","GKE → Cloud Run → Compute Engine"]],c:"c",why:"GKE (orchestrated) is most involved; Cloud Run is managed; Compute Engine is a raw VM."},
+ {q:"Where do Google’s ML/model services live?",o:[["a","Vertex AI"],["b","Cloud DNS"],["c","the billing console"]],c:"a",why:"Vertex AI is the door to the ML/LLM Acts."}
+],
+data:[
+ {q:"The first qualifying question of most AI projects is…",o:[["a","which model is trendiest"],["b","do they have clean, accessible, permissioned data"],["c","how fast are the laptops"]],c:"b",why:"Data readiness gates feasibility more than model choice."},
+ {q:"An API is…",o:[["a","a defined way for systems to request data/actions"],["b","a type of monitor"],["c","a password"]],c:"a",why:"APIs are the integration fabric — and how agents call tools."},
+ {q:"JSON is…",o:[["a","a database brand"],["b","a simple text format for structured data"],["c","a programming language"]],c:"b",why:"JSON is the common payload format for web APIs."},
+ {q:"SQL vs NoSQL is a choice about…",o:[["a","screen colour"],["b","how data is structured and queried"],["c","internet speed"]],c:"b",why:"SQL uses structured tables; NoSQL trades structure for flexibility."},
+ {q:"Why is data governance (quality, PII) a bottleneck?",o:[["a","it isn’t"],["b","models are cheap; trustworthy, permissioned data is scarce"],["c","it makes servers faster"]],c:"b",why:"The scarce ingredient is usually usable, governed data."}
+],
+ml_why:[
+ {q:"Machine learning beats hand-written rules when…",o:[["a","the task is simple and fixed"],["b","patterns are messy and rules keep breaking"],["c","you have no data at all"]],c:"b",why:"ML learns patterns from data where explicit rules fail."},
+ {q:"ML is essentially…",o:[["a","learning patterns from examples"],["b","a giant if/else written by hand"],["c","a lookup table of answers"]],c:"a",why:"It generalises from examples rather than following coded rules."},
+ {q:"A good early sign ML is the wrong tool:",o:[["a","the rule is exact, simple and stable"],["b","the data is huge and messy"],["c","patterns shift constantly"]],c:"a",why:"For exact, stable logic, plain code is cheaper and clearer."},
+ {q:"‘Training’ an ML model means…",o:[["a","writing more rules by hand"],["b","adjusting the model from labelled examples"],["c","buying faster hardware"]],c:"b",why:"The model tunes itself to fit the examples."},
+ {q:"The business risk of reaching for ML too early is…",o:[["a","it always works"],["b","cost and complexity where simple rules would do"],["c","nothing"]],c:"b",why:"ML adds data + ops burden; use it only when rules break down."}
+],
+ml_landscape:[
+ {q:"‘Machine learning’ is best thought of as…",o:[["a","one algorithm"],["b","a family of very different tools"],["c","only neural networks"]],c:"b",why:"Picking the wrong family dooms a project early."},
+ {q:"Supervised learning needs…",o:[["a","labelled examples"],["b","no data"],["c","only rules"]],c:"a",why:"It learns a mapping from inputs to known answers."},
+ {q:"Unsupervised learning is used when…",o:[["a","you have labels for everything"],["b","there are no labels — find structure"],["c","you want to write rules"]],c:"b",why:"It discovers structure like clusters without answers to copy."},
+ {q:"Choosing the wrong ML family usually causes…",o:[["a","faster success"],["b","a project that fails before it starts"],["c","cheaper hardware"]],c:"b",why:"Fit of tool to problem is a first-order decision."},
+ {q:"Classification vs regression differ in…",o:[["a","the colour of the chart"],["b","predicting a category vs a number"],["c","the programming language"]],c:"b",why:"Classification outputs classes; regression outputs continuous values."}
+],
+ml_data:[
+ {q:"‘Features’ are…",o:[["a","the inputs the model learns from"],["b","bugs in the code"],["c","the server’s CPUs"]],c:"a",why:"Feature quality drives model quality more than the algorithm."},
+ {q:"A model quietly got worse though nobody changed the algorithm. Likely cause?",o:[["a","the data feed degraded (blanks/typos)"],["b","the monitor broke"],["c","the logo changed"]],c:"a",why:"Data quality is the real 80% of ML work."},
+ {q:"‘Garbage in, garbage out’ means…",o:[["a","models fix bad data automatically"],["b","poor input data yields poor predictions"],["c","data doesn’t matter"]],c:"b",why:"No algorithm rescues fundamentally bad inputs."},
+ {q:"Feature engineering is…",o:[["a","shaping raw data into useful inputs"],["b","buying more RAM"],["c","writing marketing copy"]],c:"a",why:"Good features encode the signal the model needs."},
+ {q:"Before modelling, the unglamorous priority is…",o:[["a","data cleaning and preparation"],["b","picking a logo"],["c","choosing office chairs"]],c:"a",why:"Most ML effort is data work, not modelling."}
+],
+ml_model:[
+ {q:"After training on 2 features, a simple model is essentially…",o:[["a","a boundary/line separating the classes"],["b","a video file"],["c","a spreadsheet macro"]],c:"a",why:"The model is the learned decision boundary."},
+ {q:"A model generalises when it…",o:[["a","memorises the training rows"],["b","performs well on new, unseen data"],["c","runs fast"]],c:"b",why:"Generalisation, not memorisation, is the goal."},
+ {q:"‘Parameters’ of a model are…",o:[["a","the adjustable numbers tuned in training"],["b","the office rules"],["c","the file names"]],c:"a",why:"Training sets these numbers to fit the data."},
+ {q:"A decision boundary separates…",o:[["a","classes in feature space"],["b","folders on disk"],["c","users by name"]],c:"a",why:"It’s the surface where the model changes its prediction."},
+ {q:"The model is only as good as…",o:[["a","its data and features"],["b","the desktop wallpaper"],["c","the font used"]],c:"a",why:"Inputs cap achievable quality."}
+],
+ml_train:[
+ {q:"Gradient descent finds a good model by…",o:[["a","random guessing once"],["b","following its own errors ‘downhill’ step by step"],["c","asking a human each time"]],c:"b",why:"It iteratively reduces error by adjusting parameters."},
+ {q:"The ‘loss’ measures…",o:[["a","how wrong the model currently is"],["b","internet speed"],["c","disk space"]],c:"a",why:"Training minimises loss."},
+ {q:"A learning rate that’s too high can…",o:[["a","overshoot and fail to settle"],["b","always be best"],["c","delete the data"]],c:"a",why:"Step size must be tuned; too big overshoots the minimum."},
+ {q:"Training is essentially…",o:[["a","tuning parameters to reduce error"],["b","buying more monitors"],["c","writing documentation"]],c:"a",why:"It’s optimisation over the model’s numbers."},
+ {q:"‘Convergence’ means…",o:[["a","the model settles near a good solution"],["b","the server crashed"],["c","the data doubled"]],c:"a",why:"Error stops improving meaningfully."}
+],
+ml_overfit:[
+ {q:"A model scores 100% on past data but fails on new data. That’s…",o:[["a","overfitting"],["b","underfitting"],["c","perfect"]],c:"a",why:"It memorised noise instead of the general pattern."},
+ {q:"To detect overfitting you…",o:[["a","test on held-out, unseen data"],["b","only look at training accuracy"],["c","ask the model nicely"]],c:"a",why:"A validation/test set reveals generalisation."},
+ {q:"Underfitting means the model…",o:[["a","is too simple to capture the pattern"],["b","memorised everything"],["c","is perfect"]],c:"a",why:"It hasn’t learned enough signal."},
+ {q:"A common cure for overfitting is…",o:[["a","more/representative data or simpler models"],["b","a bigger monitor"],["c","ignoring the test set"]],c:"a",why:"Regularisation, more data, or simpler models help it generalise."},
+ {q:"High training accuracy alone is…",o:[["a","proof of a great model"],["b","not enough — check unseen data"],["c","irrelevant always"]],c:"b",why:"Generalisation, not training fit, is what matters."}
+],
+ml_families:[
+ {q:"Which model draws a straight boundary?",o:[["a","linear model"],["b","deep neural network"],["c","none"]],c:"a",why:"Linear models separate with a straight boundary."},
+ {q:"Decision trees split data into…",o:[["a","axis-aligned regions by feature thresholds"],["b","random colours"],["c","email folders"]],c:"a",why:"Trees split on features; forests combine many trees."},
+ {q:"For arbitrarily curved boundaries you’d reach for…",o:[["a","neural networks"],["b","a single straight line"],["c","a spreadsheet"]],c:"a",why:"Neural nets compose layers to learn complex shapes."},
+ {q:"A random forest is…",o:[["a","many decision trees combined"],["b","one giant tree"],["c","a type of database"]],c:"a",why:"Ensembling trees improves robustness."},
+ {q:"Simpler models are often preferred when…",o:[["a","you need speed, interpretability or little data"],["b","never"],["c","only for images"]],c:"a",why:"Match model complexity to the problem and constraints."}
+],
+ml_neural:[
+ {q:"A single neuron does what?",o:[["a","stores a file"],["b","weighted sum of inputs → a switch (activation)"],["c","sends email"]],c:"b",why:"Weighted votes summed, then passed through an activation."},
+ {q:"‘Deep’ in deep learning refers to…",o:[["a","many stacked layers"],["b","how heavy the server is"],["c","dark colours"]],c:"a",why:"Depth = many layers, enabling hierarchical features."},
+ {q:"Learning in a neural net means…",o:[["a","tuning the weights on data"],["b","adding monitors"],["c","writing rules by hand"]],c:"a",why:"Training adjusts all the weights via gradient descent."},
+ {q:"A Transformer (the LLM engine) is…",o:[["a","a spreadsheet"],["b","a neural-network architecture"],["c","a database index"]],c:"b",why:"LLMs are large neural nets specialised for sequences."},
+ {q:"Neural nets trade transparency for…",o:[["a","power on messy, high-dimensional data"],["b","nothing"],["c","smaller data needs"]],c:"a",why:"They win on images/language but resist easy explanation and need more data/compute."}
+],
+ml_cluster:[
+ {q:"Clustering is used when…",o:[["a","there are no labels — group by similarity"],["b","every row is labelled"],["c","you want exact rules"]],c:"a",why:"Unsupervised grouping finds structure without answers."},
+ {q:"A business use of clustering is…",o:[["a","customer segmentation"],["b","exact tax calculation"],["c","sending email"]],c:"a",why:"Segments emerge from data without predefined labels."},
+ {q:"Unsupervised learning differs from supervised because it…",o:[["a","has no target answers to copy"],["b","needs more labels"],["c","is always better"]],c:"a",why:"There are no ‘correct’ labels to learn from."},
+ {q:"A risk with clusters is…",o:[["a","they’re always meaningful"],["b","they may not map to anything useful"],["c","they need no interpretation"]],c:"b",why:"Clusters need human interpretation to be actionable."},
+ {q:"k in k-means sets…",o:[["a","the number of clusters"],["b","the data size"],["c","the accuracy"]],c:"a",why:"You choose how many groups to find."}
+],
+ml_eval:[
+ {q:"With rare fraud, plain accuracy is misleading because…",o:[["a","a model flagging nothing still scores high"],["b","accuracy is always perfect"],["c","fraud is common"]],c:"a",why:"Class imbalance makes accuracy a poor metric."},
+ {q:"Precision measures…",o:[["a","of those flagged, how many were right"],["b","internet speed"],["c","disk usage"]],c:"a",why:"Precision = correct positives / all flagged."},
+ {q:"Recall measures…",o:[["a","of the real positives, how many you caught"],["b","the model’s colour"],["c","training time"]],c:"a",why:"Recall = caught positives / all actual positives."},
+ {q:"‘Deploy’ in ML includes…",o:[["a","serving, monitoring and handling drift"],["b","only training once"],["c","printing the code"]],c:"a",why:"MLOps keeps a live model healthy over time."},
+ {q:"Model drift is…",o:[["a","performance decay as the world changes"],["b","the server moving"],["c","a UI bug"]],c:"a",why:"Data shifts over time, so models need monitoring/retraining."}
+],
+ml_bias:[
+ {q:"A model rejected a whole neighbourhood though nobody coded that. Why?",o:[["a","it learned a bias present in the data"],["b","a network error"],["c","random chance only"]],c:"a",why:"Models faithfully learn biases baked into historical data."},
+ {q:"Fairness problems usually originate in…",o:[["a","the training data and labels"],["b","the monitor"],["c","the font"]],c:"a",why:"Biased history produces biased models."},
+ {q:"A responsible step before deploying is…",o:[["a","test outcomes across groups"],["b","ship and hope"],["c","hide the metrics"]],c:"a",why:"Check disparate impact, not just overall accuracy."},
+ {q:"High overall accuracy can still hide…",o:[["a","harm to specific subgroups"],["b","nothing"],["c","faster training"]],c:"a",why:"Aggregate metrics mask group-level failures."},
+ {q:"In regulated domains, models often need…",o:[["a","explainability and auditability"],["b","only speed"],["c","no oversight"]],c:"a",why:"Accountability requires being able to explain decisions."}
+],
+ml_biz:[
+ {q:"To a CFO, the strongest framing of a model is…",o:[["a","‘91% accurate’"],["b","‘retained revenue = customers saved × value − cost’"],["c","‘it uses deep learning’"]],c:"b",why:"Executives buy outcomes in currency, not accuracy."},
+ {q:"The first thing to qualify in an ML opportunity is…",o:[["a","the data and the value"],["b","the office location"],["c","the model brand"]],c:"a",why:"No data or no value means no project."},
+ {q:"A model’s accuracy matters only if…",o:[["a","it moves a business metric"],["b","it looks impressive"],["c","it’s a round number"]],c:"a",why:"Tie every metric to a decision or dollar."},
+ {q:"Scoping should default to…",o:[["a","the cheapest sufficient approach"],["b","the most complex model"],["c","whatever is trendiest"]],c:"a",why:"Right-size the solution to the problem and value."},
+ {q:"‘Value in currency’ means…",o:[["a","value delivered net of run cost"],["b","the model’s file size"],["c","the number of features"]],c:"a",why:"Frame ROI as benefit minus cost of running it."}
+],
+llm_why:[
+ {q:"An LLM is fundamentally…",o:[["a","a fact database it looks up"],["b","a model trained to predict the next token"],["c","a bundle of separate task models"]],c:"b",why:"One objective, scaled, yields broad competence."},
+ {q:"LLM generality comes from…",o:[["a","separate training per task"],["b","mastering one task (next-token) at scale"],["c","a huge if/else"]],c:"b",why:"Predicting text well forces general skills to emerge."},
+ {q:"‘We want AI for ten different things’ signals…",o:[["a","they’ve noticed LLM generality"],["b","a hardware fault"],["c","nothing"]],c:"a",why:"Your job is to prioritise, not enable everything at once."},
+ {q:"An LLM can be fluent and wrong because…",o:[["a","it predicts plausible text, not looked-up facts"],["b","the network is slow"],["c","it ran out of storage"]],c:"a",why:"No database underneath — just learned patterns."},
+ {q:"The same LLM does many jobs by…",o:[["a","changing the instruction (prompt), same weights"],["b","retraining each time"],["c","swapping servers"]],c:"a",why:"One set of weights, steered by the prompt."}
+],
+llm_tokens:[
+ {q:"A token is…",o:[["a","a whole document"],["b","a word or word-piece — the unit the model reads"],["c","a password"]],c:"b",why:"Models read and predict tokens, not letters or whole words."},
+ {q:"Tokens matter commercially because…",o:[["a","they set colour"],["b","you’re billed and memory-limited by them"],["c","they don’t"]],c:"b",why:"Token counts drive cost and context limits."},
+ {q:"Rare words, names and code tend to…",o:[["a","become a single token"],["b","split into more tokens"],["c","be ignored"]],c:"b",why:"Uncommon text fragments into more pieces."},
+ {q:"Mis-estimating tokens leads to…",o:[["a","mis-pricing the project"],["b","faster training"],["c","nothing"]],c:"a",why:"Cost scales with tokens, not requests."},
+ {q:"Cost usually scales with…",o:[["a","token count"],["b","number of buttons"],["c","screen size"]],c:"a",why:"Both input and output tokens are billed."}
+],
+llm_predict:[
+ {q:"When generating text, an LLM is really…",o:[["a","looking up the answer"],["b","predicting the next token, repeatedly"],["c","copying a database row"]],c:"b",why:"It samples plausible continuations step by step."},
+ {q:"‘Temperature’ controls…",o:[["a","randomness of the output"],["b","the server heat"],["c","the token price"]],c:"a",why:"Low = focused/consistent, high = varied/creative."},
+ {q:"Hallucination is rooted in the fact that the model optimises…",o:[["a","truth"],["b","plausibility (likelihood), not veracity"],["c","speed"]],c:"b",why:"It generates likely text, which can be confidently false."},
+ {q:"Because generation is probabilistic, the same prompt can…",o:[["a","give slightly different answers"],["b","always be identical"],["c","crash the server"]],c:"a",why:"Sampling introduces variation, tuned by temperature."},
+ {q:"‘Next-token prediction’ implies the model…",o:[["a","builds output piece by piece"],["b","reads your mind"],["c","stores every answer"]],c:"a",why:"Each token is chosen given the ones so far."}
+],
+llm_attention:[
+ {q:"Attention lets the model…",o:[["a","weigh which earlier words matter most"],["b","store files"],["c","connect to Wi-Fi"]],c:"a",why:"It focuses on relevant context when predicting."},
+ {q:"Longer context windows tend to…",o:[["a","cost more (compute scales with length)"],["b","be free"],["c","reduce quality always"]],c:"a",why:"Attention cost grows with context length — a cost lever."},
+ {q:"‘Context’ is best described as…",o:[["a","the model’s working memory, in tokens"],["b","the office"],["c","the training data"]],c:"a",why:"It’s all the text the model can consider at once."},
+ {q:"Attention is the core of which architecture?",o:[["a","the Transformer"],["b","a spreadsheet"],["c","a database"]],c:"a",why:"Transformers are built on attention."},
+ {q:"A practical reason to trim prompts is…",o:[["a","context length drives cost and limits"],["b","shorter looks nicer"],["c","no reason"]],c:"a",why:"Fewer tokens = lower cost and less overflow risk."}
+],
+llm_training:[
+ {q:"For answering from frequently-changing docs, reach first for…",o:[["a","fine-tuning a custom model"],["b","prompting/retrieval"],["c","building a new model"]],c:"b",why:"Prompting/retrieval is cheaper and stays current."},
+ {q:"Pretraining is…",o:[["a","the massive first phase learning language by next-token prediction"],["b","the final polish"],["c","a UI step"]],c:"a",why:"It builds broad language ability at scale."},
+ {q:"Fine-tuning is worth it mainly for…",o:[["a","style/format or a narrow task with good labelled data"],["b","every project"],["c","never"]],c:"a",why:"It’s costly; reserve it for where prompting won’t do."},
+ {q:"RLHF exists to…",o:[["a","make models more helpful/safe via human preferences"],["b","speed up the network"],["c","reduce token cost"]],c:"a",why:"Human feedback aligns model behaviour."},
+ {q:"A client insisting on ‘train our own model’ for simple prompting is likely…",o:[["a","about to overspend by an order of magnitude"],["b","making the cheap choice"],["c","always right"]],c:"a",why:"Default to the cheapest sufficient option first."}
+],
+llm_prompt:[
+ {q:"If you exceed the context window…",o:[["a","earlier content is dropped/truncated silently"],["b","the model gets smarter"],["c","cost goes to zero"]],c:"a",why:"Overflow means the model loses information quietly."},
+ {q:"A prompt is…",o:[["a","the input that steers what the model generates"],["b","a password"],["c","the training set"]],c:"a",why:"Prompt design shapes output quality."},
+ {q:"A reliable prompting tactic is…",o:[["a","clear instructions and relevant context"],["b","vaguer is better"],["c","never give examples"]],c:"a",why:"Specificity and good context improve results."},
+ {q:"The production symptom of context overflow is…",o:[["a","the model ‘forgetting’ earlier instructions"],["b","faster answers"],["c","lower cost"]],c:"a",why:"Dropped context degrades answers unpredictably."},
+ {q:"Few-shot prompting means…",o:[["a","showing a few examples in the prompt"],["b","training for a few hours"],["c","using few servers"]],c:"a",why:"Examples steer the model without retraining."}
+],
+llm_halluc:[
+ {q:"The best fix for making up company facts is…",o:[["a","grounding (retrieval), not just prompting"],["b","raising temperature"],["c","a bigger monitor"]],c:"a",why:"Give the model the real facts at answer time."},
+ {q:"Hallucination can be reduced but…",o:[["a","not fully eliminated"],["b","always eliminated"],["c","ignored safely"]],c:"a",why:"‘Zero hallucination’ isn’t an achievable spec — design trust-and-verify."},
+ {q:"Citations help because they…",o:[["a","let users verify the source"],["b","speed up the model"],["c","reduce token cost"]],c:"a",why:"Provenance builds trust and catches errors."},
+ {q:"Hallucination arises because the model optimises…",o:[["a","plausibility over truth"],["b","storage"],["c","latency"]],c:"a",why:"Fluent-but-false is the failure mode of likelihood-based generation."},
+ {q:"For high-stakes facts you should…",o:[["a","ground and verify, keep a human in the loop"],["b","trust the raw output"],["c","raise temperature"]],c:"a",why:"Design verification for consequential outputs."}
+],
+llm_eval:[
+ {q:"Many impressive LLM demos never ship because…",o:[["a","cost and reliability aren’t addressed"],["b","they’re too cheap"],["c","they’re too accurate"]],c:"a",why:"Demo ≠ production; economics and evaluation gate deployment."},
+ {q:"Model tier choice can swing the monthly bill by…",o:[["a","roughly 10×"],["b","never"],["c","1%"]],c:"a",why:"Quality vs cost vs latency is the core LLM trade-off."},
+ {q:"A production concern beyond accuracy is…",o:[["a","latency and cost per request"],["b","the logo"],["c","the office"]],c:"a",why:"Serving economics decide viability."},
+ {q:"Evaluating an LLM feature should include…",o:[["a","task-specific quality tests, not just vibes"],["b","only a single demo"],["c","nothing"]],c:"a",why:"Repeatable evals separate demo from deployable."},
+ {q:"Choosing a smaller model can be right when…",o:[["a","it meets quality at much lower cost/latency"],["b","never"],["c","only for images"]],c:"a",why:"Right-size the model to the task’s needs."}
+],
+llm_risk:[
+ {q:"For enterprise LLM deployments, guardrails are…",o:[["a","in-scope, not optional"],["b","a nice-to-have"],["c","irrelevant"]],c:"a",why:"Safety, privacy and governance are core scope."},
+ {q:"Prompt injection is a risk where…",o:[["a","malicious input hijacks the model’s instructions"],["b","the server overheats"],["c","tokens run out"]],c:"a",why:"Untrusted content can subvert behaviour — must be mitigated."},
+ {q:"Handling PII with LLMs requires…",o:[["a","governance and data controls"],["b","ignoring it"],["c","more tokens"]],c:"a",why:"Privacy obligations apply to model inputs/outputs."},
+ {q:"Guardrails typically act on…",o:[["a","inputs and outputs (filtering, checks)"],["b","the electricity"],["c","the font"]],c:"a",why:"You constrain what goes in and what comes out."},
+ {q:"Treating governance as an afterthought usually…",o:[["a","blocks the deal late and expensively"],["b","speeds delivery"],["c","has no effect"]],c:"a",why:"Enterprises gate on risk; design it in early."}
+],
+llm_biz:[
+ {q:"To qualify an LLM idea, check first…",o:[["a","data/source, value, and risk"],["b","the logo"],["c","the server brand"]],c:"a",why:"Qualification touches data readiness, value and risk."},
+ {q:"Framing value to a CFO means…",o:[["a","outcomes in currency (hours saved, revenue)"],["b","accuracy percentages"],["c","model names"]],c:"a",why:"Money, not metrics, gets funded."},
+ {q:"A strong presales move is to…",o:[["a","reframe ‘AI everywhere’ into a prioritised shortlist"],["b","enable every use case at once"],["c","avoid scoping"]],c:"a",why:"Sequence by value × feasibility × risk."},
+ {q:"The cheapest sufficient path for grounded answers is often…",o:[["a","prompting/RAG before fine-tuning"],["b","train from scratch"],["c","buy more GPUs"]],c:"a",why:"Reserve fine-tuning for where cheaper options fail."},
+ {q:"De-risking an LLM proposal includes…",o:[["a","governance, guardrails, human-in-the-loop"],["b","hiding the risks"],["c","ignoring PII"]],c:"a",why:"Name and mitigate risks to make it deployable."}
+],
+genai:[
+ {q:"Generative AI’s value is most reliable in…",o:[["a","draft-and-review, high-volume production"],["b","exact single-answer tasks"],["c","legally exact figures"]],c:"a",why:"It shines where a human reviews the output."},
+ {q:"Diffusion models generate images by…",o:[["a","starting from noise and denoising to match a prompt"],["b","looking up stock photos"],["c","scanning a printer"]],c:"a",why:"Iterative denoising builds the picture."},
+ {q:"A ‘foundation model’ is…",o:[["a","pretrained once at scale, adapted to many tasks"],["b","a small single-task model"],["c","a database"]],c:"a",why:"It amortises huge pretraining across uses."},
+ {q:"‘Multimodal’ means the model handles…",o:[["a","several media (text, image, audio) together"],["b","only text"],["c","only spreadsheets"]],c:"a",why:"It unifies multiple input/output types."},
+ {q:"A key governance concern for generative content is…",o:[["a","IP and provenance"],["b","screen brightness"],["c","keyboard layout"]],c:"a",why:"Ownership and source of generated content matter."}
+],
+embeddings:[
+ {q:"An embedding turns text into…",o:[["a","a vector positioned by meaning"],["b","a smaller font"],["c","a password"]],c:"a",why:"Similar meanings land close together in vector space."},
+ {q:"Embeddings enable search by…",o:[["a","meaning (semantic), not just keywords"],["b","file size"],["c","colour"]],c:"a",why:"Nearest vectors capture related meaning."},
+ {q:"A vector is…",o:[["a","a list of numbers used as coordinates"],["b","a type of server"],["c","a programming language"]],c:"a",why:"Embeddings place meaning at points in space."},
+ {q:"A vector database is used to…",o:[["a","store embeddings and find nearest ones fast"],["b","render video"],["c","send email"]],c:"a",why:"It powers similarity search at scale."},
+ {q:"Embeddings quietly underpin…",o:[["a","search, RAG, dedup, recommendation"],["b","only image editing"],["c","nothing useful"]],c:"a",why:"One capability unlocks several products."}
+],
+rag:[
+ {q:"For an assistant answering from a frequently-updated wiki, reach for…",o:[["a","RAG (retrieve + ground)"],["b","fine-tuning the wiki in"],["c","a bigger model only"]],c:"a",why:"Updatable, citable, no retraining as the wiki changes."},
+ {q:"RAG reduces hallucination by…",o:[["a","giving the model source facts at answer time"],["b","raising temperature"],["c","adding GPUs"]],c:"a",why:"Grounding anchors answers in provided evidence."},
+ {q:"In RAG, documents are first…",o:[["a","chunked and embedded into a vector store"],["b","deleted"],["c","printed"]],c:"a",why:"Chunks are retrieved by similarity at query time."},
+ {q:"RAG decouples…",o:[["a","knowledge (index) from reasoning (model)"],["b","screen from keyboard"],["c","nothing"]],c:"a",why:"You update the index without retraining the model."},
+ {q:"RAG quality is dominated by…",o:[["a","retrieval and chunking quality"],["b","the model’s colour"],["c","the font"]],c:"a",why:"Failure modes live in retrieval, not the LLM."}
+],
+agents:[
+ {q:"An agent adds which risk over a plain chatbot?",o:[["a","mistakes now take actions and compound"],["b","slightly more electricity"],["c","none"]],c:"a",why:"Acting gives errors consequences across steps."},
+ {q:"‘Function calling’ is really…",o:[["a","the model calling APIs (tools)"],["b","a phone feature"],["c","a database query language"]],c:"a",why:"Tools are APIs — the same request/response you know."},
+ {q:"The agent loop is…",o:[["a","plan → act → observe → repeat"],["b","train → deploy → forget"],["c","copy → paste"]],c:"a",why:"It iterates toward a goal using tools."},
+ {q:"For high-stakes, irreversible actions you should…",o:[["a","require human approval"],["b","fully automate"],["c","skip guardrails"]],c:"a",why:"Place the human where consequences are largest."},
+ {q:"Agent memory splits into…",o:[["a","short-term context and long-term store"],["b","RAM and monitors"],["c","fonts"]],c:"a",why:"Conversation context vs a durable lookup store."}
+],
+capstone:[
+ {q:"The winning solution arc is…",o:[["a","qualify → scope → value → de-risk"],["b","build → hope → invoice"],["c","demo → forget"]],c:"a",why:"That arc turns ‘we want AI’ into a funded programme."},
+ {q:"A reference AI solution typically spans…",o:[["a","data → model → RAG → agent on GCP, with governance"],["b","one spreadsheet"],["c","a single prompt"]],c:"a",why:"Real systems thread the whole stack under constraints."},
+ {q:"The easy half of solutioning is…",o:[["a","the technology; framing the outcome is harder"],["b","the business case"],["c","there is no hard half"]],c:"a",why:"Value framing, not tech, usually decides funding."},
+ {q:"Cost, security and governance should be…",o:[["a","first-class design constraints"],["b","afterthoughts"],["c","ignored"]],c:"a",why:"Enterprises gate on these; design them in."},
+ {q:"‘Value in currency’ for the capstone means…",o:[["a","value delivered minus run cost, risks named"],["b","the model’s size"],["c","the number of features"]],c:"a",why:"Executives fund outcomes in money, de-risked."}
+]
+};
+
+var PRACTICE_USED={};
+function practiceRemaining(cid){var a=PRACTICE[cid]||[];return a.length-(PRACTICE_USED[cid]||0);}
+function servePractice(cid,host){var arr=PRACTICE[cid]||[];var idx=PRACTICE_USED[cid]||0;if(idx>=arr.length)return;var cfg=arr[idx];PRACTICE_USED[cid]=idx+1;
+  var wrap=document.createElement('div');wrap.className='beat in';
+  wrap.innerHTML='<div class="q"><div class="qk">Extra practice · '+(concepts[cid]?concepts[cid].label:cid)+' · '+(idx+1)+'/'+arr.length+'</div><div class="qtext">'+cfg.q+'</div>'+cfg.o.map(function(o){return '<button class="opt" data-k="'+o[0]+'">'+o[1]+'</button>';}).join('')+'<div class="feedback" id="pfb"></div></div>';
+  (host||col).appendChild(wrap);
+  var opts=wrap.querySelectorAll('.opt'),fb=wrap.querySelector('#pfb'),answered=false;
+  opts.forEach(function(o){o.onclick=function(){if(answered)return;answered=true;var k=o.dataset.k,right=(k===cfg.c);
+    opts.forEach(function(x){x.classList.add('dim');if(x.dataset.k===cfg.c)x.classList.remove('dim');});
+    if(right){o.classList.add('correct');o.classList.remove('dim');bktUpdate(cid,true);fb.className='feedback ok show';fb.innerHTML='<div class="who"><span class="dot"></span>Aadi</div>'+cfg.why;}
+    else{o.classList.add('wrong');bktUpdate(cid,false);fb.className='feedback mis show';fb.innerHTML='<div class="who"><span class="dot"></span>Aadi</div>'+cfg.why;}
+    var c=document.createElement('div');c.className='continue';var more=practiceRemaining(cid)>0;var h='<div class="btnrow">';if(more)h+='<button class="btn ghost" data-more="1">Practice another →</button>';h+='<button class="btn" data-done="1">Where next?</button></div>';c.innerHTML=h;wrap.querySelector('.q').appendChild(c);
+    var mb=c.querySelector('[data-more]');if(mb)mb.onclick=function(){c.remove();servePractice(cid,col);};
+    var db=c.querySelector('[data-done]');if(db)db.onclick=function(){c.remove();chooser(col,'Where next?');};
+  };});
+  setTimeout(function(){wrap.scrollIntoView({behavior:'smooth',block:'start'});},100);}
 
 var EPISODES={
 ml_biz:{concept:"ml_biz",node:"Business Outcomes",act:"Act 7 · Machine Learning",title:"From ML to Business Outcomes",
@@ -1413,7 +1762,7 @@ function buildOverlays(){
   sp.innerHTML='<div class="splash-card"><div class="brand" style="justify-content:center"><b>ALOS</b><span>Adaptive Learning OS</span></div><h1 class="splash-h">Learn cloud &amp; AI the way it actually evolved.</h1><p class="splash-p">One continuous, adaptive book that takes you from a bare processor to autonomous AI agents — 34 concepts across 14 Acts, built for strategy &amp; solution roles. Machine Learning and Large Language Models are full deep dives; the rest are previews you can see the depth of on the map. It adapts to what you already know, and you can hover underlined terms for their meaning.</p><input id="nameInput" class="nameInput" placeholder="Your name (optional)" autocomplete="off"/><div class="diag">How much of cloud &amp; AI do you already know?</div><div class="diagrow" id="diagrow"><button data-t="support">New to it</button><button data-t="standard" class="on">Some idea</button><button data-t="fast">Comfortable</button></div><div class="btnrow" style="justify-content:center"><button class="btn" id="startBtn">Start the Act →</button><button class="btn ghost" id="helpFromSplash">How it works</button></div></div>';
   document.body.appendChild(sp);
   var hm=document.createElement('div');hm.className='overlay hidden';hm.id='helpModal';
-  hm.innerHTML='<div class="modal"><button class="modal-x" id="helpClose">✕</button><h2>How this works</h2><div class="step"><div class="si">1</div><div class="st"><b>Read the story, then play.</b> Each lesson is a short narrative with a hands-on interactive — a rules-tester, a classifier, gradient descent, overfitting, a confusion matrix.</div></div><div class="step"><div class="si">2</div><div class="st"><b>It adapts to you.</b> Your pace (Support / Standard / Fast) changes the explanations and question difficulty. Change it anytime via the badge under Aadi — and Aadi eases it automatically if you’re struggling.</div></div><div class="step"><div class="si">3</div><div class="st"><b>The left map is your progress.</b> All 34 concepts across 14 Acts light up as you master them. Hover a node to see its depth. Hover the left edge or tap MAP.</div></div><div class="step"><div class="si">4</div><div class="st"><b>Progress saves</b> automatically, and you earn XP. Underlined terms show a definition on hover/tap; a hands-on capstone shapes a real LLM solution.</div></div><div class="btnrow" style="margin-top:16px"><button class="btn" id="helpDone">Got it</button></div></div>';
+  hm.innerHTML='<div class="modal hiw"><button class="modal-x" id="helpClose">✕</button><h2>How ALOS works</h2><p class="hiw-sub">Every concept runs one quiet loop that adapts to you.</p><div class="hiw-loop"><div class="hiw-track"></div><div class="hiw-pulse"></div><div class="hiw-node n1"><div class="hd">📖</div><div class="hl">Read a beat</div></div><div class="hiw-node n2"><div class="hd">✔</div><div class="hl">Answer</div></div><div class="hiw-node n3"><div class="hd">◉</div><div class="hl">Mastery grows</div></div><div class="hiw-node n4"><div class="hd">🎚</div><div class="hl">Aadi adapts</div></div></div><div class="hiw-meters"><div class="hiw-m"><div class="hiw-mlab">Your mastery of this concept</div><div class="hiw-bar"><i></i></div></div><div class="hiw-m"><div class="hiw-mlab">Aadi tunes your pace</div><div class="hiw-pace"><span data-t="support">Support</span><span data-t="standard">Standard</span><span data-t="fast">Fast</span></div></div></div><div class="hiw-lines"><p><b>Read, then do.</b> Each concept is a short story with a hands-on interactive.</p><p><b>It adapts.</b> Your answers feed a real mastery model, and your pace shifts to match — automatically when you struggle.</p><p><b>The map is your journey.</b> 34 concepts across 14 Acts light up as you master them; hover any node to see its depth.</p><p><b>Everything saves.</b> Progress, XP and streak persist on this device; underlined terms define on hover.</p></div><div class="btnrow" style="margin-top:8px"><button class="btn" id="helpDone">Got it — start learning</button></div></div>';
   document.body.appendChild(hm);
   var chosen="standard";
   sp.querySelectorAll('#diagrow button').forEach(function(bt){bt.onclick=function(){sp.querySelectorAll('#diagrow button').forEach(function(x){x.classList.remove('on');});bt.classList.add('on');chosen=bt.dataset.t;};});
@@ -1421,7 +1770,7 @@ function buildOverlays(){
   sp.querySelector('#helpFromSplash').onclick=function(){hm.classList.remove('hidden');};
   hm.querySelector('#helpClose').onclick=function(){hm.classList.add('hidden');};
   hm.querySelector('#helpDone').onclick=function(){hm.classList.add('hidden');};
-  document.getElementById('helpFab').onclick=function(){hm.classList.remove('hidden');};
+  var _hf=document.getElementById('helpFab');if(_hf)_hf.onclick=function(){hm.classList.remove('hidden');};
 }
 
 function initApp(){
@@ -1440,6 +1789,7 @@ function initApp(){
   rail.addEventListener('mouseenter',function(){clearTimeout(t);});rail.addEventListener('mouseleave',function(){clearTimeout(t);t=setTimeout(cl,340);});
   if(mapBtn)mapBtn.addEventListener('click',function(){rail.classList.contains('open')?cl():op();});
   var _ml=document.getElementById('maplist');if(_ml)_ml.addEventListener('click',function(){setTimeout(cl,200);});
+  document.addEventListener('click',function(e){if(rail.classList.contains('open')&&!rail.contains(e.target)&&e.target!==mapBtn&&!(mapBtn&&mapBtn.contains&&mapBtn.contains(e.target))&&e.target!==handle&&!(handle&&handle.contains&&handle.contains(e.target))&&e.target!==edge)cl();});
 })();
 
 initApp();
@@ -1460,7 +1810,7 @@ initApp();
   function load(){try{return JSON.parse(localStorage.getItem(KEY)||"[]");}catch(e){return[];}}
   function save(a){try{localStorage.setItem(KEY,JSON.stringify(a));}catch(e){}}
   function ctx(){var loc="—",tier="";try{if(typeof ACTIVE!=="undefined"){loc=ACTIVE;if(typeof EPISODES!=="undefined"&&EPISODES[ACTIVE])loc=EPISODES[ACTIVE].title;if(typeof beatIdx!=="undefined")loc+=" (step "+(beatIdx+1)+")";}if(typeof LEARNER!=="undefined"&&LEARNER.tier)tier=LEARNER.tier;}catch(e){}return {loc:loc,tier:tier};}
-  var fab=document.createElement("button");fab.className="fabnote";fab.type="button";fab.innerHTML="✎ Note";document.body.appendChild(fab);
+  var fab=document.createElement("button");fab.className="fabnote";fab.type="button";fab.innerHTML="✎ Note";/* opened from the top-right menu, not floated */
   var ov=document.createElement("div");ov.className="overlay hidden";
   ov.innerHTML='<div class="modal" style="max-width:520px"><button class="modal-x" id="nX">✕</button><h2 style="font-family:var(--serif);font-weight:600;font-size:22px;margin:0 0 4px">Your testing notes</h2><div id="nCtx" style="font-size:12px;color:var(--ink-faint);margin-bottom:12px"></div><textarea id="nT" placeholder="Your detailed thought about this exact screen…"></textarea><div class="btnrow" style="margin-top:12px"><button class="btn" id="nS">Save note</button><button class="btn ghost" id="nCp">Copy all</button><button class="btn ghost" id="nDl">Download</button></div><div id="nCnt" style="font-size:12px;color:var(--ink-soft);margin-top:14px"></div><div id="nL" style="margin-top:8px;max-height:190px;overflow:auto"></div><div style="margin-top:14px;font-size:12px;color:var(--ink-faint)">Prefer a form? <a href="https://docs.google.com/forms/d/e/1FAIpQLSdtuQRxn_0VVbjmCUuTnP2CVSDi7zKbYfzZ-jf-lCsS7vlM5g/viewform" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;border-bottom:1px dotted var(--gold-soft)">Open the tester feedback form &#8599;</a></div><div style="margin-top:12px"><button id="nClr" style="background:none;border:none;color:var(--ink-faint);font-size:12px;cursor:pointer;text-decoration:underline">Clear all notes</button></div></div>';
   document.body.appendChild(ov);
@@ -1475,11 +1825,40 @@ initApp();
   ov.querySelector("#nCp").onclick=function(){var txt=toText();if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){if(typeof toast==="function")toast("<b>Copied</b> all notes to clipboard.");});}else{T.value=txt;T.select();}};
   ov.querySelector("#nDl").onclick=function(){try{var blob=new Blob([toText()],{type:"text/plain"});var url=URL.createObjectURL(blob);var a=document.createElement("a");a.href=url;a.download="alos-notes.txt";document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1000);}catch(e){ov.querySelector("#nCp").click();}};
   ov.querySelector("#nClr").onclick=function(){if(confirm("Delete all saved notes on this device?")){save([]);renderList();}};
+  window.__alosOpenNotes=function(){fab.onclick();};
 })();
 /* mobile pace chip */
 (function(){var m=document.getElementById("mTier");if(m){m.onclick=function(){var o=["support","standard","fast"];setTier(o[(o.indexOf(LEARNER.tier)+1)%3]);if(typeof toast==="function")toast("Pace updated — applies as you continue.");};}})();
 /* restored standalone Feedback button (stacked bottom-right, above Note) */
-(function(){var a=document.createElement('a');a.className='fbfab';a.href='https://docs.google.com/forms/d/e/1FAIpQLSdtuQRxn_0VVbjmCUuTnP2CVSDi7zKbYfzZ-jf-lCsS7vlM5g/viewform';a.target='_blank';a.rel='noopener';a.textContent='✦ Feedback';document.body.appendChild(a);})();
+/* feedback + note now live in the top-right menu */
+(function(){
+ var btn=document.getElementById('menuBtn'),brand=document.getElementById('brandBtn');
+ var form='https://docs.google.com/forms/d/e/1FAIpQLSdtuQRxn_0VVbjmCUuTnP2CVSDi7zKbYfzZ-jf-lCsS7vlM5g/viewform';
+ var p=document.createElement('div');p.className='menupanel hidden';p.id='menuPanel';
+ p.innerHTML='<button data-a="how"><span class="mi-ic">✦</span>How it works</button>'
+  +'<button data-a="map"><span class="mi-ic">⎈</span>Your journey (map)</button>'
+  +'<button data-a="pace"><span class="mi-ic">≡</span>Change pace</button>'
+  +'<div class="menu-sep"></div>'
+  +'<button data-a="note"><span class="mi-ic">✎</span>Leave a note</button>'
+  +'<button data-a="fb"><span class="mi-ic">✦</span>Feedback</button>'
+  +'<div class="menu-sep"></div>'
+  +'<button data-a="restart"><span class="mi-ic">↺</span>Restart progress</button>'
+  +'<div class="menu-about">ALOS · research preview</div>';
+ document.body.appendChild(p);
+ function openp(){var r=btn?btn.getBoundingClientRect():null;if(r){p.style.top=(r.bottom+8)+'px';p.style.right=(window.innerWidth-r.right)+'px';p.style.left='auto';}p.classList.remove('hidden');}function closep(){p.classList.add('hidden');}
+ function help(){var hm=document.getElementById('helpModal');if(hm)hm.classList.remove('hidden');}
+ if(btn)btn.onclick=function(e){e.stopPropagation();p.classList.contains('hidden')?openp():closep();};
+ if(brand)brand.onclick=function(){help();};
+ document.addEventListener('click',function(e){if(!p.contains(e.target)&&e.target!==btn&&!(btn&&btn.contains(e.target)))closep();});
+ p.querySelectorAll('button').forEach(function(b){b.onclick=function(){var a=b.dataset.a;closep();
+   if(a==='how')help();
+   else if(a==='map'){var r=document.querySelector('.rail');if(r)r.classList.add('open');}
+   else if(a==='pace'){var o=['support','standard','fast'];setTier(o[(o.indexOf(LEARNER.tier)+1)%3]);if(typeof toast==='function')toast('Pace set to <b>'+({support:'Support',standard:'Standard',fast:'Fast'}[LEARNER.tier])+'</b> — applies as you continue.');}
+   else if(a==='note'){if(window.__alosOpenNotes)window.__alosOpenNotes();}
+   else if(a==='fb'){window.open(form,'_blank','noopener');}
+   else if(a==='restart'){if(confirm('Restart — clear your saved progress on this device?')){try{localStorage.removeItem(LS_KEY);}catch(e){}location.reload();}}
+ };});
+})();
 </script>
 </body>
 </html>
