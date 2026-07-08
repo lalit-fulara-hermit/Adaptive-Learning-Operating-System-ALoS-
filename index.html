@@ -322,6 +322,32 @@
 #maplist .mpct{font-size:10.5px;color:var(--ink-faint);font-family:var(--mono,ui-monospace,monospace);min-width:24px;text-align:right;flex:0 0 auto}
 .act-tag{flex:0 0 auto}
 </style>
+<style>
+.jmodal{max-width:560px;max-height:84vh;overflow:auto}
+.jmodal h2{margin:0 0 14px}
+.j-top{margin-bottom:12px}
+.j-name{font-size:18px;font-weight:600;color:#fff}
+.j-sub{font-size:12.5px;color:var(--ink-soft);margin-top:3px}
+.j-overallbar{height:10px;background:var(--line);border-radius:6px;overflow:hidden;margin-bottom:6px}
+.j-overallbar>i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--glow))}
+.j-overtxt{font-size:12px;color:var(--ink-faint);margin-bottom:16px}
+.j-overtxt b{color:var(--ink)}
+.j-continue{margin-bottom:20px}
+.j-ph{margin-bottom:16px}
+.j-ph-h{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;font-weight:700}
+.j-ph-c{color:var(--ink-faint);font-weight:400}
+.j-ph-bar{height:5px;background:var(--line);border-radius:5px;overflow:hidden;margin-bottom:10px}
+.j-ph-bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-soft),var(--glow))}
+.j-chips{display:flex;flex-wrap:wrap;gap:6px}
+.j-chip{display:inline-flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--line);color:var(--ink-soft);border-radius:999px;padding:5px 11px;font-size:12px;cursor:pointer;font-family:var(--sans)}
+.j-chip:hover{border-color:var(--gold-soft);color:#fff}
+.j-cdot{width:7px;height:7px;border-radius:50%;background:var(--ink-faint);flex:0 0 auto}
+.j-chip.done .j-cdot{background:var(--green)}
+.j-chip.prog .j-cdot{background:var(--gold)}
+.j-chip.open .j-cdot{background:var(--glow)}
+.j-chip.lock{opacity:.5}
+.j-cpct{color:var(--ink-faint);font-size:10.5px;font-family:var(--mono,ui-monospace,monospace)}
+</style>
 </head>
 <body>
 <div class="app">
@@ -1836,7 +1862,7 @@ initApp();
  var form='https://docs.google.com/forms/d/e/1FAIpQLSdtuQRxn_0VVbjmCUuTnP2CVSDi7zKbYfzZ-jf-lCsS7vlM5g/viewform';
  var p=document.createElement('div');p.className='menupanel hidden';p.id='menuPanel';
  p.innerHTML='<button data-a="how"><span class="mi-ic">✦</span>How it works</button>'
-  +'<button data-a="map"><span class="mi-ic">⎈</span>Your journey (map)</button>'
+  +'<button data-a="map"><span class="mi-ic">⎈</span>Your journey</button>'
   +'<button data-a="pace"><span class="mi-ic">≡</span>Change pace</button>'
   +'<div class="menu-sep"></div>'
   +'<button data-a="note"><span class="mi-ic">✎</span>Leave a note</button>'
@@ -1852,12 +1878,41 @@ initApp();
  document.addEventListener('click',function(e){if(!p.contains(e.target)&&e.target!==btn&&!(btn&&btn.contains(e.target)))closep();});
  p.querySelectorAll('button').forEach(function(b){b.onclick=function(){var a=b.dataset.a;closep();
    if(a==='how')help();
-   else if(a==='map'){var r=document.querySelector('.rail');if(r)r.classList.add('open');}
+   else if(a==='map'){if(window.__alosOpenJourney)window.__alosOpenJourney();}
    else if(a==='pace'){var o=['support','standard','fast'];setTier(o[(o.indexOf(LEARNER.tier)+1)%3]);if(typeof toast==='function')toast('Pace set to <b>'+({support:'Support',standard:'Standard',fast:'Fast'}[LEARNER.tier])+'</b> — applies as you continue.');}
    else if(a==='note'){if(window.__alosOpenNotes)window.__alosOpenNotes();}
    else if(a==='fb'){window.open(form,'_blank','noopener');}
    else if(a==='restart'){if(confirm('Restart — clear your saved progress on this device?')){try{localStorage.removeItem(LS_KEY);}catch(e){}location.reload();}}
  };});
+})();
+/* ===== Your journey: a real progress view ===== */
+(function(){
+  var ov=document.createElement('div');ov.className='overlay hidden';
+  ov.innerHTML='<div class="modal jmodal"><button class="modal-x" id="jX">✕</button><h2>Your journey</h2><div id="jBody"></div><div class="btnrow" style="margin-top:16px"><button class="btn ghost" id="jMap">Open the visual map ↞</button><button class="btn" id="jClose2">Close</button></div></div>';
+  document.body.appendChild(ov);
+  var body=ov.querySelector('#jBody');
+  function pct(x){return Math.round(x*100);}
+  function openJourney(){
+    var tot=0,dn=0,inprog=0,k;for(k in concepts){tot++;var pp=concepts[k].p;if(pp>=UNLOCK)dn++;else if(pp>0.02)inprog++;}
+    var lvl=(typeof levelOf==='function')?levelOf(STATE.xp):1;
+    var nextId=null,i;for(i=0;i<PLAYABLE.length;i++){if(concepts[PLAYABLE[i]].p<UNLOCK){nextId=PLAYABLE[i];break;}}
+    var h='<div class="j-top"><div class="j-name">'+((STATE.name||'Explorer'))+'</div><div class="j-sub">Level '+lvl+' · '+STATE.xp+' XP · 🔥 '+STATE.streak+' · pace: '+({support:'Support',standard:'Standard',fast:'Fast'}[LEARNER.tier]||'Standard')+'</div></div>';
+    h+='<div class="j-overallbar"><i style="width:'+pct(dn/tot)+'%"></i></div><div class="j-overtxt"><b>'+dn+'</b> mastered · '+inprog+' in progress · '+tot+' total</div>';
+    if(nextId)h+='<button class="btn j-continue" data-k="'+nextId+'">Continue: '+concepts[nextId].label+' →</button>';
+    PHASES.forEach(function(ph){var ptt=0,pdd=0;ph.ids.forEach(function(id){ptt++;if(concepts[id].p>=UNLOCK)pdd++;});
+      h+='<div class="j-ph"><div class="j-ph-h"><span>'+ph.t+'</span><span class="j-ph-c">'+pdd+'/'+ptt+'</span></div><div class="j-ph-bar"><i style="width:'+pct(pdd/ptt)+'%"></i></div><div class="j-chips">';
+      ph.ids.forEach(function(id){var c=concepts[id],unlocked=isUnlocked(id),pp=c.p;var st=pp>=UNLOCK?'done':(pp>0.02?'prog':(unlocked?'open':'lock'));
+        h+='<button class="j-chip '+st+'" data-k="'+id+'"><span class="j-cdot"></span>'+c.label+'<span class="j-cpct">'+(pp>0.02?pct(pp)+'%':'')+'</span></button>';});
+      h+='</div></div>';});
+    body.innerHTML=h;
+    body.querySelectorAll('[data-k]').forEach(function(b){b.onclick=function(){var id=b.dataset.k;ov.classList.add('hidden');if(typeof EPISODES!=='undefined'&&EPISODES[id])loadEpisode(id);};});
+    ov.classList.remove('hidden');
+  }
+  ov.querySelector('#jX').onclick=function(){ov.classList.add('hidden');};
+  ov.querySelector('#jClose2').onclick=function(){ov.classList.add('hidden');};
+  ov.querySelector('#jMap').onclick=function(){ov.classList.add('hidden');setTimeout(function(){var r=document.querySelector('.rail');if(r)r.classList.add('open');},40);};
+  ov.addEventListener('click',function(e){if(e.target===ov)ov.classList.add('hidden');});
+  window.__alosOpenJourney=openJourney;
 })();
 </script>
 </body>
