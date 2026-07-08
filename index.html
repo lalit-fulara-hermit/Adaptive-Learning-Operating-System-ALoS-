@@ -402,7 +402,8 @@ var concepts={
   ml_cluster:{label:"Unsupervised",p:0.0,depth:"deep",prereq:["ml_neural"]},
   ml_eval:{label:"Evaluate & Deploy",p:0.0,depth:"deep",prereq:["ml_cluster"]},
   ml_bias:{label:"Bias & Fairness",p:0.0,depth:"deep",prereq:["ml_eval"]},
-  ml_biz:{label:"ML Business Outcomes",p:0.0,depth:"deep",prereq:["ml_bias"]},
+  ml_ops:{label:"MLOps & Lifecycle",p:0.0,depth:"deep",prereq:["ml_bias"]},
+  ml_biz:{label:"ML Business Outcomes",p:0.0,depth:"deep",prereq:["ml_ops"]},
   llm_why:{label:"Why LLMs",p:0.0,depth:"deep",prereq:["ml_biz"]},
   llm_tokens:{label:"Tokens",p:0.0,depth:"deep",prereq:["llm_why"]},
   llm_predict:{label:"Next-Token",p:0.0,depth:"deep",prereq:["llm_tokens"]},
@@ -410,23 +411,24 @@ var concepts={
   llm_training:{label:"How They’re Made",p:0.0,depth:"deep",prereq:["llm_attention"]},
   llm_prompt:{label:"Prompting",p:0.0,depth:"deep",prereq:["llm_training"]},
   llm_halluc:{label:"Hallucination",p:0.0,depth:"deep",prereq:["llm_prompt"]},
-  llm_eval:{label:"Eval & Economics",p:0.0,depth:"deep",prereq:["llm_halluc"]},
+  llm_approach:{label:"Prompt·RAG·Fine-tune",p:0.0,depth:"deep",prereq:["llm_halluc"]},
+  llm_eval:{label:"Eval & Economics",p:0.0,depth:"deep",prereq:["llm_approach"]},
   llm_risk:{label:"Risk & Governance",p:0.0,depth:"deep",prereq:["llm_eval"]},
   llm_biz:{label:"LLM Business Outcomes",p:0.0,depth:"deep",prereq:["llm_risk"]},
   genai:{label:"Generative AI",p:0.0,depth:"preview",prereq:["llm_biz"]},
-  embeddings:{label:"Embeddings",p:0.0,depth:"preview",prereq:["genai"]},
-  rag:{label:"RAG",p:0.0,depth:"preview",prereq:["embeddings"]},
-  agents:{label:"Agentic AI",p:0.0,depth:"preview",prereq:["rag"]},
+  embeddings:{label:"Embeddings",p:0.0,depth:"deep",prereq:["genai"]},
+  rag:{label:"RAG",p:0.0,depth:"deep",prereq:["embeddings"]},
+  agents:{label:"Agentic AI",p:0.0,depth:"deep",prereq:["rag"]},
   capstone:{label:"Capstone",p:0.0,depth:"preview",prereq:["agents"]}
 };
 var PHASES=[
  {t:"Foundations",ids:["computing","networks","servers","virt"]},
  {t:"Cloud & Data",ids:["cloud","gcp","data"]},
- {t:"Machine Learning · deep dive",ids:["ml_why","ml_landscape","ml_data","ml_model","ml_train","ml_overfit","ml_families","ml_neural","ml_cluster","ml_eval","ml_bias","ml_biz"]},
- {t:"Large Language Models · deep dive",ids:["llm_why","llm_tokens","llm_predict","llm_attention","llm_training","llm_prompt","llm_halluc","llm_eval","llm_risk","llm_biz"]},
- {t:"Applied AI",ids:["genai","embeddings","rag","agents","capstone"]}
+ {t:"Machine Learning · deep dive",ids:["ml_why","ml_landscape","ml_data","ml_model","ml_train","ml_overfit","ml_families","ml_neural","ml_cluster","ml_eval","ml_bias","ml_ops","ml_biz"]},
+ {t:"Large Language Models · deep dive",ids:["llm_why","llm_tokens","llm_predict","llm_attention","llm_training","llm_prompt","llm_halluc","llm_approach","llm_eval","llm_risk","llm_biz"]},
+ {t:"Applied GenAI · deep dive",ids:["genai","embeddings","rag","agents","capstone"]}
 ];
-var UNLOCK=0.75, PLAYABLE=["computing","networks","servers","virt","cloud","gcp","data","ml_why","ml_landscape","ml_data","ml_model","ml_train","ml_overfit","ml_families","ml_neural","ml_cluster","ml_eval","ml_bias","ml_biz","llm_why","llm_tokens","llm_predict","llm_attention","llm_training","llm_prompt","llm_halluc","llm_eval","llm_risk","llm_biz","genai","embeddings","rag","agents","capstone"];
+var UNLOCK=0.75, PLAYABLE=["computing","networks","servers","virt","cloud","gcp","data","ml_why","ml_landscape","ml_data","ml_model","ml_train","ml_overfit","ml_families","ml_neural","ml_cluster","ml_eval","ml_bias","ml_ops","ml_biz","llm_why","llm_tokens","llm_predict","llm_attention","llm_training","llm_prompt","llm_halluc","llm_approach","llm_eval","llm_risk","llm_biz","genai","embeddings","rag","agents","capstone"];
 var misconceptions={}, ACTIVE="llm_why";
 var LEARNER={tier:"standard"};
 function tierPick(o){return o[LEARNER.tier]!==undefined?o[LEARNER.tier]:o.standard;}
@@ -517,6 +519,18 @@ function offerDepth(key){var c=ACTIVE;var recFast=concepts[c].p>0.5||LEARNER.tie
 function lensBeat(add,so,tell,move){add('<div class="card lens"><div class="lskick">Strategist\u2019s Lens \u00b7 second-order &amp; business</div><div class="ls-row"><div class="ls-h">Second-order effect</div><div class="ls-b">'+so+'</div></div><div class="ls-row"><div class="ls-h">The tell \u2014 what to listen for</div><div class="ls-b">'+tell+'</div></div><div class="ls-row"><div class="ls-h">Your presales / solution-architecture move</div><div class="ls-b">'+move+'</div></div></div>');}
 
 var PRACTICE={
+ml_ops:[
+ {q:"A live model’s accuracy falls over months with no code change. The cause is usually…",o:[["a","the code wearing out"],["b","data/concept drift"],["c","a slow server"]],c:"b",why:"The world moves; live data drifts from what the model learned."},
+ {q:"MLOps mainly adds which cost to a project?",o:[["a","a one-off build cost"],["b","a recurring monitor + retrain cost"],["c","no cost"]],c:"b",why:"Run/monitor/retrain is the ongoing bill, usually larger than the build."},
+ {q:"The point of monitoring a model is to…",o:[["a","make it faster"],["b","catch drift before users do"],["c","shrink its size"]],c:"b",why:"You want to detect decay early, not from complaints."},
+ {q:"Retraining a model means…",o:[["a","rewriting the app"],["b","fitting it again on fresh, recent data"],["c","buying a new server"]],c:"b",why:"Fresh data lets it relearn today’s patterns."}
+],
+llm_approach:[
+ {q:"Default order of levers, cheapest first, is…",o:[["a","fine-tune → RAG → prompt"],["b","prompt → RAG → fine-tune"],["c","pretrain → prompt → RAG"]],c:"b",why:"Escalate only when a cheaper lever provably can’t do the job."},
+ {q:"Answers from private, frequently-changing docs with citations →",o:[["a","RAG"],["b","fine-tune"],["c","pretrain"]],c:"a",why:"Updatable, citable knowledge is RAG’s home."},
+ {q:"A consistent brand voice / fixed format at scale →",o:[["a","prompt only"],["b","fine-tune"],["c","RAG"]],c:"b",why:"Behaviour/style the prompt keeps drifting on is the fine-tune case."},
+ {q:"Fine-tuning is the wrong tool for…",o:[["a","teaching fresh, changing facts"],["b","style/format consistency"],["c","a narrow skill"]],c:"a",why:"Facts baked into weights go stale and lack sources — use RAG."}
+],
 computing:[
  {q:"Which resource holds what a program is actively working on right now?",o:[["a","Storage (disk)"],["b","Memory (RAM)"],["c","The network card"]],c:"b",why:"RAM is the fast, temporary workspace; storage keeps data when the power is off."},
  {q:"A cloud bill mostly decomposes into…",o:[["a","screen size and colour"],["b","compute, memory, storage and network"],["c","the number of apps installed"]],c:"b",why:"Every higher abstraction still bills back to these primitives."},
@@ -775,6 +789,90 @@ function servePractice(cid,host){var arr=PRACTICE[cid]||[];var idx=PRACTICE_USED
   setTimeout(function(){wrap.scrollIntoView({behavior:'smooth',block:'start'});},100);}
 
 var EPISODES={
+ml_ops:{concept:"ml_ops",node:"MLOps & Lifecycle",act:"Act 7 · Machine Learning",title:"MLOps — The Model Is a Living System",
+  intro:"Priya’s fraud model shipped at 92% and the team moved on. Eleven weeks later it’s quietly at 74% — and nobody changed a line of code. A model isn’t a deliverable you hand over; it’s a system you keep alive. This is the lesson that pays the bills.",
+  build:function(){var b=[];var add=function(h,g){b.push({html:h,gate:g});};
+    add('<div class="kicker">Retail startup · eleven weeks later</div><h1>The model that decayed on its own</h1><p class="lead">Nobody touched the code, yet the fraud model’s accuracy slid week after week. The world moved on: new products, new fraud tactics, new customer behaviour. The data it sees today no longer looks like the data it learned from. That silent slide is <strong>drift</strong> — and it is the normal fate of every deployed model.</p><p>Launch day isn’t the finish line. It’s the moment the real cost starts.</p>');
+    add('<span class="tierflag">'+({support:"Support pace",standard:"Standard pace",fast:"Fast pace"}[LEARNER.tier]||"Standard pace")+'</span>'+tierPick({
+      support:'<div class="kicker">First principles</div><h2>Ship → watch → refresh, forever</h2><p>A model learns the world <em>as it was</em> during training. But the world keeps changing — that change is called <strong>drift</strong>. So a live model needs three never-ending jobs. <strong>Monitor</strong>: watch its accuracy and its inputs so you spot the slide early — not from an angry customer. <strong>Alert</strong>: draw a line (“if accuracy drops below 85%, tell us”). <strong>Retrain</strong>: feed it fresh, recent data so it relearns today’s patterns, then redeploy. Ship, watch, refresh — that loop never ends, and running it well is called <strong>MLOps</strong>. The lesson for costing a project: the <em>build</em> is a one-off; the <em>keeping-it-alive</em> is the recurring bill, and it usually dwarfs the build.</p>',
+      standard:'<div class="kicker">First principles</div><h2>The model lifecycle</h2><p>Training captures a snapshot; production is a moving target. <strong>Data drift</strong> (inputs shift) and <strong>concept drift</strong> (the input→output relationship shifts) degrade any live model. MLOps keeps it healthy: <strong>monitoring</strong> (accuracy plus input distributions), <strong>alerting</strong> on an SLA/threshold, scheduled or triggered <strong>retraining</strong> on fresh data, and versioned redeploy (a model registry) through a repeatable pipeline. Build is one-off and capex-like; monitoring and retraining are the recurring operating cost.</p>',
+      fast:'<div class="kicker">First principles</div><h2>Production ML as an operating system</h2><p>Deployed models decay via data/concept drift; performance is non-stationary. MLOps = monitoring (perf + distributional), alerting on SLOs, automated retraining/validation, model registry with versioned rollout (canary/shadow), reproducible feature/pipeline, and rollback. TCO is dominated by the run loop (observability, retraining compute, data pipeline, on-call), not the initial fit. A model is a liability with an SLA, not a static artifact.</p>'}));
+    add('<div class="card"><div class="kicker">Watch it drift — then fix it</div><h2>Run the model in production</h2><p class="hint">Advance the weeks and watch accuracy drift down as the world changes. Retrain to recover it — and watch the running cost tick up. That cycle <em>is</em> the real cost of ML.</p><canvas id="mlopscv" width="600" height="220" style="width:100%;height:auto;background:#0b0f1b;border:1px solid var(--line-soft);border-radius:12px"></canvas><div style="display:flex;flex-wrap:wrap;gap:18px;margin:10px 0;font-size:13px"><span>Accuracy: <b id="mlacc" style="color:var(--green)">92%</b></span><span>Week: <b id="mlwk">0</b></span><span>Retrains: <b id="mlrt">0</b></span><span>Run cost: <b id="mlcost" style="color:var(--xp)">£0</b></span></div><div class="btnrow"><button class="btn" id="mladv">Advance week</button><button class="btn ghost" id="mlretrain">Retrain (£8k)</button></div><div class="binmsg" id="mlopsmsg" style="margin-top:10px"></div></div>',
+      function(wrap,done){
+        var cv=wrap.querySelector('#mlopscv'),ctx=cv.getContext('2d'),W=600,H=220;
+        var acc=[0.92],wk=0,retr=0,cost=0,alerted=false,did=false;
+        var accEl=wrap.querySelector('#mlacc'),wkEl=wrap.querySelector('#mlwk'),rtEl=wrap.querySelector('#mlrt'),costEl=wrap.querySelector('#mlcost'),msg=wrap.querySelector('#mlopsmsg');
+        function py(a){return H-20-(a-0.5)/0.5*(H-40);}
+        function draw(){ctx.clearRect(0,0,W,H);
+          var y85=py(0.85);ctx.strokeStyle='rgba(244,63,94,.5)';ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(40,y85);ctx.lineTo(W-10,y85);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='rgba(244,63,94,.85)';ctx.font='11px monospace';ctx.fillText('SLA 85%',44,y85-5);
+          var span=Math.max(11,acc.length-1);
+          ctx.strokeStyle='#5cc8ff';ctx.lineWidth=2;ctx.beginPath();
+          acc.forEach(function(a,i){var x=40+(i/span)*(W-60),y=py(a);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);});ctx.stroke();
+          acc.forEach(function(a,i){var x=40+(i/span)*(W-60),y=py(a);ctx.fillStyle=a<0.85?'#f43f5e':'#34d399';ctx.beginPath();ctx.arc(x,y,3,0,7);ctx.fill();});}
+        function upd(){var a=acc[acc.length-1];accEl.textContent=Math.round(a*100)+'%';accEl.style.color=a<0.85?'var(--red)':'var(--green)';wkEl.textContent=wk;rtEl.textContent=retr;costEl.textContent='£'+(cost/1000)+'k';draw();}
+        draw();upd();
+        wrap.querySelector('#mladv').onclick=function(){if(wk>=11)return;wk++;var a=Math.max(0.55,acc[acc.length-1]-(0.02+Math.random()*0.03));acc.push(a);cost+=500;upd();
+          if(a<0.85&&!alerted){alerted=true;msg.className='binmsg';msg.innerHTML='🔔 <b>Alert:</b> accuracy crossed the 85% SLA. In the real world you catch this from your <b>monitoring</b> — or from a furious customer. Retrain to recover.';}};
+        wrap.querySelector('#mlretrain').onclick=function(){retr++;cost+=8000;var a=Math.min(0.93,acc[acc.length-1]+0.15+Math.random()*0.05);acc.push(a);wk++;alerted=false;upd();
+          msg.className='binmsg ok';msg.innerHTML='✓ Retrained on fresh data — accuracy recovers. But watch the <b>run cost</b> climb: monitoring + retraining is the bill that never stops, and it’s the line you must scope and price.';
+          if(!did){did=true;bktUpdate('ml_ops',true);mentor("This loop — drift, detect, retrain — is the real ML product. Scope it and you win the renewal; ignore it and the model quietly dies in month three.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}};
+        mentor("Advance a few weeks first — watch the line fall toward the SLA on its own.");});
+    lensBeat(add,
+      "A model is the only deliverable that gets <em>worse</em> after you ship it — silently, with no code change. That single fact turns an AI project from a one-off build into an operating commitment (monitoring, retraining compute, data pipelines, on-call), which is usually the larger, recurring cost.",
+      "A client budgeting only to “build the model,” with no line for monitoring or retraining, is pricing a car and forgetting the fuel, insurance and servicing. Ask “what happens in month four?” and listen for the silence.",
+      "Scope and price the <b>lifecycle</b>, not the model: put monitoring, drift alerting, a retraining cadence and rollback in the proposal as core scope. It’s better margin, it’s stickier (the renewal lives here), and it’s the honest answer — an unmaintained model will fail in production.");
+    questionBeat(add,{concept:"ml_ops",k:"Check · why models decay",
+      q:tierPick({support:"A deployed model’s accuracy falls over months although no code changed. The usual cause is…",standard:"A live model degrades over time with no code change. Most likely cause?",fast:"Non-stationary production performance with a fixed model is chiefly due to…"}),
+      opts:[{k:"a",t:"The code slowly wears out."},{k:"b",t:"<b>Drift</b> — the live data no longer matches the training data."},{k:"c",t:"The server got slower."}],
+      correct:"b",flag:"drift",
+      right:"Right. The world moves, the data shifts, and a frozen model falls behind — so you monitor and retrain. That loop is MLOps, and it’s the recurring cost you must scope.",
+      rightSay:"That instinct — models decay, plan for it — is what separates a proposal that survives contact with production from one that doesn’t.",
+      wrongDefault:"Code doesn’t wear out. The <b>data</b> drifts away from what the model learned — so accuracy slides until you retrain.",
+      wrongToast:"<b>Misconception flagged:</b> treating a model as a static, finished artifact."});
+    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Ship is the start, not the end.</strong> Live models drift; MLOps keeps them alive with monitoring, alerting and retraining. Build is one-off; run is forever — and it’s usually the bigger number. Scope the lifecycle, or the project dies quietly.</p><p class="whisper">You’ve got the full lifecycle. Now turn all of it into a deal — in the client’s currency. <a class="jump" data-k="ml_biz">From ML to Business Outcomes</a>.</p>',
+      function(wrap,done){chooser(wrap,'You can price the whole lifecycle now. Where next?');});
+    return b;}
+},
+llm_approach:{concept:"llm_approach",node:"Prompt · RAG · Fine-tune",act:"Act 8 · Large Language Models",title:"Prompt, RAG or Fine-tune?",
+  intro:"“We need to fine-tune a model on our data.” You’ll hear it in almost every LLM conversation — and most of the time it’s the wrong, most expensive answer. Knowing which of three levers to pull, and in what order, is the most valuable call you’ll make in an LLM deal.",
+  build:function(){var b=[];var add=function(h,g){b.push({html:h,gate:g});};
+    add('<div class="kicker">The client meeting · the reflex answer</div><h1>Three levers, cheapest first</h1><p class="lead">There are exactly three ways to make an LLM do what a client wants. <strong>Prompt</strong> it well (instructions and examples in the <span class="term" data-t="context window">context window</span>). Give it <strong>RAG</strong> (retrieve your facts at answer time). Or <strong>fine-tune</strong> it (train on your examples to change its behaviour). They fix different problems — and they differ by roughly 10–100× in cost and effort.</p><p>The discipline: <strong>prompt → RAG → fine-tune</strong>, cheapest first, and only move down when the cheaper lever provably can’t do the job.</p>');
+    add('<span class="tierflag">'+({support:"Support pace",standard:"Standard pace",fast:"Fast pace"}[LEARNER.tier]||"Standard pace")+'</span>'+tierPick({
+      support:'<div class="kicker">First principles</div><h2>What each lever actually fixes</h2><p><strong>Prompting</strong> changes the <em>instructions</em>. Cheapest, instant, no data project — the right first move for almost everything. Use it when the model already knows enough and just needs steering (tone, format, a task).</p><p><strong>RAG</strong> changes the <em>knowledge</em>. Use it when the answer depends on <em>your</em> facts — documents, policies, a wiki — especially if they change often or you need citations. It fixes “it doesn’t know our stuff” and cuts <span class="term" data-t="hallucination">hallucination</span>, without retraining.</p><p><strong>Fine-tuning</strong> changes the <em>behaviour</em>. It’s a real data-and-engineering project. Reach for it only when you need a consistent <em>style or format</em> at scale, or a narrow skill prompting can’t reach — <em>not</em> to teach it facts (that’s RAG’s job, and facts baked into weights go stale).</p>',
+      standard:'<div class="kicker">First principles</div><h2>Instructions vs knowledge vs behaviour</h2><p><strong>Prompting</strong> conditions behaviour in-context — zero training, instant iteration; the default. <strong>RAG</strong> injects external knowledge at inference — best for private, changing or citable facts; fixes knowledge gaps and hallucination without touching weights. <strong>Fine-tuning</strong> updates weights (often PEFT/LoRA) to internalise a consistent style, format or narrow skill — data + pipeline + eval cost, and it doesn’t keep facts fresh. Decision rule: prompt → RAG → fine-tune, escalating only on demonstrated need. Frequently combined (a fine-tuned model inside a RAG system).</p>',
+      fast:'<div class="kicker">First principles</div><h2>The adaptation ladder</h2><p>Three orthogonal interventions: in-context conditioning (prompt), non-parametric knowledge injection (RAG), parametric adaptation (PEFT/LoRA/full FT). Map to the failure mode: steering → prompt; missing/stale/citable knowledge → RAG; distributional style/format or token/latency compression → fine-tune. Cost/effort ascends ~1→10→100; facts belong in a retrievable index (fresh, auditable), not the weights. Compose freely; escalate only on evidence the cheaper tier caps out.</p>'}));
+    add('<div class="card"><div class="kicker">Make the call</div><h2>Pick the cheapest lever that works</h2><p class="hint">Three real client asks. For each, choose the <em>first</em> approach you’d reach for. One best answer each.</p><div id="apsort"></div><div class="binmsg" id="apmsg" style="margin-top:10px"></div></div>',
+      function(wrap,done){
+        var opts=[["prompt","Prompt"],["rag","RAG"],["ft","Fine-tune"]];
+        var probs=[
+          {q:"“Answer staff questions from our internal wiki, which changes every week, with links to the source.”",a:"rag",why:"Private, fast-changing facts plus citations = RAG. Fine-tuning would bake in stale answers with no sources."},
+          {q:"“Summarise any pasted customer email into three bullet points.”",a:"prompt",why:"The model already can do this — it just needs a clear instruction. Prompt it. No data project."},
+          {q:"“Every reply must match our exact brand voice and a fixed JSON format, consistently, at scale.”",a:"ft",why:"A consistent style/format the prompt keeps drifting on is the classic fine-tuning case — behaviour, not facts."}
+        ];
+        var host=wrap.querySelector('#apsort'),msg=wrap.querySelector('#apmsg'),solved=0;
+        host.innerHTML=probs.map(function(p,i){return '<div style="background:#0b0f1b;border:1px solid var(--line-soft);border-radius:11px;padding:12px 14px;margin-bottom:9px"><div style="font-size:14px;color:#eef2fa;margin-bottom:9px">'+p.q+'</div><div class="rulebtns" data-i="'+i+'" style="margin:0">'+opts.map(function(o){return '<button class="rulebtn" data-t="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div><div data-w="'+i+'" style="font-size:12.5px;color:var(--green);margin-top:8px;display:none"></div></div>';}).join('');
+        host.querySelectorAll('.rulebtns').forEach(function(row){var i=+row.dataset.i,locked=false;row.querySelectorAll('.rulebtn').forEach(function(btn){btn.onclick=function(){if(locked)return;var w=host.querySelector('[data-w="'+i+'"]');if(btn.dataset.t===probs[i].a){btn.classList.add('on');btn.style.borderColor='var(--green)';locked=true;solved++;w.style.display='block';w.style.color='var(--green)';w.innerHTML='✓ '+probs[i].why;
+          if(solved===probs.length){msg.className='binmsg ok';msg.innerHTML='✓ That’s the ladder: <b>prompt</b> for steering, <b>RAG</b> for your facts, <b>fine-tune</b> for behaviour. Reaching for fine-tuning first is how AI budgets get burned.';bktUpdate('llm_approach',true);mentor("You just did the single most valuable triage in LLM solutioning — and disqualified the expensive default when a cheaper lever wins.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}else{btn.style.borderColor='var(--red)';w.style.display='block';w.style.color='var(--rose)';w.innerHTML='Not the cheapest lever that works — ask whether the ask is steering, facts, or behaviour.';setTimeout(function(){btn.style.borderColor='';},700);}};});});
+        mentor("Start with the summariser — if the model can already do it, you don’t need a data project.");});
+    lensBeat(add,
+      "The instinct to fine-tune is usually a category error: teams reach for the most expensive lever to solve a knowledge problem that RAG solves better, cheaper and with citations. The wrong lever doesn’t just cost more — it locks in staleness (facts frozen in weights) and kills auditability.",
+      "A client who <em>opens</em> with “we need to fine-tune / train our own model” — before anyone has tried a good prompt or retrieval — is describing a solution, not a problem. Ask what it must <em>do</em>, then find the cheapest lever.",
+      "Reframe every “fine-tune” request as a diagnosis: is this steering (prompt), facts (RAG), or behaviour (fine-tune)? Default to prompt → RAG, reserve fine-tuning for style/format/narrow-skill, and price accordingly — you win on cost and honesty, and often close faster.");
+    questionBeat(add,{concept:"llm_approach",k:"Check · the default order",
+      q:tierPick({support:"A client needs answers from their private, frequently-updated documents, with sources. What do you reach for first?",standard:"Private, changing, citable facts — the cost-optimal first lever is:",fast:"Which failure mode does RAG address better than fine-tuning?"}),
+      opts:tierPick({
+        support:[{k:"a",t:"Fine-tune a model on the documents"},{k:"b",t:"<b>RAG</b> — retrieve the facts and ground the answer"},{k:"c",t:"Train a model from scratch"}],
+        standard:[{k:"a",t:"Fine-tuning"},{k:"b",t:"<b>RAG</b>"},{k:"c",t:"Pretraining your own model"}],
+        fast:[{k:"a",t:"Consistent output style/format"},{k:"b",t:"<b>Private, fresh, citable knowledge</b>"},{k:"c",t:"Lower per-token latency"}]}),
+      correct:"b",flag:"finetune_reflex",
+      right:"Exactly. Changing, private, citable facts → RAG, every time. Fine-tuning bakes knowledge into weights: stale on change, and no sources.",
+      rightSay:"That’s the reflex that protects a client’s budget — and your credibility — in the first meeting.",
+      wrongDefault:"For <b>facts</b> that change and need citing, RAG wins: updatable and auditable. Fine-tuning is for <b>behaviour</b> (style/format), not knowledge.",
+      wrongToast:"<b>Misconception flagged:</b> fine-tuning to inject knowledge."});
+    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Prompt → RAG → fine-tune, cheapest first.</strong> Prompt steers, RAG supplies facts, fine-tuning shapes behaviour. Most “we must fine-tune” asks are really prompt or RAG problems. Escalate only on proven need — and you can combine them.</p><p class="whisper">Now, whatever you build runs on tokens and has to be proven good. Next: <a class="jump" data-k="llm_eval">Evaluation &amp; Token Economics</a>.</p>',
+      function(wrap,done){chooser(wrap,'You can pick the right lever now. Where next?');});
+    return b;}
+},
 ml_biz:{concept:"ml_biz",node:"Business Outcomes",act:"Act 7 · Machine Learning",title:"From ML to Business Outcomes",
   intro:"You’ve learned how ML works from the inside. In strategy, presales and solution architecture, that only pays off when you turn it into a business outcome — live, in the room. Let’s put it all together.",
   build:function(){var b=[];var add=function(h,g){b.push({html:h,gate:g});};
@@ -980,7 +1078,7 @@ ml_bias:{concept:"ml_bias",node:"Bias & Fairness",act:"Act 7 · Machine Learning
       wrong:{a:'Math isn’t neutral when it learns from a biased world — you watched a 31-point gap appear from historical data alone. Neutrality has to be engineered.',c:'Any model can inherit bias — it comes from the <b>data</b>, not the model type. A simple linear model on biased data is biased too.'},
       wrongToast:'<b>Misconception flagged:</b> “the model is neutral because it’s math.”'});
     add('<div class="card lens"><div class="lskick">Strategist’s Lens · second-order &amp; business</div><div class="ls-row"><div class="ls-h">Second-order effect</div><div class="ls-b">Model risk is enterprise risk — brand, legal, regulatory and adoption. A biased or unmonitored model isn’t a bug; it’s a headline, a lawsuit, or a failed procurement review. And bias slips in quietly through historical data and <em>proxy</em> features even when no protected attribute is used.</div></div><div class="ls-row"><div class="ls-h">The tell — what to listen for</div><div class="ls-b">If the solution story has no answer for “how do we detect bias, and how do we know the model still works in six months?”, governance is a gap — and enterprise security/compliance reviews will find it before your champion can save the deal.</div></div><div class="ls-row"><div class="ls-h">Your presales / solution-architecture move</div><div class="ls-b">Treat fairness testing, governance and monitoring/drift as first-class, billable scope — and raise them before the client does. It de-risks the deal, signals maturity, and is often where the recurring-revenue upside (managed monitoring) lives. The vendor who ignores governance loses enterprise deals at the compliance gate.</div></div></div>');
-    add('<div class="kicker">The whole act, on one page</div><h2>You understand machine learning — responsibly</h2><p>You went from “why not just write rules?” all the way to <strong>naming problem types, shaping data, choosing model families, training, generalizing, clustering, evaluating, deploying, and auditing for fairness.</strong> That is a genuine, honest foundation.</p><p class="whisper">And here is the doorway onward: scale this exact machinery — features, a learned function, gradient descent, deep networks — to billions of parameters, with “predict the next word” as the task, and you get an LLM. That’s the wider ALOS journey. But first — the skill that turns all of this into deals for <em>your</em> role: <a class="jump" data-k="ml_biz">From ML to Business Outcomes</a>.</p>',
+    add('<div class="kicker">The whole act, on one page</div><h2>You understand machine learning — responsibly</h2><p>You went from “why not just write rules?” all the way to <strong>naming problem types, shaping data, choosing model families, training, generalizing, clustering, evaluating, deploying, and auditing for fairness.</strong> That is a genuine, honest foundation.</p><p class="whisper">And here is the doorway onward: scale this exact machinery — features, a learned function, gradient descent, deep networks — to billions of parameters, with “predict the next word” as the task, and you get an LLM. That’s the wider ALOS journey. But first, a hard truth about shipping: a live model quietly decays the moment it goes into production. <a class="jump" data-k="ml_ops">MLOps — keeping the model alive</a>.</p>',
       function(wrap,done){chooser(wrap,'You’ve completed the Machine Learning Act. Revisit any lesson:');});
     return b;}
 },
@@ -1358,6 +1456,25 @@ embeddings:{concept:"embeddings",node:"Embeddings",act:"Act 11 · Applied AI",ti
       support:'<div class="kicker">First principles</div><h2>Vectors and similarity</h2><p>A <strong>vector</strong> is just a list of numbers — think of coordinates locating a point. An <strong>embedding model</strong> reads text and outputs the coordinates for its <em>meaning</em>. To find related content you look for the <strong>nearest</strong> vectors — <em>semantic</em> similarity, not keyword matching. A <strong>vector database</strong> stores millions of these and finds the nearest ones fast.</p>',
       standard:'<div class="kicker">First principles</div><h2>Semantic space</h2><p>Embedding models map content into a high-dimensional space where distance ≈ semantic dissimilarity. Nearest-neighbour search over those vectors gives meaning-based retrieval, dedup, clustering and recommendation. <strong>Vector databases</strong> index them for fast similarity queries at scale.</p>',
       fast:'<div class="kicker">First principles</div><h2>Dense retrieval</h2><p>Learned dense representations place semantics in ℝⁿ; cosine/ANN search enables retrieval, clustering, dedup, recsys. Vector DBs provide approximate nearest-neighbour indexing. Embeddings are the substrate under RAG, semantic search and memory — cheap to compute, high-leverage.</p>'}));
+    add('<div class="card"><div class="kicker">Try it · keyword vs meaning</div><h2>Find the answer by <em>meaning</em></h2><p class="hint">A user asks: <b>“how do I get my money back?”</b> Five help articles are on file. Search by keyword, then by embedding — watch which one actually finds the right doc.</p><div id="emlist"></div><div class="btnrow" style="margin:12px 0 0"><button class="btn ghost" id="emkw">Search by keyword</button><button class="btn" id="emsem">Search by meaning (embeddings)</button></div><div class="binmsg" id="emmsg" style="margin-top:10px"></div></div>',
+      function(wrap,done){
+        var docs=[
+          {t:"Refunds &amp; returns: how to get a refund",kw:0,v:0.96},
+          {t:"Track my delivery status",kw:0,v:0.19},
+          {t:"Reset your account password",kw:0,v:0.08},
+          {t:"Payment methods we accept",kw:1,v:0.54},
+          {t:"Update your billing address",kw:1,v:0.41}
+        ];
+        var list=wrap.querySelector('#emlist'),msg=wrap.querySelector('#emmsg');
+        function paint(mode){
+          var ranked=docs.map(function(d,i){return {d:d,i:i,score:mode==='kw'?d.kw:d.v};});
+          ranked.sort(function(a,b){return b.score-a.score;});
+          list.innerHTML=ranked.map(function(r){var hit=(mode==='sem'&&r.i===0);return '<div style="display:flex;justify-content:space-between;gap:10px;background:#0b0f1b;border:1px solid '+(hit?'var(--green)':'var(--line-soft)')+';border-radius:10px;padding:9px 12px;margin-bottom:7px"><span style="color:#eef2fa">'+r.d.t+'</span><span class="mono" style="color:var(--ink-faint);font-size:11.5px;white-space:nowrap">'+(mode==='kw'?(r.d.kw?'word match':'no shared word'):'sim '+r.d.v.toFixed(2))+'</span></div>';}).join('');
+        }
+        paint('none');
+        wrap.querySelector('#emkw').onclick=function(){paint('kw');msg.className='binmsg';msg.innerHTML='Keyword search ranks by <b>shared words</b>. “money back” shares no word with “Refunds &amp; returns” — so the right article sinks while a payments doc floats up. This is why keyword search misses paraphrases.';};
+        wrap.querySelector('#emsem').onclick=function(){paint('sem');msg.className='binmsg ok';msg.innerHTML='✓ Embeddings rank by <b>meaning</b>. “How do I get my money back?” lands right next to “how to get a refund” in vector space — no shared word required. That is semantic search, and the engine under RAG.';bktUpdate('embeddings',true);mentor("That gap — same meaning, different words — is exactly what embeddings close, and why keyword search alone fails on real user language.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};};
+        mentor("Try keyword search first — notice the right doc doesn’t come top.");});
     lensBeat(add,
       "Embeddings quietly underpin search, RAG, deduplication and recommendation — one capability that unlocks several products. Their quality and freshness silently cap the quality of everything built on them.",
       "A client wanting “AI search over our documents” is describing an embeddings + vector-search project, whether or not they use those words.",
@@ -1379,6 +1496,19 @@ rag:{concept:"rag",node:"RAG",act:"Act 12 · Applied AI",title:"RAG — Groundin
       support:'<div class="kicker">First principles</div><h2>The RAG loop</h2><p>Split your documents into <strong>chunks</strong> and embed them into a vector store. When a question comes in, embed it too, <strong>retrieve</strong> the nearest chunks, and paste them into the <span class="term" data-t="prompt">prompt</span> with an instruction like “answer using only this.” The model now <strong>grounds</strong> its answer in your facts and can even <strong>cite</strong> them — dramatically cutting made-up answers. No model retraining needed.</p>',
       standard:'<div class="kicker">First principles</div><h2>Retrieve → ground → cite</h2><p>Chunk + embed a corpus; at query time, retrieve top-k relevant chunks and inject them as context with a grounding instruction. The model answers from provided evidence, with citations, reducing hallucination — all without touching model weights. Failure modes live in chunking and retrieval quality, not the LLM.</p>',
       fast:'<div class="kicker">First principles</div><h2>Grounded generation</h2><p>RAG = dense retrieval over a chunked corpus + conditioned generation with provenance. It decouples “knowledge” (updatable index) from “reasoning” (frozen model), giving freshness, auditability and lower hallucination without fine-tuning. Quality is dominated by retrieval + chunking, not the LLM.</p>'}));
+    add('<div class="card"><div class="kicker">Try it · grounding in action</div><h2>Same question, two ways to answer</h2><p class="hint">A customer asks your assistant: <b>“What’s your refund window?”</b> Your real policy (in the docs) is <b>14 days</b>. Watch what each approach says.</p><div class="btnrow" style="margin:6px 0 12px"><button class="btn ghost" id="ragplain">Answer without RAG</button><button class="btn" id="raggnd">Answer with RAG</button></div><div id="ragstep"></div><div class="binmsg" id="ragmsg" style="margin-top:10px"></div></div>',
+      function(wrap,done){
+        var step=wrap.querySelector('#ragstep'),msg=wrap.querySelector('#ragmsg');
+        wrap.querySelector('#ragplain').onclick=function(){
+          step.innerHTML='<div style="background:#0b0f1b;border:1px solid var(--red);border-radius:10px;padding:11px 13px"><div class="mono" style="color:var(--ink-faint);font-size:11px;margin-bottom:5px">MODEL · from memory only</div><div style="color:#eef2fa">“Our refund window is <b>30 days</b> from purchase.”</div><div style="color:var(--red);font-size:12.5px;margin-top:7px">✗ Confident, fluent — and wrong. No source. It predicted a <i>plausible</i> number, not <i>your</i> number.</div></div>';
+          msg.className='binmsg';msg.innerHTML='This is hallucination: a frozen model answering from patterns, with no access to your policy.';};
+        wrap.querySelector('#raggnd').onclick=function(){
+          step.innerHTML='<div style="display:grid;gap:7px">'
+            +'<div style="background:#0b0f1b;border:1px solid var(--line-soft);border-radius:10px;padding:9px 12px"><b>1 · Retrieve</b> — embed the question, find the nearest chunk in your policy index.</div>'
+            +'<div style="background:#0b0f1b;border:1px solid var(--gold-soft);border-radius:10px;padding:9px 12px"><span class="mono" style="font-size:11px;color:var(--ink-faint)">refund_policy.pdf · chunk 3</span><br>“Customers may return items within <b>14 days</b> of delivery for a full refund.”</div>'
+            +'<div style="background:#0b0f1b;border:1px solid var(--green);border-radius:10px;padding:11px 13px"><div class="mono" style="font-size:11px;color:var(--ink-faint);margin-bottom:5px">MODEL · grounded on the retrieved chunk</div><div style="color:#eef2fa">“Our refund window is <b>14 days</b> from delivery. <span class="mono" style="font-size:11px;color:var(--gold)">[refund_policy.pdf]</span>”</div></div></div>';
+          msg.className='binmsg ok';msg.innerHTML='✓ Same model — but now it answers <b>from your facts</b> and cites the source. That is RAG: fix the <i>input</i>, not the model.';bktUpdate('rag',true);mentor("Notice we never retrained the model. RAG changed what we put <em>into</em> the prompt — retrieved evidence — and the answer became correct and auditable.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};};
+        mentor("Run the plain answer first — watch it invent a plausible number.");});
     lensBeat(add,
       "RAG separates knowledge (a cheap, updatable index) from reasoning (the frozen model). That decoupling is why it usually beats fine-tuning on cost, freshness and auditability for “answer from our documents” — the single most common enterprise ask.",
       "A client insisting they must fine-tune a model on their docs, when the docs change weekly and they need citations, is describing a RAG problem.",
@@ -1400,6 +1530,21 @@ agents:{concept:"agents",node:"Agentic AI",act:"Act 13 · Applied AI",title:"Age
       support:'<div class="kicker">First principles</div><h2>Tools, memory, loop</h2><p>Give the model a set of <strong>tools</strong> it’s allowed to call (search, a database query, sending an email) — this is <strong>function calling</strong>, just APIs. Give it <strong>memory</strong> (short-term: the current conversation; long-term: a store it can look things up in). Then let it loop: decide → act → see what happened → decide again. Multiple agents can even split roles. The power is real; so is the risk, because now mistakes <em>do</em> things.</p>',
       standard:'<div class="kicker">First principles</div><h2>The agent loop</h2><p>ReAct-style loop: reason → call a tool (function calling over APIs) → observe → iterate. Add short- and long-term <strong>memory</strong>; optionally orchestrate multiple specialised agents. Autonomy multiplies value and blast radius — errors now take actions, not just say wrong things.</p>',
       fast:'<div class="kicker">First principles</div><h2>Autonomy vs reliability</h2><p>Agents = LLM policy + tool APIs + memory + control loop (plan/act/observe). Multi-agent orchestration decomposes tasks. The governing tension is autonomy × reliability: compounding steps compound error, and side-effecting tools raise blast radius. Guardrails and eval are first-class, not add-ons.</p>'}));
+    add('<div class="card"><div class="kicker">Try it · the agent loop</div><h2>Reason → act → observe → repeat</h2><p class="hint">Goal: <b>“Email the customer the total they owe on overdue invoices.”</b> A plain model would guess. Step the agent through — and note where a human must sign off.</p><div id="agstep" style="min-height:40px"></div><div class="btnrow" style="margin-top:10px"><button class="btn" id="agnext">Start</button></div></div>',
+      function(wrap,done){
+        var logEl=wrap.querySelector('#agstep'),btn=wrap.querySelector('#agnext'),i=0,html='';
+        var steps=[
+          {r:"Reason: I need the overdue invoices before I can total them.",a:"Act → call tool <span class=\"mono\">search_invoices(status=\"overdue\")</span>",o:"Observe: 3 invoices — £420, £1,150, £310."},
+          {r:"Reason: now add them up.",a:"Act → call tool <span class=\"mono\">calculator(420+1150+310)</span>",o:"Observe: total = £1,880."},
+          {r:"Reason: draft the email with the total.",a:"Act → call tool <span class=\"mono\">draft_email(total=£1,880)</span>",o:"Observe: draft ready."}
+        ];
+        function render(){logEl.innerHTML=html||'<span class="hint">Press start to run the loop.</span>';}
+        render();
+        btn.onclick=function(){
+          if(i<steps.length){var s=steps[i];html+='<div style="background:#0b0f1b;border:1px solid var(--line-soft);border-radius:10px;padding:9px 12px;margin-bottom:7px"><div style="color:var(--violet)">'+s.r+'</div><div style="color:#eef2fa;margin:3px 0">'+s.a+'</div><div style="color:var(--ink-soft);font-size:13px">'+s.o+'</div></div>';i++;render();btn.textContent=(i<steps.length)?'Next step':'Send the email';}
+          else if(!btn.dataset.gate){html+='<div style="background:#0b0f1b;border:1px solid var(--xp);border-radius:10px;padding:11px 13px;margin-bottom:7px"><b>⚠ Human-in-the-loop gate</b> — emailing a customer is <i>irreversible</i>, so the agent pauses for approval before acting.</div>';render();btn.textContent='Approve &amp; send';btn.dataset.gate='1';}
+          else{html+='<div style="background:#0b0f1b;border:1px solid var(--green);border-radius:10px;padding:11px 13px"><span style="color:var(--green)">✓ Approved — email sent with the correct total.</span> The agent chained three tools into a real outcome, with a human on the one step that mattered.</div>';render();btn.style.display='none';bktUpdate('agents',true);mentor("Every step depended on the last — that is why errors compound, and why the irreversible step earned a human gate. Placing that gate well is the strategist’s core agent-design decision.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}
+        };});
     lensBeat(add,
       "The moment a model can <em>act</em>, every mistake gains consequences — and errors compound across steps. Autonomy and reliability pull in opposite directions; more independence means more ways to fail expensively.",
       "A client wanting a fully autonomous agent to take irreversible actions (payments, emails to customers) with no human check is under-pricing the risk of compounding errors.",
@@ -1663,7 +1808,7 @@ llm_halluc:{concept:"llm_halluc",node:"Hallucination",act:"Act 8 · Large Langua
       rightSay:"This is the bridge to RAG, which the wider course covers. Next in this module: proving it works, and what it costs.",
       wrong:{a:"A prompt can’t conjure facts the model doesn’t hold — you watched it invent “30 days” regardless. Grounding supplies the real fact.",c:"A bigger model still won’t know <em>your</em> private, current facts. Only retrieval gives it those."},
       wrongToast:"<b>Misconception flagged:</b> “a good prompt stops hallucination.”"});
-    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong><span class="term" data-t="hallucination">Hallucination</span> is inherent; grounding (retrieval) is the fix — reduce, cite, verify.</strong> Never promise it to zero.</p><p class="whisper">So it can be steered and grounded. But how do you <em>prove</em> a free-form assistant is good enough to ship — and what will it cost at scale? Next: <a class="jump" data-k="llm_eval">Evaluation &amp; Token Economics</a>.</p>',
+    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong><span class="term" data-t="hallucination">Hallucination</span> is inherent; grounding (retrieval) is the fix — reduce, cite, verify.</strong> Never promise it to zero.</p><p class="whisper">So it can be steered and grounded. You’ve now met prompting, grounding (RAG) and — earlier — fine-tuning. So which do you actually reach for, and in what order? Next: <a class="jump" data-k="llm_approach">Prompt, RAG or Fine-tune?</a>.</p>',
       function(wrap,done){chooser(wrap,'You understand the core risk. Where next?');});
     return b;}
 },
