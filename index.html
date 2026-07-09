@@ -404,8 +404,10 @@ var concepts={
   ml_cluster:{label:"Unsupervised",p:0.0,depth:"deep",prereq:["ml_neural"]},
   ml_eval:{label:"Evaluate & Deploy",p:0.0,depth:"deep",prereq:["ml_cluster"]},
   ml_bias:{label:"Bias & Fairness",p:0.0,depth:"deep",prereq:["ml_eval"]},
-  ml_ops:{label:"MLOps & Lifecycle",p:0.0,depth:"deep",prereq:["ml_bias"]},
-  ml_biz:{label:"ML Business Outcomes",p:0.0,depth:"deep",prereq:["ml_ops"]},
+  ml_explain:{label:"Explainability",p:0.0,depth:"deep",prereq:["ml_bias"]},
+  ml_ops:{label:"MLOps & Lifecycle",p:0.0,depth:"deep",prereq:["ml_explain"]},
+  ml_buildbuy:{label:"Build · Buy · Skip",p:0.0,depth:"deep",prereq:["ml_ops"]},
+  ml_biz:{label:"ML Business Outcomes",p:0.0,depth:"deep",prereq:["ml_buildbuy"]},
   llm_why:{label:"Why LLMs",p:0.0,depth:"deep",prereq:["ml_biz"]},
   llm_tokens:{label:"Tokens",p:0.0,depth:"deep",prereq:["llm_why"]},
   llm_predict:{label:"Next-Token",p:0.0,depth:"deep",prereq:["llm_tokens"]},
@@ -416,23 +418,31 @@ var concepts={
   llm_approach:{label:"Prompt/RAG/FT",p:0.0,depth:"deep",prereq:["llm_halluc"]},
   llm_eval:{label:"Eval & Economics",p:0.0,depth:"deep",prereq:["llm_approach"]},
   llm_risk:{label:"Risk & Governance",p:0.0,depth:"deep",prereq:["llm_eval"]},
-  llm_biz:{label:"LLM Business Outcomes",p:0.0,depth:"deep",prereq:["llm_risk"]},
+  llm_deploy:{label:"Model & Deployment",p:0.0,depth:"deep",prereq:["llm_risk"]},
+  llm_biz:{label:"LLM Business Outcomes",p:0.0,depth:"deep",prereq:["llm_deploy"]},
   genai:{label:"Generative AI",p:0.0,depth:"preview",prereq:["llm_biz"]},
-  embeddings:{label:"Embeddings",p:0.0,depth:"deep",prereq:["genai"]},
+  multimodal:{label:"Multimodal & Docs",p:0.0,depth:"deep",prereq:["genai"]},
+  embeddings:{label:"Embeddings",p:0.0,depth:"deep",prereq:["multimodal"]},
   rag:{label:"RAG",p:0.0,depth:"deep",prereq:["embeddings"]},
-  agents:{label:"Agentic AI",p:0.0,depth:"deep",prereq:["rag"]},
+  funccall:{label:"Function Calling",p:0.0,depth:"deep",prereq:["rag"]},
+  agents:{label:"Agentic AI",p:0.0,depth:"deep",prereq:["funccall"]},
   capstone:{label:"Capstone",p:0.0,depth:"preview",prereq:["agents"]}
 };
 var PHASES=[
  {t:"Foundations",ids:["computing","networks","servers","virt"]},
  {t:"Cloud & Data",ids:["cloud","gcp","data"]},
- {t:"Machine Learning · deep dive",ids:["ml_why","ml_landscape","ml_data","ml_model","ml_train","ml_overfit","ml_families","ml_neural","ml_cluster","ml_eval","ml_bias","ml_ops","ml_biz"]},
- {t:"Large Language Models · deep dive",ids:["llm_why","llm_tokens","llm_predict","llm_attention","llm_training","llm_prompt","llm_halluc","llm_approach","llm_eval","llm_risk","llm_biz"]},
- {t:"Applied GenAI · deep dive",ids:["genai","embeddings","rag","agents","capstone"]}
+ {t:"Machine Learning · deep dive",ids:["ml_why","ml_landscape","ml_data","ml_model","ml_train","ml_overfit","ml_families","ml_neural","ml_cluster","ml_eval","ml_bias","ml_explain","ml_ops","ml_buildbuy","ml_biz"]},
+ {t:"Large Language Models · deep dive",ids:["llm_why","llm_tokens","llm_predict","llm_attention","llm_training","llm_prompt","llm_halluc","llm_approach","llm_eval","llm_risk","llm_deploy","llm_biz"]},
+ {t:"Applied GenAI · deep dive",ids:["genai","multimodal","embeddings","rag","funccall","agents","capstone"]}
 ];
-var UNLOCK=0.75, PLAYABLE=["computing","networks","servers","virt","cloud","gcp","data","ml_why","ml_landscape","ml_data","ml_model","ml_train","ml_overfit","ml_families","ml_neural","ml_cluster","ml_eval","ml_bias","ml_ops","ml_biz","llm_why","llm_tokens","llm_predict","llm_attention","llm_training","llm_prompt","llm_halluc","llm_approach","llm_eval","llm_risk","llm_biz","genai","embeddings","rag","agents","capstone"];
+var UNLOCK=0.75, PLAYABLE=["computing","networks","servers","virt","cloud","gcp","data","ml_why","ml_landscape","ml_data","ml_model","ml_train","ml_overfit","ml_families","ml_neural","ml_cluster","ml_eval","ml_bias","ml_explain","ml_ops","ml_buildbuy","ml_biz","llm_why","llm_tokens","llm_predict","llm_attention","llm_training","llm_prompt","llm_halluc","llm_approach","llm_eval","llm_risk","llm_deploy","llm_biz","genai","multimodal","embeddings","rag","funccall","agents","capstone"];
 var misconceptions={}, ACTIVE="llm_why";
 var OUTCOMES={
+ml_buildbuy:"decide when to build, buy, or skip ML — and gate feasibility before scoping.",
+ml_explain:"judge when a model must be explainable, and name how to get there.",
+multimodal:"spot where multimodal/document AI fits and scope a document-extraction use case.",
+llm_deploy:"size a model choice and deployment topology against a data-residency constraint.",
+funccall:"explain how an LLM plugs into real systems via structured output and tool calls.",
 ml_why:"spot when a problem needs ML instead of hand-written rules.",
 ml_landscape:"name whether an ask is classification, regression, or clustering.",
 ml_data:"explain why data quality caps model quality, and scope the data work.",
@@ -559,6 +569,36 @@ function offerDepth(key){var c=ACTIVE;var recFast=concepts[c].p>0.5||LEARNER.tie
 function lensBeat(add,so,tell,move){add('<div class="card lens"><div class="lskick">Strategist\u2019s Lens \u00b7 second-order &amp; business</div><div class="ls-row"><div class="ls-h">Second-order effect</div><div class="ls-b">'+so+'</div></div><div class="ls-row"><div class="ls-h">The tell \u2014 what to listen for</div><div class="ls-b">'+tell+'</div></div><div class="ls-row"><div class="ls-h">Your presales / solution-architecture move</div><div class="ls-b">'+move+'</div></div></div>');}
 
 var PRACTICE={
+ml_buildbuy:[
+ {q:"“Flag orders over $500” is best solved by…",o:[["a","a custom model"],["b","a simple rule — skip ML"],["c","a bought API"]],c:"b",why:"A fixed threshold is a one-line rule."},
+ {q:"Buy (a pretrained API) when…",o:[["a","the capability is a commodity, not your differentiator"],["b","always"],["c","never"]],c:"a",why:"Commodities like ASR/translation are cheaper to buy."},
+ {q:"Build a custom model when…",o:[["a","a client mentions AI"],["b","it's a differentiator backed by proprietary data"],["c","an API already solves it"]],c:"b",why:"Build for a defensible, data-backed edge."},
+ {q:"The gate before any build is…",o:[["a","the model architecture"],["b","clean, permissioned data actually exists"],["c","the GPU budget"]],c:"b",why:"No data, no build."}
+],
+ml_explain:[
+ {q:"Explainability is a hard requirement when…",o:[["a","the model is large"],["b","decisions are regulated or consequential to a person"],["c","never"]],c:"b",why:"Regulated/consequential decisions demand a defensible reason."},
+ {q:"Which model type explains itself most readily?",o:[["a","a deep neural net"],["b","a small decision tree or linear model"],["c","a large ensemble"]],c:"b",why:"Intrinsically interpretable models expose their reasoning."},
+ {q:"SHAP-style tools are used to…",o:[["a","speed up training"],["b","attribute a prediction to its input features"],["c","clean data"]],c:"b",why:"They estimate what drove a particular decision."},
+ {q:"The accuracy–interpretability trade-off means…",o:[["a","accuracy is always best"],["b","the most accurate model may be the least explainable"],["c","they are unrelated"]],c:"b",why:"You sometimes trade accuracy for defensibility."}
+],
+multimodal:[
+ {q:"Document AI (OCR + LLM) is highest-ROI for…",o:[["a","writing poems"],["b","extracting fields from high-volume manual documents"],["c","longer chat replies"]],c:"b",why:"It displaces costly manual data entry at scale."},
+ {q:"Turning recorded calls into transcripts is…",o:[["a","a vision task"],["b","a speech (ASR) task"],["c","document AI"]],c:"b",why:"Audio to text is speech recognition."},
+ {q:"Because extraction accuracy isn't perfect, you should…",o:[["a","auto-post everything"],["b","route low-confidence cases to a human"],["c","ignore accuracy"]],c:"b",why:"Confidence thresholds + human-in-the-loop."},
+ {q:"A multimodal model can take in…",o:[["a","only text"],["b","text, images and audio"],["c","only numbers"]],c:"b",why:"It fuses multiple input modalities."}
+],
+llm_deploy:[
+ {q:"What usually dictates deployment topology in an enterprise deal?",o:[["a","the latest benchmark"],["b","data sensitivity and residency"],["c","the biggest context window"]],c:"b",why:"Where data is allowed to go sets the topology."},
+ {q:"For a narrow, high-volume task, the cost-smart first choice is…",o:[["a","the largest frontier model"],["b","a smaller model + retrieval"],["c","pretrain your own"]],c:"b",why:"Right-size to the task; small+RAG often wins on cost."},
+ {q:"A private/VPC endpoint is chosen mainly to…",o:[["a","get a smarter model"],["b","keep data in-region with zero-retention"],["c","reduce latency only"]],c:"b",why:"It addresses residency and retention constraints."},
+ {q:"Open-weight self-hosting trades API simplicity for…",o:[["a","worse quality always"],["b","data control and lower cost at scale, but you run the ops"],["c","nothing"]],c:"b",why:"Control and TCO vs operational burden."}
+],
+funccall:[
+ {q:"Function calling means the model…",o:[["a","directly changes your systems"],["b","proposes a tool call your code executes"],["c","only ever returns prose"]],c:"b",why:"The model decides; your code acts."},
+ {q:"Structured output is for when…",o:[["a","a human just reads the answer"],["b","a system must consume the answer (e.g. JSON fields)"],["c","you want longer replies"]],c:"b",why:"Machine-consumable output needs a fixed shape."},
+ {q:"A great chat pilot that “won’t integrate” usually lacks…",o:[["a","a bigger model"],["b","a structured-output / function-calling layer"],["c","a better prompt"]],c:"b",why:"Prose can’t be consumed by software."},
+ {q:"Keeping side effects in your code (not the model) gives…",o:[["a","control, least-privilege and audit"],["b","slower responses only"],["c","no benefit"]],c:"a",why:"The model proposes; your runtime executes safely."}
+],
 ml_ops:[
  {q:"A live model’s accuracy falls over months with no code change. The cause is usually…",o:[["a","the code wearing out"],["b","data/concept drift"],["c","a slow server"]],c:"b",why:"The world moves; live data drifts from what the model learned."},
  {q:"MLOps mainly adds which cost to a project?",o:[["a","a one-off build cost"],["b","a recurring monitor + retrain cost"],["c","no cost"]],c:"b",why:"Run/monitor/retrain is the ongoing bill, usually larger than the build."},
@@ -829,6 +869,217 @@ function servePractice(cid,host){var arr=PRACTICE[cid]||[];var idx=PRACTICE_USED
   setTimeout(function(){wrap.scrollIntoView({behavior:'smooth',block:'start'});},100);}
 
 var EPISODES={
+ml_buildbuy:{concept:"ml_buildbuy",node:"Build · Buy · Skip",act:"Act 7 · Machine Learning",title:"Build, Buy or Skip",
+  intro:"The most valuable thing a strategist does often happens before any modelling: deciding whether to build a custom model, buy an off-the-shelf one, or not use ML at all. Getting this wrong burns budgets; getting it right wins trust.",
+  build:function(){var b=[];var add=function(h,g){b.push({html:h,gate:g});};
+    add('<div class="kicker">The decision before the project</div><h1>Not every problem is a build</h1><p class="lead">Faced with an AI ask, weak teams jump straight to building a model. Strong ones first run two gates. <strong>Is this even an ML problem</strong> — or would a simple rule or query do? And if it is ML, <strong>should you build it or buy it</strong> — a custom model, or a pretrained API/product that already exists?</p><p>Answering these fast is how you protect a client’s budget and your own credibility.</p>');
+    add('<span class="tierflag">'+({support:"Support pace",standard:"Standard pace",fast:"Fast pace"}[LEARNER.tier]||"Standard pace")+'</span>'+tierPick({
+      support:'<div class="kicker">First principles</div><h2>Skip, buy, or build</h2><p>Three outcomes, in order of cost. <strong>Skip ML</strong> when a fixed, simple rule or a database query already does the job (“flag orders over $500”) — ML would just add cost and fragility. <strong>Buy</strong> when the capability is a solved <em>commodity</em> that isn’t your differentiator — speech-to-text, standard translation, common document extraction: a pretrained <strong>API</strong> or product is faster, cheaper and better than anything you’d build. <strong>Build</strong> a custom model only when the problem is <em>core to the business</em> and depends on <em>your</em> proprietary data — that’s where a bespoke model creates an edge worth the cost. The gate before all of this: do they even have the clean, permissioned <strong>data</strong>? No data, no build.</p>',
+      standard:'<div class="kicker">First principles</div><h2>The feasibility and build/buy gates</h2><p>Sequence two decisions. Feasibility: is this ML at all, or does a deterministic rule/query suffice (and is the data there)? Then build vs buy: <strong>buy</strong> commoditised capabilities (ASR, translation, generic extraction) via pretrained APIs/products — cheaper, faster, maintained for you; <strong>build</strong> only where the task is a strategic differentiator grounded in proprietary data. Build is justified by defensibility, not novelty. Disqualifying non-ML and buy-not-build cases early is the highest-leverage move.</p>',
+      fast:'<div class="kicker">First principles</div><h2>Skip / buy / build triage</h2><p>Gate 1 (feasibility): deterministic rule/query vs ML; data availability/permissioning. Gate 2 (make-vs-buy): commodity capability → pretrained API/SaaS (lower TCO, maintained); differentiating + proprietary-data problem → custom build. Build is warranted by strategic moat, not resume-driven development. Fast disqualification of non-ML and buy cases is where SA leverage concentrates.</p>'}));
+    add('<div class="card"><div class="kicker">Make the call · skip, buy, or build</div><h2>Route each ask</h2><p class="hint">For each client ask, pick the lowest-cost option that actually fits. One best answer each.</p><div id="bbsort"></div><div class="binmsg" id="bbmsg" style="margin-top:10px"></div></div>',
+      function(wrap,done){
+        var opts=[["skip","Skip ML — a rule does it"],["buy","Buy — pretrained API / product"],["build","Build — custom model"]];
+        var probs=[
+          {q:"“Flag any order above $500 for manual review.”",a:"skip",why:"A fixed, exact threshold is a one-line rule — ML would only add cost and fragility."},
+          {q:"“Transcribe our support calls into text.”",a:"buy",why:"Speech-to-text is a mature commodity; a pretrained API beats anything you’d build, cheaper and faster."},
+          {q:"“Predict churn from our unique customer behaviour — it’s core to our strategy.”",a:"build",why:"A strategic differentiator grounded in proprietary data is the case for a custom build."}
+        ];
+        var host=wrap.querySelector('#bbsort'),msg=wrap.querySelector('#bbmsg'),solved=0;
+        host.innerHTML=probs.map(function(p,i){return '<div style="background:#0b0f1b;border:1px solid var(--line-soft);border-radius:11px;padding:12px 14px;margin-bottom:9px"><div style="font-size:14px;color:#eef2fa;margin-bottom:9px">'+p.q+'</div><div class="rulebtns" data-i="'+i+'" style="margin:0">'+opts.map(function(o){return '<button class="rulebtn" data-t="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div><div data-w="'+i+'" style="font-size:12.5px;margin-top:8px;display:none"></div></div>';}).join('');
+        host.querySelectorAll('.rulebtns').forEach(function(row){var i=+row.dataset.i,locked=false;row.querySelectorAll('.rulebtn').forEach(function(btn){btn.onclick=function(){if(locked)return;var w=host.querySelector('[data-w="'+i+'"]');if(btn.dataset.t===probs[i].a){btn.classList.add('on');btn.style.borderColor='var(--green)';locked=true;solved++;w.style.display='block';w.style.color='var(--green)';w.innerHTML='✓ '+probs[i].why;
+          if(solved===probs.length){msg.className='binmsg ok';msg.innerHTML='✓ Cheapest option that fits, every time: a rule beats a bought model, a bought model beats a build — unless the build is your differentiator.';bktUpdate('ml_buildbuy',true);mentor("Running this triage fast is pure strategist value: you save the client from expensive builds they didn’t need, and reserve the build budget for where it actually creates an edge.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}else{btn.style.borderColor='var(--red)';w.style.display='block';w.style.color='var(--rose)';w.innerHTML='Ask: would a rule do it? Is it a commodity to buy? Or is it a differentiator worth building?';setTimeout(function(){btn.style.borderColor='';},700);}};});});
+        mentor("Start with the $500 rule — if a one-line rule solves it, ML is the wrong tool.");});
+    lensBeat(add,
+      "Disqualifying a bad-fit ask fast — “that’s a rule, not ML” or “buy that, don’t build it” — is where a strategist protects the client’s budget and earns trust. The reflex to build everything is how AI programmes overspend and under-deliver.",
+      "A client determined to build a custom model for a commodity capability (transcription, generic extraction) is about to pay far more for something worse than an off-the-shelf API.",
+      "Run the two gates in discovery: is it ML at all (or a rule), and is it buy or build? Reserve custom builds for differentiating problems with proprietary data; steer everything else to rules or pretrained products — and price accordingly.");
+    questionBeat(add,{concept:"ml_buildbuy",k:"Check · when to build",
+      q:tierPick({support:"When is building a custom model actually the right call?",standard:"A custom build is justified mainly when…",fast:"Custom build is warranted when…"}),
+      opts:[{k:"a",t:"Whenever a client asks for AI."},{k:"b",t:"<b>When the problem is a strategic differentiator grounded in your proprietary data.</b>"},{k:"c",t:"When a pretrained API already solves it well."}],
+      correct:"b",
+      right:"Right — build for a differentiating, data-backed edge; buy the commodities and skip ML where a rule suffices.",
+      rightSay:"That discipline — build only for the moat — is what keeps an AI budget honest.",
+      wrongDefault:"Build only when it’s a strategic differentiator on proprietary data; otherwise buy or skip."});
+    questionBeat(add,{concept:"ml_buildbuy",k:"Apply · protect the budget",
+      q:"A client wants to build a bespoke model for standard language translation across their docs. Your advice?",
+      opts:[{k:"a",t:"Build it — custom is always better."},{k:"b",t:"<b>Buy it — translation is a mature commodity; a pretrained API is cheaper, faster and better.</b>"},{k:"c",t:"Skip it — translation can’t be automated."}],
+      correct:"b",
+      right:"Right — translation is commoditised; buying an API beats a custom build on cost, speed and quality. Save the build budget for the differentiator.",
+      wrongDefault:"Buy commodity capabilities like translation; reserve custom builds for differentiating, proprietary-data problems."});
+    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Cheapest option that fits.</strong> Skip ML when a rule works; buy commodity capabilities via pretrained APIs; build only for a strategic differentiator backed by your own data. The gate before any of it: is the data even there? Fast, honest triage protects the budget and wins trust.</p><p class="whisper">Now turn a well-qualified opportunity into a business case. <a class="jump" data-k="ml_biz">From ML to Business Outcomes</a>.</p>',
+      function(wrap,done){chooser(wrap,'You can triage build/buy/skip now. Where next?');});
+    return b;}
+},
+ml_explain:{concept:"ml_explain",node:"Explainability",act:"Act 7 · Machine Learning",title:"Explainability — “Why Did It Decide That?”",
+  intro:"Priya’s model rejects a loan. The customer asks why. The regulator asks why. “The AI decided” is not an answer either will accept. For a whole class of deals, a model you can’t explain is a model you can’t sell.",
+  build:function(){var b=[];var add=function(h,g){b.push({html:h,gate:g});};
+    add('<div class="kicker">The question a model can’t dodge</div><h1>Accuracy isn’t enough — you may need “why”</h1><p class="lead">A powerful model can be a <strong>black box</strong>: it gives an answer, but can’t easily say <em>which inputs drove it</em>. That’s fine for a movie recommendation and unacceptable for a loan, a diagnosis, or a hiring screen — where the person affected, and often the law, demands a reason.</p><p>Knowing when “why” is a hard requirement is a core qualification skill.</p>');
+    add('<span class="tierflag">'+({support:"Support pace",standard:"Standard pace",fast:"Fast pace"}[LEARNER.tier]||"Standard pace")+'</span>'+tierPick({
+      support:'<div class="kicker">First principles</div><h2>Glass box vs black box</h2><p>Some models are naturally see-through — a small <strong>decision tree</strong> or a <strong>linear model</strong> lets you read off exactly why (“income below X and three missed payments”). Others — big neural nets — are <strong>black boxes</strong>: accurate, but hard to explain. When you need reasons from a black box, you add <strong>explainability</strong> tools (the best known is <strong>SHAP</strong>) that estimate <em>how much each input pushed this particular decision</em>. There’s often a trade-off: the most accurate model can be the least explainable, so in regulated settings you may deliberately trade a little accuracy for a model you can defend. The key skill: decide up front whether “why” is a <em>hard requirement</em> or a nice-to-have.</p>',
+      standard:'<div class="kicker">First principles</div><h2>Interpretability and the trade-off</h2><p>Intrinsically interpretable models (linear, shallow trees) expose their reasoning directly; complex models (deep nets, large ensembles) are opaque and need post-hoc explainability — feature-importance methods like <strong>SHAP</strong> attribute a prediction to its inputs. There’s a real accuracy–interpretability trade-off: the top-scoring model may be undefendable in a regulated context. Treat “must explain each decision” as a first-class requirement that can override raw performance.</p>',
+      fast:'<div class="kicker">First principles</div><h2>Interpretability as a constraint</h2><p>Intrinsic interpretability (GLMs, shallow trees) vs post-hoc attribution (SHAP/LIME, feature importance) for opaque models. Accuracy–interpretability is a genuine frontier; regulatory/consequential contexts (credit, insurance, health, employment) make explainability a hard constraint that can dominate model selection. Scope it as a requirement, not a nice-to-have, and pick the model class accordingly.</p>'}));
+    add('<div class="card"><div class="kicker">Make the call · is “why” required?</div><h2>Required, or nice-to-have?</h2><p class="hint">For each use case, decide whether per-decision explainability is a hard requirement or merely nice-to-have. One best answer each.</p><div id="exsort"></div><div class="binmsg" id="exmsg" style="margin-top:10px"></div></div>',
+      function(wrap,done){
+        var opts=[["req","Required (regulated / high-stakes)"],["nice","Nice-to-have"]];
+        var probs=[
+          {q:"“Approve or decline a personal loan application.”",a:"req",why:"Credit decisions are regulated — the applicant is owed a reason and the regulator will ask. Explainability is mandatory."},
+          {q:"“Recommend the next movie to watch.”",a:"nice",why:"Low stakes, no regulation — a good recommendation is enough; nobody is owed a formal reason."},
+          {q:"“Flag which patients a doctor should review first.”",a:"req",why:"High-stakes clinical support — clinicians must understand and trust the reasoning; explainability is required."},
+          {q:"“Order products on a homepage to boost clicks.”",a:"nice",why:"Commercial optimisation with no legal duty to justify each choice — explainability is optional."}
+        ];
+        var host=wrap.querySelector('#exsort'),msg=wrap.querySelector('#exmsg'),solved=0;
+        host.innerHTML=probs.map(function(p,i){return '<div style="background:#0b0f1b;border:1px solid var(--line-soft);border-radius:11px;padding:12px 14px;margin-bottom:9px"><div style="font-size:14px;color:#eef2fa;margin-bottom:9px">'+p.q+'</div><div class="rulebtns" data-i="'+i+'" style="margin:0">'+opts.map(function(o){return '<button class="rulebtn" data-t="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div><div data-w="'+i+'" style="font-size:12.5px;margin-top:8px;display:none"></div></div>';}).join('');
+        host.querySelectorAll('.rulebtns').forEach(function(row){var i=+row.dataset.i,locked=false;row.querySelectorAll('.rulebtn').forEach(function(btn){btn.onclick=function(){if(locked)return;var w=host.querySelector('[data-w="'+i+'"]');if(btn.dataset.t===probs[i].a){btn.classList.add('on');btn.style.borderColor='var(--green)';locked=true;solved++;w.style.display='block';w.style.color='var(--green)';w.innerHTML='✓ '+probs[i].why;
+          if(solved===probs.length){msg.className='binmsg ok';msg.innerHTML='✓ The test: is the decision <b>consequential to a person</b> or <b>regulated</b>? If yes, “why” is mandatory and it constrains your model choice.';bktUpdate('ml_explain',true);mentor("Deciding this up front saves a deal: you scope an explainable model where it’s required, instead of building an accurate black box the client legally can’t use.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}else{btn.style.borderColor='var(--red)';w.style.display='block';w.style.color='var(--rose)';w.innerHTML='Ask: is this consequential to a person or regulated? That decides whether “why” is mandatory.';setTimeout(function(){btn.style.borderColor='';},700);}};});});
+        mentor("Start with the loan — regulated, consequential to a person: “why” is not optional.");});
+    lensBeat(add,
+      "In a regulated or high-stakes deal, an unexplainable model is <em>unsellable</em> regardless of accuracy — the buyer legally cannot deploy a decision they can’t justify. Explainability is a gating requirement, not a feature you add later.",
+      "A client excited about a black-box model’s accuracy for a credit, hiring or clinical decision hasn’t yet hit the “explain every decision” wall that compliance will put in front of them.",
+      "Qualify the explainability requirement early: is each decision consequential to a person or regulated? If so, scope an interpretable model (or robust SHAP-style explanations) from the start — and be ready to trade a little accuracy for defensibility.");
+    questionBeat(add,{concept:"ml_explain",k:"Check · the trade-off",
+      q:tierPick({support:"Why might you choose a slightly less accurate model on purpose?",standard:"When would you trade some accuracy for interpretability?",fast:"When does interpretability override raw accuracy?"}),
+      opts:[{k:"a",t:"Never — always pick the highest accuracy."},{k:"b",t:"<b>When the decision is regulated or consequential and must be explained.</b>"},{k:"c",t:"Only when the accurate model is slower."}],
+      correct:"b",
+      right:"Right — in regulated, consequential contexts a defensible model beats a marginally more accurate black box you can’t deploy.",
+      rightSay:"That judgement — defensibility can outrank accuracy — is what a responsible strategist brings to the table.",
+      wrongDefault:"When decisions are regulated/consequential, an explainable model can be worth more than a slightly more accurate opaque one."});
+    questionBeat(add,{concept:"ml_explain",k:"Apply · name the tool",
+      q:"A client needs to tell each rejected applicant which factors drove the decision, but the best model is a neural net. What do you propose?",
+      opts:[{k:"a",t:"Tell them it’s impossible with a neural net."},{k:"b",t:"<b>Add post-hoc explanations (e.g. SHAP) to attribute each decision to its inputs — or use an interpretable model.</b>"},{k:"c",t:"Give every applicant the same generic reason."}],
+      correct:"b",
+      right:"Right — SHAP-style attribution can surface per-decision drivers for an opaque model; if that’s not enough, switch to an interpretable model class.",
+      wrongDefault:"Use post-hoc explainability (SHAP) to attribute each decision, or choose an interpretable model — not a generic reason."});
+    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>“Why” can be a hard requirement.</strong> Consequential or regulated decisions demand explainability; it can override raw accuracy and dictate the model class. Interpretable models explain themselves; for black boxes, SHAP-style attribution estimates what drove each decision.</p><p class="whisper">A model you can trust still has to survive production. Next: <a class="jump" data-k="ml_ops">MLOps — the model lifecycle</a>.</p>',
+      function(wrap,done){chooser(wrap,'You can qualify the explainability requirement now. Where next?');});
+    return b;}
+},
+multimodal:{concept:"multimodal",node:"Multimodal & Docs",act:"Act 10 · Applied GenAI",title:"Multimodal & Document AI",
+  intro:"The most profitable enterprise AI is often the least glamorous: turning mountains of documents — invoices, contracts, claims, forms — into clean, structured data. Once a model can read images, audio and PDFs, a huge amount of expensive manual work is suddenly automatable.",
+  build:function(){var b=[];var add=function(h,g){b.push({html:h,gate:g});};
+    add('<div class="kicker">Beyond text</div><h1>Models that read images, audio and documents</h1><p class="lead">A <strong>multimodal</strong> model handles more than text — it can take in an image, a sound clip, or a scanned page. The enterprise workhorse is <strong>document AI</strong>: combine <strong>OCR</strong> (reading text off a scan) with an LLM to pull structured fields out of messy PDFs and forms.</p><p>Unglamorous, and often the highest-ROI AI a business will buy.</p>');
+    add('<span class="tierflag">'+({support:"Support pace",standard:"Standard pace",fast:"Fast pace"}[LEARNER.tier]||"Standard pace")+'</span>'+tierPick({
+      support:'<div class="kicker">First principles</div><h2>One model, several senses</h2><p>Text was just the start. <strong>Vision</strong> models look at images (classify a product photo, spot a defect, describe a scene). <strong>Speech</strong> models turn audio into text (transcribe calls). <strong>Document AI</strong> is the big enterprise win: take a scanned invoice or contract, use <strong>OCR</strong> to read the characters, then an LLM to extract the fields you care about — amount, date, party, line items — as <strong>structured output</strong> you can drop into a system. The value is enormous because it replaces slow, costly manual data entry. The catch: accuracy is never perfect, so you design a <strong>human-in-the-loop</strong> to check the low-confidence extractions.</p>',
+      standard:'<div class="kicker">First principles</div><h2>Modalities and document extraction</h2><p>Multimodal models fuse encoders so one system handles text, images and audio. Vision (classification, detection, captioning) and speech (ASR) are established; the enterprise sweet spot is <strong>document AI</strong>: OCR + LLM to extract structured fields from unstructured scans/PDFs at scale. It targets high-volume manual document processing — the ROI is in labour displaced. Design for imperfect extraction with confidence thresholds and human review on the uncertain cases.</p>',
+      fast:'<div class="kicker">First principles</div><h2>Multimodality + IDP</h2><p>Fused-encoder models span text/vision/audio; mature sub-areas: vision (classification/detection/captioning), ASR, and intelligent document processing (OCR→LLM extraction to schema). Highest enterprise ROI is IDP over high-volume documents (invoices, claims, KYC). Engineer around non-unit accuracy: confidence scoring, thresholds, and HITL verification on low-confidence extractions; value = displaced manual effort.</p>'}));
+    add('<div class="card"><div class="kicker">Make the call · which modality?</div><h2>Match the task to the capability</h2><p class="hint">For each client task, pick the AI capability that fits. One best answer each.</p><div id="mmsort"></div><div class="binmsg" id="mmmsg" style="margin-top:10px"></div></div>',
+      function(wrap,done){
+        var opts=[["doc","Document AI (extract fields)"],["vision","Vision (images)"],["audio","Speech (audio)"]];
+        var probs=[
+          {q:"“Pull the amount, date and vendor off 50,000 scanned invoices.”",a:"doc",why:"Structured extraction from scanned documents = OCR + LLM document AI. The classic high-ROI case."},
+          {q:"“Automatically flag product photos that show visible damage.”",a:"vision",why:"Judging the content of images is a vision task."},
+          {q:"“Turn 10,000 recorded support calls into searchable transcripts.”",a:"audio",why:"Audio to text is speech recognition (ASR)."}
+        ];
+        var host=wrap.querySelector('#mmsort'),msg=wrap.querySelector('#mmmsg'),solved=0;
+        host.innerHTML=probs.map(function(p,i){return '<div style="background:#0b0f1b;border:1px solid var(--line-soft);border-radius:11px;padding:12px 14px;margin-bottom:9px"><div style="font-size:14px;color:#eef2fa;margin-bottom:9px">'+p.q+'</div><div class="rulebtns" data-i="'+i+'" style="margin:0">'+opts.map(function(o){return '<button class="rulebtn" data-t="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div><div data-w="'+i+'" style="font-size:12.5px;margin-top:8px;display:none"></div></div>';}).join('');
+        host.querySelectorAll('.rulebtns').forEach(function(row){var i=+row.dataset.i,locked=false;row.querySelectorAll('.rulebtn').forEach(function(btn){btn.onclick=function(){if(locked)return;var w=host.querySelector('[data-w="'+i+'"]');if(btn.dataset.t===probs[i].a){btn.classList.add('on');btn.style.borderColor='var(--green)';locked=true;solved++;w.style.display='block';w.style.color='var(--green)';w.innerHTML='✓ '+probs[i].why;
+          if(solved===probs.length){msg.className='binmsg ok';msg.innerHTML='✓ Match the modality to the input — and notice the invoice case: <b>document AI</b> is where the biggest, most boring ROI usually hides.';bktUpdate('multimodal',true);mentor("Spotting the document-extraction use case is a superpower in enterprise deals — it’s high volume, high cost, and very automatable.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}else{btn.style.borderColor='var(--red)';w.style.display='block';w.style.color='var(--rose)';w.innerHTML='What is the raw input — a document, an image, or audio? That names the capability.';setTimeout(function(){btn.style.borderColor='';},700);}};});});
+        mentor("Start with the invoices — reading fields off scans is the document-AI sweet spot.");});
+    lensBeat(add,
+      "Document extraction is one of the highest-ROI, least-glamorous AI use cases: it replaces slow, expensive manual data entry at volume. The value is in <em>structured output plus verification</em> — not in a clever chat interface.",
+      "A client chasing a flashy generative demo while sitting on tens of thousands of manually-keyed documents is overlooking the boring project that would pay for everything else.",
+      "Actively hunt for the document-AI use case in discovery: high-volume, manual, document-driven work. Scope it as OCR + extraction to a schema with confidence thresholds and human review — and price it on labour displaced, not novelty.");
+    questionBeat(add,{concept:"multimodal",k:"Check · where the ROI is",
+      q:tierPick({support:"Which is usually the highest-ROI enterprise use of multimodal AI?",standard:"Where does document AI typically create the most value?",fast:"Highest-ROI IDP target?"}),
+      opts:[{k:"a",t:"Generating artistic images for fun."},{k:"b",t:"<b>Extracting structured data from high-volume manual documents (invoices, claims, forms).</b>"},{k:"c",t:"Writing longer chat replies."}],
+      correct:"b",
+      right:"Right — automating high-volume manual document processing displaces real labour cost; that’s where the money is.",
+      rightSay:"Hunting for that boring, high-volume document task is a reliable way to find fundable AI value.",
+      wrongDefault:"The ROI is in extracting structured data from high-volume manual documents, not in novelty generation."});
+    questionBeat(add,{concept:"multimodal",k:"Apply · design for reality",
+      q:"You scope an invoice-extraction system. Extraction accuracy won’t be 100%. How do you handle that?",
+      opts:[{k:"a",t:"Assume it’s perfect and auto-post everything."},{k:"b",t:"<b>Score confidence and route low-confidence extractions to a human to verify.</b>"},{k:"c",t:"Only process invoices it’s sure about and drop the rest."}],
+      correct:"b",
+      right:"Right — confidence thresholds with human-in-the-loop on the uncertain cases is how document AI ships safely at scale.",
+      wrongDefault:"Design for imperfect accuracy: confidence scoring plus human review on low-confidence extractions."});
+    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>The boring win is the big win.</strong> Multimodal spans text, vision and audio; document AI (OCR + LLM → structured fields) automates high-volume manual document work — the highest-ROI, least-glamorous AI most enterprises can buy. Design for imperfect accuracy with confidence thresholds and human verification.</p><p class="whisper">To search and ground all this content by meaning, you need embeddings. <a class="jump" data-k="embeddings">Embeddings</a>.</p>',
+      function(wrap,done){chooser(wrap,'You can spot the document-AI use case now. Where next?');});
+    return b;}
+},
+llm_deploy:{concept:"llm_deploy",node:"Model & Deployment",act:"Act 8 · Large Language Models",title:"Model Choice & Where the Data Goes",
+  intro:"Before the security team signs anything, they ask one question that quietly decides your whole design: “where does our data go?” Get the model and the deployment topology right and the deal moves; get it wrong and it stalls in review for months.",
+  build:function(){var b=[];var add=function(h,g){b.push({html:h,gate:g});};
+    add('<div class="kicker">The question that decides the deal</div><h1>Which model — and where does it run?</h1><p class="lead">Two decisions sit under every LLM solution. <strong>Which model</strong> (a big proprietary one, or a smaller open-weight one you host)? And <strong>where does the data go</strong> when you call it — a public API, a private endpoint in your own cloud, or fully on-premises?</p><p>For a strategist these aren’t IT trivia: they’re the questions security, legal and finance grill you on before they buy.</p>');
+    add('<span class="tierflag">'+({support:"Support pace",standard:"Standard pace",fast:"Fast pace"}[LEARNER.tier]||"Standard pace")+'</span>'+tierPick({
+      support:'<div class="kicker">First principles</div><h2>Two dials: capability and control</h2><p><strong>Model choice</strong> is a dial between <em>capability</em> and <em>cost/control</em>. A big <strong>proprietary</strong> model (called over an API) is the most capable and the easiest to start with, but your data leaves your walls and you pay per <span class="term" data-t="token">token</span>. A smaller <strong>open-weight</strong> model you <strong>self-host</strong> is cheaper at scale and keeps data in-house, but you run the infrastructure. The trick: “good enough” usually wins — a smaller model plus <strong>RAG</strong> often beats the frontier model for a specific job, at a fraction of the cost.</p><p><strong>Deployment topology</strong> is <em>where the data goes</em>: a <strong>public API</strong> (simplest, data leaves your cloud), a <strong>private / VPC endpoint</strong> (runs in your own cloud, often with <strong>zero-retention</strong> and <strong>data-residency</strong> guarantees), or fully <strong>on-premises</strong> (nothing leaves at all). Regulated data usually forces the second or third — regardless of which model scores highest on a benchmark.</p>',
+      standard:'<div class="kicker">First principles</div><h2>Capability vs control, and where data flows</h2><p><strong>Model selection</strong> trades capability against cost and control: proprietary frontier models (API, per-token, most capable) vs open-weight models you self-host (cheaper at scale, data stays in-house, you own the ops). Right-size to the task — a smaller model + RAG frequently beats a frontier model for a narrow job. <strong>Deployment topology</strong> decides data flow: public API, private/VPC endpoint (zero-retention, residency controls), or on-prem. In regulated settings the residency answer, not the benchmark, usually dictates the choice.</p>',
+      fast:'<div class="kicker">First principles</div><h2>Selection + topology</h2><p>Two orthogonal axes: model tier (proprietary/API ↔ open-weight/self-host; capability vs TCO/control) and deployment topology (public API ↔ private-VPC/zero-retention ↔ on-prem; data-egress/residency). Right-size against the task (small+RAG often dominates frontier on cost/quality for narrow use), then let compliance constraints (residency, retention, IP) gate the topology. Benchmark rank is frequently irrelevant next to the data-flow constraint.</p>'}));
+    add('<div class="card"><div class="kicker">Make the call · match the constraint</div><h2>Pick the deployment for each client</h2><p class="hint">Three clients, three data situations. For each, choose the deployment topology you’d scope first. One best answer each.</p><div id="dpsort"></div><div class="binmsg" id="dpmsg" style="margin-top:10px"></div></div>',
+      function(wrap,done){
+        var opts=[["api","Public hosted API"],["vpc","Private / VPC endpoint"],["onprem","Self-host open-weight (on-prem)"]];
+        var probs=[
+          {q:"“Patient health records — regulation says the data cannot leave our cloud region.”",a:"vpc",why:"Residency rules point to a private/VPC endpoint in-region with zero-retention — not a public API."},
+          {q:"“Public marketing blog drafts, very high volume, cost is the main worry.”",a:"api",why:"Low-sensitivity, cost-driven, high-volume → a hosted API on a small/cheap model is simplest and cheapest."},
+          {q:"“Our core algorithm and unreleased IP — no third party may ever see this data.”",a:"onprem",why:"Zero third-party exposure of crown-jewel IP → self-host an open-weight model on-prem/VPC."}
+        ];
+        var host=wrap.querySelector('#dpsort'),msg=wrap.querySelector('#dpmsg'),solved=0;
+        host.innerHTML=probs.map(function(p,i){return '<div style="background:#0b0f1b;border:1px solid var(--line-soft);border-radius:11px;padding:12px 14px;margin-bottom:9px"><div style="font-size:14px;color:#eef2fa;margin-bottom:9px">'+p.q+'</div><div class="rulebtns" data-i="'+i+'" style="margin:0">'+opts.map(function(o){return '<button class="rulebtn" data-t="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div><div data-w="'+i+'" style="font-size:12.5px;margin-top:8px;display:none"></div></div>';}).join('');
+        host.querySelectorAll('.rulebtns').forEach(function(row){var i=+row.dataset.i,locked=false;row.querySelectorAll('.rulebtn').forEach(function(btn){btn.onclick=function(){if(locked)return;var w=host.querySelector('[data-w="'+i+'"]');if(btn.dataset.t===probs[i].a){btn.classList.add('on');btn.style.borderColor='var(--green)';locked=true;solved++;w.style.display='block';w.style.color='var(--green)';w.innerHTML='✓ '+probs[i].why;
+          if(solved===probs.length){msg.className='binmsg ok';msg.innerHTML='✓ Notice the pattern: the <b>data constraint</b> chose the topology every time — the model benchmark barely entered the room.';bktUpdate('llm_deploy',true);mentor("That reflex — let the data-residency answer drive the topology, then right-size the model — is what gets you through enterprise security review.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}else{btn.style.borderColor='var(--red)';w.style.display='block';w.style.color='var(--rose)';w.innerHTML='Re-read the data sensitivity — where is this data allowed to go?';setTimeout(function(){btn.style.borderColor='';},700);}};});});
+        mentor("Start with the health records — the phrase “cannot leave our region” is the whole answer.");});
+    lensBeat(add,
+      "For most enterprises the model choice is decided by the <em>data-residency answer</em>, not the benchmark. A frontier model you can’t legally send the data to is worth zero; a “good enough” model in the right topology ships.",
+      "A client debating which model is “smartest” before anyone has asked where the data is allowed to live is optimising the wrong variable — the compliance constraint will overrule the benchmark.",
+      "Lead with the data question: what is the data’s sensitivity and residency, and what retention is allowed? That answer sets the topology; then right-size the model (small + RAG first) to the task and cost. Sell the topology and the guardrails, not the leaderboard.");
+    questionBeat(add,{concept:"llm_deploy",k:"Check · the first question",
+      q:tierPick({support:"Before choosing a model, what should you establish first in an enterprise deal?",standard:"What most often dictates the deployment topology?",fast:"Which constraint usually dominates model choice in enterprise?"}),
+      opts:[{k:"a",t:"Which model tops the latest benchmark."},{k:"b",t:"<b>The data’s sensitivity and residency — where it’s allowed to go.</b>"},{k:"c",t:"Which model has the biggest context window."}],
+      correct:"b",
+      right:"Right. Data sensitivity and residency set the topology; the model is chosen inside those constraints, not before them.",
+      rightSay:"That ordering — data constraint first, model second — is what separates a deployable proposal from a demo.",
+      wrongDefault:"Establish the data’s sensitivity and residency first; that gates the topology before any model comparison."});
+    questionBeat(add,{concept:"llm_deploy",k:"Apply · right-size it",
+      q:"A narrow support-classification task needs to hit a quality bar at high volume and low cost. Best first choice?",
+      opts:[{k:"a",t:"The largest frontier model, for maximum quality."},{k:"b",t:"<b>A smaller model plus retrieval — right-sized to the task, far cheaper.</b>"},{k:"c",t:"Pretrain a bespoke model."}],
+      correct:"b",
+      right:"Right — “good enough” wins: a smaller model + RAG usually meets a narrow task’s bar at a fraction of the frontier cost.",
+      wrongDefault:"Right-size to the task: a smaller model + retrieval typically beats the frontier on cost for a narrow job."});
+    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Data constraint first, model second.</strong> Topology (public API / private-VPC / on-prem) follows the data’s residency and retention rules; the model is right-sized inside them — smaller + RAG before frontier. The benchmark rarely decides the deal.</p><p class="whisper">You can shape the whole solution now — let’s frame it as a business outcome. <a class="jump" data-k="llm_biz">From LLMs to Business Outcomes</a>.</p>',
+      function(wrap,done){chooser(wrap,'You can size model + deployment now. Where next?');});
+    return b;}
+},
+funccall:{concept:"funccall",node:"Function Calling",act:"Act 10 · Applied GenAI",title:"Function Calling & Structured Output",
+  intro:"A model that chats is a demo. A model that returns clean, structured data and calls your systems is a product. This is the unglamorous bridge that turns an LLM from a talking toy into something a real application can build on — and it’s what makes agents possible.",
+  build:function(){var b=[];var add=function(h,g){b.push({html:h,gate:g});};
+    add('<div class="kicker">From chat to system</div><h1>Make the model’s output machine-usable</h1><p class="lead">Left alone, an LLM replies in prose — lovely for a human, useless to a program. Two capabilities fix that. <strong>Structured output</strong>: force the answer into a fixed shape (like JSON) your code can read. <strong>Function calling</strong>: let the model emit a request to run one of <em>your</em> tools (an API), which your code executes and feeds back.</p><p>This is the seam where an LLM plugs into real software.</p>');
+    add('<span class="tierflag">'+({support:"Support pace",standard:"Standard pace",fast:"Fast pace"}[LEARNER.tier]||"Standard pace")+'</span>'+tierPick({
+      support:'<div class="kicker">First principles</div><h2>JSON in, action out</h2><p>Ask a plain model “book a meeting with Sam tomorrow at 3” and it says “Sure!” — and nothing happens. With <strong>structured output</strong> you instead require it to return a fixed shape, e.g. <span class="term" data-t="json">JSON</span> like <em>{title, attendee, time}</em>, which your program can drop straight into a calendar. With <strong>function calling</strong>, you tell the model which tools it may use (each is just an <strong>API</strong> — the request/response you met in Act 2); the model decides <em>which</em> to call and with what arguments, your code runs it, and the result goes back to the model. The model never touches your systems directly — it just proposes the call; your code stays in control.</p>',
+      standard:'<div class="kicker">First principles</div><h2>Structured output and tool calls</h2><p><strong>Structured output</strong> constrains generation to a schema (JSON/typed fields) so downstream code can consume it deterministically. <strong>Function calling</strong> exposes a set of tool signatures (APIs) to the model; it emits a structured call (name + arguments), your runtime executes it and returns the result. Your code — not the model — performs side effects, which keeps control and auditability. Together these are the integration layer between an LLM and production systems, and the substrate agents are built on.</p>',
+      fast:'<div class="kicker">First principles</div><h2>The integration layer</h2><p>Structured/JSON-mode decoding constrains output to a schema for deterministic downstream parsing. Function/tool calling exposes typed tool signatures; the model emits (name, args), the runtime executes and returns observations. Side effects live in your code (control, least-privilege, audit), not the model. This is the demo→product boundary and the mechanism the agent loop iterates over.</p>'}));
+    add('<div class="card"><div class="kicker">Make the call · what does the app need?</div><h2>Free text, or structured?</h2><p class="hint">For each job, decide whether the app needs plain text from the model or a structured output / function call it can act on. One best answer each.</p><div id="fcsort"></div><div class="binmsg" id="fcmsg" style="margin-top:10px"></div></div>',
+      function(wrap,done){
+        var opts=[["text","Free-text reply"],["struct","Structured output / function call"]];
+        var probs=[
+          {q:"“The model should trigger a refund in our billing system.”",a:"struct",why:"A real side-effect in another system needs a function call your code executes — never loose prose."},
+          {q:"“The model writes a friendly one-paragraph summary for a human to read.”",a:"text",why:"A human is the consumer and there’s no system action — plain text is exactly right."},
+          {q:"“The answer must fill the amount, date and category fields of a database record.”",a:"struct",why:"Populating fields deterministically needs structured output (a fixed JSON shape), not free text."}
+        ];
+        var host=wrap.querySelector('#fcsort'),msg=wrap.querySelector('#fcmsg'),solved=0;
+        host.innerHTML=probs.map(function(p,i){return '<div style="background:#0b0f1b;border:1px solid var(--line-soft);border-radius:11px;padding:12px 14px;margin-bottom:9px"><div style="font-size:14px;color:#eef2fa;margin-bottom:9px">'+p.q+'</div><div class="rulebtns" data-i="'+i+'" style="margin:0">'+opts.map(function(o){return '<button class="rulebtn" data-t="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div><div data-w="'+i+'" style="font-size:12.5px;margin-top:8px;display:none"></div></div>';}).join('');
+        host.querySelectorAll('.rulebtns').forEach(function(row){var i=+row.dataset.i,locked=false;row.querySelectorAll('.rulebtn').forEach(function(btn){btn.onclick=function(){if(locked)return;var w=host.querySelector('[data-w="'+i+'"]');if(btn.dataset.t===probs[i].a){btn.classList.add('on');btn.style.borderColor='var(--green)';locked=true;solved++;w.style.display='block';w.style.color='var(--green)';w.innerHTML='✓ '+probs[i].why;
+          if(solved===probs.length){msg.className='binmsg ok';msg.innerHTML='✓ The rule: if a <b>system</b> consumes it or an <b>action</b> follows, you need structure or a tool call; if a <b>human</b> reads it, free text is fine.';bktUpdate('funccall',true);mentor("That distinction — human-readable prose vs machine-actionable structure — is the line between a chatbot demo and a shipped feature.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}else{btn.style.borderColor='var(--red)';w.style.display='block';w.style.color='var(--rose)';w.innerHTML='Ask: does a system consume this or an action follow (structure), or does a human just read it (text)?';setTimeout(function(){btn.style.borderColor='';},700);}};});});
+        mentor("Start with the refund — anything that acts on another system needs a function call, not prose.");});
+    lensBeat(add,
+      "Structured output and function calling are the line between a chatbot demo and a production system. Most “the pilot was amazing but it won’t integrate” failures are really a missing structured-output/tool layer — the model was never wired to <em>do</em> anything.",
+      "A client dazzled by a chat demo but with no plan for how its output feeds their systems is about to hit the integration wall — the demo talks, but nothing downstream can consume it.",
+      "Scope the structured-output/function-calling layer as core, not a nice-to-have: define the schemas and the tools the model may call, and keep all side effects in your code under least-privilege. It’s also the prerequisite for any agent work.");
+    questionBeat(add,{concept:"funccall",k:"Check · who acts",
+      q:tierPick({support:"With function calling, who actually performs the action (e.g. sending an email)?",standard:"In a function-calling setup, where do side effects happen?",fast:"Where do side effects execute in a tool-calling architecture?"}),
+      opts:[{k:"a",t:"The model reaches out and does it directly."},{k:"b",t:"<b>Your code runs the tool; the model only proposes the call and its arguments.</b>"},{k:"c",t:"Nothing happens — it’s always just text."}],
+      correct:"b",
+      right:"Right. The model proposes (name + arguments); your runtime executes under your control and returns the result. That separation is what keeps it safe and auditable.",
+      rightSay:"Keep that boundary crisp in every design: the model decides, your code acts.",
+      wrongDefault:"The model only emits a structured call; your code executes it — side effects stay in your control, not the model’s."});
+    questionBeat(add,{concept:"funccall",k:"Apply · spot the gap",
+      q:"A pilot chatbot impresses, but “can’t be integrated” into the client’s systems. The most likely missing piece?",
+      opts:[{k:"a",t:"A larger model."},{k:"b",t:"<b>A structured-output / function-calling layer so its output is machine-usable.</b>"},{k:"c",t:"A better system prompt."}],
+      correct:"b",
+      right:"Right — prose can’t be consumed by software. The missing layer is structured output / tool calls, the demo-to-product bridge.",
+      wrongDefault:"The gap is usually the structured-output/function-calling layer — the model’s prose was never made machine-actionable."});
+    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Structure is the bridge to systems.</strong> Structured output makes answers machine-readable; function calling lets the model propose tool calls your code executes. The model decides; your code acts. This is the demo-to-product line — and the foundation agents build on.</p><p class="whisper">Now let the model take steps on its own, safely. <a class="jump" data-k="agents">Agentic AI</a>.</p>',
+      function(wrap,done){chooser(wrap,'You can wire an LLM into systems now. Where next?');});
+    return b;}
+},
 ml_ops:{concept:"ml_ops",node:"MLOps & Lifecycle",act:"Act 7 · Machine Learning",title:"MLOps — The Model Is a Living System",
   intro:"Priya’s fraud model shipped at 92% and the team moved on. Eleven weeks later it’s quietly at 74% — and nobody changed a line of code. A model isn’t a deliverable you hand over; it’s a system you keep alive. This is the lesson that pays the bills.",
   build:function(){var b=[];var add=function(h,g){b.push({html:h,gate:g});};
@@ -939,15 +1190,27 @@ ml_biz:{concept:"ml_biz",node:"Business Outcomes",act:"Act 7 · Machine Learning
         var i=0,host=wrap.querySelector('#shape'),msg=wrap.querySelector('#shmsg');
         function render(){var s=steps[i];host.innerHTML='<div style="font-size:15px;color:#fff;margin-bottom:12px">Step '+(i+1)+' / 3 — '+s.q+'</div>'+s.opts.map(function(o){return '<button class="opt" data-k="'+o[0]+'">'+o[1]+'</button>';}).join('');
           host.querySelectorAll('.opt').forEach(function(bt){bt.onclick=function(){if(bt.dataset.k===s.ok){bt.classList.add('correct');msg.className='binmsg ok';msg.innerHTML='✓ '+s.why;setTimeout(function(){i++;if(i>=steps.length)finish();else{msg.textContent='';render();}},1000);}else{bt.classList.add('wrong');msg.className='binmsg';msg.innerHTML=s.why;}};});}
-        function finish(){host.innerHTML='<div style="font-size:15px;color:var(--green);line-height:1.5">✓ Solution shaped: the right ML framing, the right qualifying question, and a value case in dollars — without touching a line of model code.</div>';bktUpdate('ml_biz',true);mentor("That’s the job. You turned a vague “use AI” ask into a scoped, qualified, value-framed opportunity — the exact skill that wins Data &amp; AI deals.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}
+        function finish(){host.innerHTML='<div style="font-size:15px;color:var(--green);line-height:1.5">✓ Solution shaped: the right ML framing, the right qualifying question, and a value case in dollars — without touching a line of model code.</div>';bktUpdate('ml_biz',true,'weak');mentor("That’s the job. You turned a vague “use AI” ask into a scoped, qualified, value-framed opportunity — the exact skill that wins Data &amp; AI deals.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}
         render();mentor("Frame it, qualify it, value it — in that order. Step 1: what does “reduce churn” actually need?");});
     add('<div class="q"><div class="qk">Teach it back · make it yours</div><div class="qtext">In one line: how would you qualify whether a client’s AI ask is worth pursuing?</div><textarea id="tbz" placeholder="I’d qualify it by checking..."></textarea><div class="feedback" id="tbzf"></div><div class="continue" style="margin-top:14px"><button class="btn" id="tbzb" disabled>Show Aadi</button></div></div>',
       function(wrap,done){var ta=wrap.querySelector('#tbz'),btn=wrap.querySelector('#tbzb'),fb=wrap.querySelector('#tbzf');ta.addEventListener('input',function(){btn.disabled=ta.value.trim().length<12;});
-        btn.onclick=function(){var x=ta.value.toLowerCase();var d=/(data|label|history|readiness|quality)/.test(x),v=/(value|roi|outcome|revenue|cost|business|money|dollar|impact)/.test(x),ff=/(feasib|fit|rule|realistic|risk|possible)/.test(x);var s=(d?1:0)+(v?1:0)+(ff?1:0);bktUpdate('ml_biz',s>=2);fb.className='feedback ok show';
+        btn.onclick=function(){var x=ta.value.toLowerCase();var d=/(data|label|history|readiness|quality)/.test(x),v=/(value|roi|outcome|revenue|cost|business|money|dollar|impact)/.test(x),ff=/(feasib|fit|rule|realistic|risk|possible)/.test(x);var s=(d?1:0)+(v?1:0)+(ff?1:0);bktUpdate('ml_biz',s>=2,'weak');fb.className='feedback ok show';
           if(s>=2)fb.innerHTML='<div class="who"><span class="dot"></span>Aadi</div>Strong — you’re qualifying on what actually decides success: <b>data readiness</b>, <b>business value</b>, and <b>feasibility</b>. That’s the presales instinct in one sentence.';
           else fb.innerHTML='<div class="who"><span class="dot"></span>Aadi</div>Good start. The three levers to always check: is the <b>data</b> there (labels, quality)? is there real <b>business value</b> in dollars? and is it actually <b>feasible</b> (not better solved by simple rules)? Weave those three in.';
           btn.disabled=true;ta.disabled=true;var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn">Continue ↓</button>';wrap.querySelector('.q').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};};});
-    add('<div class="kicker">You’re ready</div><h2>From first principles to business outcomes</h2><p>You can now reason from a business goal to the right ML approach and back — <strong>qualify feasibility, size the effort and risk, and defend the value in the client’s currency.</strong> That is the core of Data &amp; AI strategy, presales and solution architecture, and you built it on real first principles, not buzzwords.</p><p class="whisper">And the same thinking scales to the rest of the AI stack — LLMs, RAG, agents. For each, ask the identical questions: what problem, what data, what risk, what value. You now have the lens to evaluate any AI opportunity that lands on your desk.</p>',
+        questionBeat(add,{concept:"ml_biz",k:"Decision · qualify the ask",
+      q:"A prospect says “we want to use AI to reduce churn.” What is your first move as the strategist?",
+      opts:[{k:"a",t:"Start designing the model architecture."},{k:"b",t:"<b>Qualify: what decision would move churn, what prediction informs it, and is the data there?</b>"},{k:"c",t:"Quote a price on the spot."}],
+      correct:"b",
+      right:"Right — you shape the outcome, not the model: run the chain from business KPI back to data and feasibility before scoping.",
+      wrongDefault:"Qualify feasibility first — decision, prediction, data — before design or price."});
+    questionBeat(add,{concept:"ml_biz",k:"Decision · frame the value",
+      q:"Two framings of the same churn model. Which one wins the CFO's budget?",
+      opts:[{k:"a",t:"“The model is 91% accurate.”"},{k:"b",t:"<b>“It retains about €1.2M of at-risk revenue a year, net of run cost.”</b>"},{k:"c",t:"“It uses a gradient-boosted ensemble.”"}],
+      correct:"b",
+      right:"Right — executives fund outcomes in currency, not accuracy or model names. Translate every metric into money.",
+      wrongDefault:"Frame value in the client's currency — money retained or saved — not accuracy percentages."});
+add('<div class="kicker">You’re ready</div><h2>From first principles to business outcomes</h2><p>You can now reason from a business goal to the right ML approach and back — <strong>qualify feasibility, size the effort and risk, and defend the value in the client’s currency.</strong> That is the core of Data &amp; AI strategy, presales and solution architecture, and you built it on real first principles, not buzzwords.</p><p class="whisper">And the same thinking scales to the rest of the AI stack — LLMs, RAG, agents. For each, ask the identical questions: what problem, what data, what risk, what value. You now have the lens to evaluate any AI opportunity that lands on your desk.</p>',
       function(wrap,done){chooser(wrap,'You’ve completed the Machine Learning Act. Revisit any lesson:');});
     return b;}
 },
@@ -1012,7 +1275,13 @@ ml_data:{concept:"ml_data",node:"Data & Features",act:"Act 7 · Machine Learning
       wrong:{a:'Tempting, but you just watched a fancier algorithm add only 2 points while cleaning the data added 31. Data usually wins.',c:'Speed helps you iterate, not accuracy. The lever is the <b>quality of the data and features</b>.'},
       wrongToast:'<b>Misconception flagged:</b> “the algorithm matters most.”'});
     add('<div class="card lens"><div class="lskick">Strategist’s Lens · second-order &amp; business</div><div class="ls-row"><div class="ls-h">Second-order effect</div><div class="ls-b">Data readiness is the biggest single driver of success and 60–80% of the effort — and it compounds: poor data doesn’t just lower accuracy, it invalidates the evaluation, hides bias, and forces the most expensive rework late in the project. The model you demo on a clean sample is not the model that meets the client’s reality.</div></div><div class="ls-row"><div class="ls-h">The tell — what to listen for</div><div class="ls-b">If the client can’t quickly answer “where does this data live, how clean is it, and who owns it?”, your real first project is data engineering — whatever the SOW says the project is.</div></div><div class="ls-row"><div class="ls-h">Your presales / solution-architecture move</div><div class="ls-b">Insert a paid data-readiness assessment as phase 0, and price data engineering as its own (often largest) line. “Show me your data” beats “show me your problem.” Naming data work openly is also a trust signal — it tells a serious buyer you’ve done this before and won’t over-promise off a demo.</div></div></div>');
-    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Data is the lever.</strong> Clean it, engineer good features, and split off a test set you never train on. A modest model on great data beats a great model on messy data.</p><p class="whisper">Now, armed with good data, back to the model itself — and the moment you’ll hit where a single straight line simply can’t capture the pattern. Next: <a class="jump" data-k="ml_model">The Model</a>.</p>',
+        questionBeat(add,{concept:"ml_data",k:"Apply · diagnose the drop",
+      q:"A model works in the lab but degrades in production. Before touching the algorithm, what do you check first?",
+      opts:[{k:"a",t:"Whether a fancier model would score higher."},{k:"b",t:"<b>Whether the production data is clean, complete, and matches the training data.</b>"},{k:"c",t:"Whether the server is fast enough."}],
+      correct:"b",
+      right:"Right — data quality caps model quality. Check the pipeline before reaching for a better model.",
+      wrongDefault:"Check the data first — a modest model on good data beats a fancy one on bad data."});
+add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Data is the lever.</strong> Clean it, engineer good features, and split off a test set you never train on. A modest model on great data beats a great model on messy data.</p><p class="whisper">Now, armed with good data, back to the model itself — and the moment you’ll hit where a single straight line simply can’t capture the pattern. Next: <a class="jump" data-k="ml_model">The Model</a>.</p>',
       function(wrap,done){chooser(wrap,'Data handled. Where next?');});
     return b;}
 },
@@ -1051,7 +1320,13 @@ ml_families:{concept:"ml_families",node:"Model Families",act:"Act 7 · Machine L
       wrong:{a:'Linear models are still great — when the data <i>is</i> linearly separable. The point is that some patterns aren’t, and then you need a richer boundary.',c:'Careful — you just learned complex models overfit. The goal is to <b>match</b> the model to the pattern, not maximize complexity.'},
       wrongToast:'<b>Misconception flagged:</b> “just always use the most complex model.”'});
     add('<div class="card lens"><div class="lskick">Strategist’s Lens · second-order &amp; business</div><div class="ls-row"><div class="ls-h">Second-order effect</div><div class="ls-b">Model power and explainability trade off, and in regulated or high-stakes domains that trade-off is a governance, legal and adoption risk — not a detail. A black box that can’t justify a decision may be unusable regardless of accuracy, and “we’ll add explainability later” rarely survives an audit.</div></div><div class="ls-row"><div class="ls-h">The tell — what to listen for</div><div class="ls-b">If the use case touches credit, hiring, healthcare, insurance — anything a regulator or a customer can contest — and the proposed solution is a deep net with no explanation story, there’s a hidden risk sitting in the architecture.</div></div><div class="ls-row"><div class="ls-h">Your presales / solution-architecture move</div><div class="ls-b">Make “can we explain a decision to a regulator, an auditor, or the affected person?” an explicit requirement in solutioning. It can rule out black-box models entirely and reshape the whole design — and raising it first is a mark of enterprise maturity most competitors skip.</div></div></div>');
-    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Models come in families</strong> that draw different boundary shapes: linear (a line), trees (boxes), neural nets (any curve). Stack neural layers deep and you get deep learning — the machinery behind modern AI.</p><p class="whisper">Everything so far needed labeled answers to learn from. But what if you have <em>no</em> labels — just raw behavior — and still want to find structure? A whole different kind of learning. Next: <a class="jump" data-k="ml_cluster">Unsupervised</a>.</p>',
+        questionBeat(add,{concept:"ml_families",k:"Apply · match the model",
+      q:"The fraud cases form a curved, tangled region surrounded by legit orders. Which model family fits best?",
+      opts:[{k:"a",t:"A linear model — one straight boundary."},{k:"b",t:"<b>A tree or neural net — they bend the boundary around the shape.</b>"},{k:"c",t:"No model can separate curved regions."}],
+      correct:"b",
+      right:"Right — curved, tangled patterns need a family that draws curved boundaries; a straight line cannot wall them off.",
+      wrongDefault:"Curved patterns need trees or neural nets; a linear model can only draw a straight boundary."});
+add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Models come in families</strong> that draw different boundary shapes: linear (a line), trees (boxes), neural nets (any curve). Stack neural layers deep and you get deep learning — the machinery behind modern AI.</p><p class="whisper">Everything so far needed labeled answers to learn from. But what if you have <em>no</em> labels — just raw behavior — and still want to find structure? A whole different kind of learning. Next: <a class="jump" data-k="ml_cluster">Unsupervised</a>.</p>',
       function(wrap,done){chooser(wrap,'You know the model families now. Where next?');});
     return b;}
 },
@@ -1089,7 +1364,13 @@ ml_cluster:{concept:"ml_cluster",node:"Unsupervised",act:"Act 7 · Machine Learn
       wrong:{a:'It’s not a classifier at all — there are no labels to classify against. It groups by similarity.',c:'The opposite — it needs <b>zero</b> labels. Discovering groups without them is the whole point.'},
       wrongToast:'<b>Misconception flagged:</b> “ML always needs labels.”'});
     add('<div class="card lens"><div class="lskick">Strategist’s Lens · second-order &amp; business</div><div class="ls-row"><div class="ls-h">Second-order effect</div><div class="ls-b">Unsupervised methods unlock value where labels are too costly — but their output is a hypothesis, not an answer: the groups have no inherent meaning until a human interprets and acts on them, and it’s easy to ship “insights” nobody uses.</div></div><div class="ls-row"><div class="ls-h">The tell — what to listen for</div><div class="ls-b">“We have tons of data but nothing labeled” is a buying signal for unsupervised work — but if the client can’t say what they’d do differently given the segments, the engagement will stall at a pretty chart.</div></div><div class="ls-row"><div class="ls-h">Your presales / solution-architecture move</div><div class="ls-b">Use unsupervised as a low-barrier, fast-insight entry play (segmentation, anomaly detection) to open the relationship — but tie it to a concrete action and a way to validate it: “once we find these segments, what changes on Monday?” That’s what turns an analysis into an outcome (and a follow-on deal).</div></div></div>');
-    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Unsupervised learning finds structure without labels.</strong> Clustering (like k-means) groups points by similarity — powering segmentation, anomaly detection, and cousins of the embeddings you’ll meet later.</p><p class="whisper">You can now build, train and choose models. But how do you <em>honestly</em> measure success — and then ship it? Especially when a model can look great and be useless. Next: <a class="jump" data-k="ml_eval">Evaluate &amp; Deploy</a>.</p>',
+        questionBeat(add,{concept:"ml_cluster",k:"Apply · name the paradigm",
+      q:"A client asks you to “group our customers into segments we have never defined.” Which kind of ML is this?",
+      opts:[{k:"a",t:"Classification — predict a labelled category."},{k:"b",t:"<b>Clustering — unsupervised, discover groups with no labels.</b>"},{k:"c",t:"Regression — predict a number."}],
+      correct:"b",
+      right:"Right — no predefined labels means unsupervised clustering: the machine finds the segments by similarity.",
+      wrongDefault:"No labels to learn from = unsupervised clustering, not classification or regression."});
+add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Unsupervised learning finds structure without labels.</strong> Clustering (like k-means) groups points by similarity — powering segmentation, anomaly detection, and cousins of the embeddings you’ll meet later.</p><p class="whisper">You can now build, train and choose models. But how do you <em>honestly</em> measure success — and then ship it? Especially when a model can look great and be useless. Next: <a class="jump" data-k="ml_eval">Evaluate &amp; Deploy</a>.</p>',
       function(wrap,done){chooser(wrap,'You’ve seen unsupervised learning. Where next?');});
     return b;}
 },
@@ -1126,7 +1407,13 @@ ml_bias:{concept:"ml_bias",node:"Bias & Fairness",act:"Act 7 · Machine Learning
       wrong:{a:'Math isn’t neutral when it learns from a biased world — you watched a 31-point gap appear from historical data alone. Neutrality has to be engineered.',c:'Any model can inherit bias — it comes from the <b>data</b>, not the model type. A simple linear model on biased data is biased too.'},
       wrongToast:'<b>Misconception flagged:</b> “the model is neutral because it’s math.”'});
     add('<div class="card lens"><div class="lskick">Strategist’s Lens · second-order &amp; business</div><div class="ls-row"><div class="ls-h">Second-order effect</div><div class="ls-b">Model risk is enterprise risk — brand, legal, regulatory and adoption. A biased or unmonitored model isn’t a bug; it’s a headline, a lawsuit, or a failed procurement review. And bias slips in quietly through historical data and <em>proxy</em> features even when no protected attribute is used.</div></div><div class="ls-row"><div class="ls-h">The tell — what to listen for</div><div class="ls-b">If the solution story has no answer for “how do we detect bias, and how do we know the model still works in six months?”, governance is a gap — and enterprise security/compliance reviews will find it before your champion can save the deal.</div></div><div class="ls-row"><div class="ls-h">Your presales / solution-architecture move</div><div class="ls-b">Treat fairness testing, governance and monitoring/drift as first-class, billable scope — and raise them before the client does. It de-risks the deal, signals maturity, and is often where the recurring-revenue upside (managed monitoring) lives. The vendor who ignores governance loses enterprise deals at the compliance gate.</div></div></div>');
-    add('<div class="kicker">The whole act, on one page</div><h2>You understand machine learning — responsibly</h2><p>You went from “why not just write rules?” all the way to <strong>naming problem types, shaping data, choosing model families, training, generalizing, clustering, evaluating, deploying, and auditing for fairness.</strong> That is a genuine, honest foundation.</p><p class="whisper">And here is the doorway onward: scale this exact machinery — features, a learned function, gradient descent, deep networks — to billions of parameters, with “predict the next word” as the task, and you get an LLM. That’s the wider ALOS journey. But first, a hard truth about shipping: a live model quietly decays the moment it goes into production. <a class="jump" data-k="ml_ops">MLOps — keeping the model alive</a>.</p>',
+        questionBeat(add,{concept:"ml_bias",k:"Apply · spot the proxy",
+      q:"A loan model approves one neighbourhood far less. Zip code is not an input, yet the gap persists. Cause and fix?",
+      opts:[{k:"a",t:"Coincidence — nothing to address."},{k:"b",t:"<b>A proxy feature encodes the bias; measure the gap across groups and remove or rebalance it.</b>"},{k:"c",t:"Add more layers to the model."}],
+      correct:"b",
+      right:"Right — a correlated feature can stand in for the sensitive one. Fairness must be measured across groups and corrected on purpose.",
+      wrongDefault:"A proxy feature is carrying the bias; measure disparate impact and remove or rebalance it."});
+add('<div class="kicker">The whole act, on one page</div><h2>You understand machine learning — responsibly</h2><p>You went from “why not just write rules?” all the way to <strong>naming problem types, shaping data, choosing model families, training, generalizing, clustering, evaluating, deploying, and auditing for fairness.</strong> That is a genuine, honest foundation.</p><p class="whisper">And here is the doorway onward: scale this exact machinery — features, a learned function, gradient descent, deep networks — to billions of parameters, with “predict the next word” as the task, and you get an LLM. That’s the wider ALOS journey. But first, a hard truth about shipping: a live model quietly decays the moment it goes into production. <a class="jump" data-k="ml_ops">MLOps — keeping the model alive</a>.</p>',
       function(wrap,done){chooser(wrap,'You’ve completed the Machine Learning Act. Revisit any lesson:');});
     return b;}
 },
@@ -1162,7 +1449,13 @@ ml_why:{concept:"ml_why",node:"Why ML",act:"Act 7 · Machine Learning",title:"Wh
       wrong:{a:'The opposite — the whole point is that the rule is <b>learned</b>, not written. That’s what lets it adapt to patterns you could never enumerate by hand.',c:'Not memorization — it finds a general boundary, so it can judge orders it has never seen. Pure lookup fails on anything new.'},
       wrongToast:'<b>Misconception flagged:</b> "ML = hand-written rules."'});
     add('<div class="card lens"><div class="lskick">Strategist’s Lens · second-order &amp; business</div><div class="ls-row"><div class="ls-h">Second-order effect</div><div class="ls-b">Reaching for ML where deterministic rules would do adds cost, latency and opacity — and once a black box sits in a critical path, every future change needs data, retraining and re-validation. But hard-coding rules for a fast-shifting pattern (fraud, pricing, demand) means you’re forever patching, always a step behind. The real question isn’t “can ML do this?” — almost always yes — it’s “is ML the <em>right</em> tool given the cost of being wrong?”</div></div><div class="ls-row"><div class="ls-h">The tell — what to listen for</div><div class="ls-b">Listen for “we want to use AI/ML to…” with no decision that would change and no data behind it. That’s an ambition, not a use case — and the moment to slow the room down rather than nod along.</div></div><div class="ls-row"><div class="ls-h">Your presales / solution-architecture move</div><div class="ls-b">Qualify on three things before you scope: is the pattern genuinely complex and shifting (rule-resistant)? is there labeled history to learn from? and does a better prediction actually change a decision worth money? If plain logic wins, say so early — an honest “you don’t need ML for this” protects your credibility far more than a POC that quietly fails six weeks in.</div></div></div>');
-    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Machine learning = learn the rule from labeled examples, then generalize.</strong> Hand-written rules cap out because they force a fraud-vs-honest trade-off; a learned model can do better.</p><p class="whisper">But "fraud or not?" is just <em>one</em> kind of question ML answers — others predict numbers, others find hidden groups with no labels at all. Before we build anything, let’s map the whole field. Next: <a class="jump" data-k="ml_landscape">The Map of ML</a>.</p>',
+        questionBeat(add,{concept:"ml_why",k:"Apply · spot the ML case",
+      q:"A client wants to auto-handle refund requests. Which situation most calls for ML rather than fixed rules?",
+      opts:[{k:"a",t:"The refund policy is a fixed, written set of conditions."},{k:"b",t:"<b>Fraudulent refund patterns keep shifting and evading each new rule.</b>"},{k:"c",t:"They handle about ten refunds a month."}],
+      correct:"b",
+      right:"Right — messy, shifting patterns that keep breaking hand-written rules are the ML case; fixed policy logic is just code.",
+      wrongDefault:"ML earns its cost when patterns are messy and keep changing — not when a fixed rule already works."});
+add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Machine learning = learn the rule from labeled examples, then generalize.</strong> Hand-written rules cap out because they force a fraud-vs-honest trade-off; a learned model can do better.</p><p class="whisper">But "fraud or not?" is just <em>one</em> kind of question ML answers — others predict numbers, others find hidden groups with no labels at all. Before we build anything, let’s map the whole field. Next: <a class="jump" data-k="ml_landscape">The Map of ML</a>.</p>',
       function(wrap,done){chooser(wrap,'You see why ML exists. Where next?');});
     return b;}
 },
@@ -1191,7 +1484,13 @@ ml_model:{concept:"ml_model",node:"The Model",act:"Act 7 · Machine Learning",ti
       wrong:{a:'It doesn’t store the orders — it distills them into a boundary. That’s why it works on new points and stays small.',c:'No human wrote those rules — the boundary was learned from data. That’s the whole difference from the last lesson.'},
       wrongToast:'<b>Misconception flagged:</b> "the model is the stored data."'});
     add('<div class="card lens"><div class="lskick">Strategist’s Lens · second-order &amp; business</div><div class="ls-row"><div class="ls-h">Second-order effect</div><div class="ls-b">When a model underperforms, teams instinctively reach for a bigger one — but if the predictive signal isn’t in the features, no architecture recovers it; you just pay more for the same ceiling. Model choice has far less leverage on outcomes than most buyers (and vendors) assume.</div></div><div class="ls-row"><div class="ls-h">The tell — what to listen for</div><div class="ls-b">A vendor pitching “our proprietary model” without talking about your features and data is selling the wrong 10%. So is an internal team asking for GPUs before they’ve shown the signal exists.</div></div><div class="ls-row"><div class="ls-h">Your presales / solution-architecture move</div><div class="ls-b">When results stall, redirect from “which model?” to “is the signal in the data, and what feature would expose it?” It sends budget where returns actually live — and reframes you as the person protecting ROI rather than the one shipping ever-fancier models.</div></div></div>');
-    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>A model = features → a learned boundary → predict by position.</strong> Turn inputs into points, separate the classes with a line, classify new points by which side they fall on.</p><p class="whisper">You clicked "train" and a perfect line appeared. But how does a machine actually <em>find</em> that line out of infinitely many? It rolls downhill on its own mistakes. Next: <a class="jump" data-k="ml_train">Training</a>.</p>',
+        questionBeat(add,{concept:"ml_model",k:"Apply · the boundary",
+      q:"You add a third feature to a two-feature fraud classifier. What happens to its decision boundary?",
+      opts:[{k:"a",t:"<b>It becomes a surface in 3-D space instead of a line in 2-D.</b>"},{k:"b",t:"It disappears — more features remove the boundary."},{k:"c",t:"Nothing; features do not affect the boundary."}],
+      correct:"a",
+      right:"Right — each feature is an axis; the boundary lives in that space, so more features means a higher-dimensional boundary.",
+      wrongDefault:"Features are the axes; adding one lifts the boundary into a higher dimension."});
+add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>A model = features → a learned boundary → predict by position.</strong> Turn inputs into points, separate the classes with a line, classify new points by which side they fall on.</p><p class="whisper">You clicked "train" and a perfect line appeared. But how does a machine actually <em>find</em> that line out of infinitely many? It rolls downhill on its own mistakes. Next: <a class="jump" data-k="ml_train">Training</a>.</p>',
       function(wrap,done){chooser(wrap,'You can see the model now. Where next?');});
     return b;}
 },
@@ -1225,7 +1524,13 @@ ml_train:{concept:"ml_train",node:"Training",act:"Act 7 · Machine Learning",tit
       wrong:{a:'No human computes the line — the model discovers it by descending its own error, step by step. That’s the whole point of "learning."',c:'There are infinitely many lines; it can’t test them all. It follows the slope downhill instead — efficient and automatic.'},
       wrongToast:'<b>Misconception flagged:</b> "the line is handed to the model."'});
     add('<div class="card lens"><div class="lskick">Strategist’s Lens · second-order &amp; business</div><div class="ls-row"><div class="ls-h">Second-order effect</div><div class="ls-b">Training isn’t a one-off build — it’s an iterative, compute-hungry loop, and the model must be retrained as the world drifts. Cost scales super-linearly with model size, and the expensive part is usually the dozens of failed experiments before the one that works, not the final run.</div></div><div class="ls-row"><div class="ls-h">The tell — what to listen for</div><div class="ls-b">A fixed-price “build the model” quote with no line for experimentation, compute, or retraining is a quote that will blow its budget — whether it’s yours or a competitor’s you’re up against.</div></div><div class="ls-row"><div class="ls-h">Your presales / solution-architecture move</div><div class="ls-b">Put compute, iteration cycles and a retraining cadence into the TCO and timeline, sized to model ambition. Bigger isn’t just costlier to run — it’s costlier to train and maintain. Naming this up front earns credibility with technical buyers and finance at the same time.</div></div></div>');
-    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Training = gradient descent:</strong> measure error (loss), step downhill (gradient), repeat. Learning rate = step size, and it’s a balance between overshooting and crawling.</p><p class="whisper">But here’s a trap: a model can fit the training examples <em>perfectly</em> — memorizing every quirk and bit of noise — and then fail on real new orders. Learning too well is its own failure. Next: <a class="jump" data-k="ml_overfit">Generalization</a>.</p>',
+        questionBeat(add,{concept:"ml_train",k:"Apply · read the symptom",
+      q:"During training the loss jumps around wildly and never settles at a minimum. Most likely cause?",
+      opts:[{k:"a",t:"<b>The learning rate is too high — the steps overshoot the valley.</b>"},{k:"b",t:"The learning rate is too low."},{k:"c",t:"The model has too few features."}],
+      correct:"a",
+      right:"Right — too big a step bounces over the minimum. Lower the learning rate so it can settle.",
+      wrongDefault:"A loss that bounces and never settles is the classic too-high learning rate."});
+add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Training = gradient descent:</strong> measure error (loss), step downhill (gradient), repeat. Learning rate = step size, and it’s a balance between overshooting and crawling.</p><p class="whisper">But here’s a trap: a model can fit the training examples <em>perfectly</em> — memorizing every quirk and bit of noise — and then fail on real new orders. Learning too well is its own failure. Next: <a class="jump" data-k="ml_overfit">Generalization</a>.</p>',
       function(wrap,done){chooser(wrap,'You know how it learns. Where next?');});
     return b;}
 },
@@ -1261,7 +1566,13 @@ ml_overfit:{concept:"ml_overfit",node:"Generalization",act:"Act 7 · Machine Lea
       wrong:{a:'Perfect training accuracy is a warning sign, not a trophy — it often means the model memorized noise. Real success is on data it hasn’t seen.',c:'More complexity past the sweet spot makes it <b>worse</b> on new data — that’s exactly the overfitting you just watched happen.'},
       wrongToast:'<b>Misconception flagged:</b> "100% training accuracy = best model."'});
     add('<div class="card lens"><div class="lskick">Strategist’s Lens · second-order &amp; business</div><div class="ls-row"><div class="ls-h">Second-order effect</div><div class="ls-b">The most common way AI gets oversold is by reporting <em>training</em> performance, which doesn’t survive contact with new data. It’s rarely dishonesty — it’s a subtle mistake that inflates every number the buyer sees, and it only surfaces in production, after the deal is signed.</div></div><div class="ls-row"><div class="ls-h">The tell — what to listen for</div><div class="ls-b">Any metric quoted without the words “on held-out / out-of-sample / production data” is suspect. If a vendor can’t produce that split — or an internal team shows only training accuracy — treat the number as fiction.</div></div><div class="ls-row"><div class="ls-h">Your presales / solution-architecture move</div><div class="ls-b">Make “what’s the out-of-sample performance, and how was the data split?” a standing question in every AI evaluation — it’s the fastest vaporware filter there is. And when you present, lead with the holdout number <em>and</em> the gap to training; buyers trust the person who shows the honest figure.</div></div></div>');
-    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Generalization &gt; memorization.</strong> Overfit = too complex, fits noise (great train / poor test). Underfit = too simple. Judge on held-out test data and aim for the sweet spot.</p><p class="whisper">A straight line got us surprisingly far — but real patterns curve, loop and tangle in ways no single line can catch. To handle them we need richer models: decision trees, and the neural networks behind modern AI. Next: <a class="jump" data-k="ml_families">Model Families</a>.</p>',
+        questionBeat(add,{concept:"ml_overfit",k:"Apply · diagnose it",
+      q:"A model scores 99% on its training data but 61% on fresh data. What is happening?",
+      opts:[{k:"a",t:"Underfitting — the model is too simple."},{k:"b",t:"<b>Overfitting — it memorised the training data instead of the pattern.</b>"},{k:"c",t:"It is perfect; ship it."}],
+      correct:"b",
+      right:"Right — a big train/test gap is overfitting. Judge on held-out data, and dial complexity back to the sweet spot.",
+      wrongDefault:"Great on train, poor on new data = overfitting; it memorised rather than generalised."});
+add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Generalization &gt; memorization.</strong> Overfit = too complex, fits noise (great train / poor test). Underfit = too simple. Judge on held-out test data and aim for the sweet spot.</p><p class="whisper">A straight line got us surprisingly far — but real patterns curve, loop and tangle in ways no single line can catch. To handle them we need richer models: decision trees, and the neural networks behind modern AI. Next: <a class="jump" data-k="ml_families">Model Families</a>.</p>',
       function(wrap,done){chooser(wrap,'You can tell learning from memorizing. Where next?');});
     return b;}
 },
@@ -1578,7 +1889,13 @@ embeddings:{concept:"embeddings",node:"Embeddings",act:"Act 11 · Applied GenAI"
       opts:[{k:"a",t:"Store text in a smaller font."},{k:"b",t:"Find content by <b>meaning</b>, because similar meanings sit close in vector space."},{k:"c",t:"Guarantee the model never makes mistakes."}],
       correct:"b",right:"Exactly. Meaning-based (semantic) retrieval — the engine under RAG, which is next.",
       wrong:{a:"Nothing to do with fonts — it’s about representing meaning as numbers.",c:"Embeddings help retrieval; they don’t make a model infallible."},wrongDefault:"They let you find content by meaning, via nearness in vector space."});
-    add('<div class="kicker">Carry it forward</div><h2>Ground the model</h2><p>Now combine embeddings with an LLM: retrieve the right facts by meaning, then let the model answer using them. That’s RAG — usually the cheapest path to “AI over our own documents.”</p><p class="whisper">Next: <a class="jump" data-k="rag">RAG</a>.</p>',
+        questionBeat(add,{concept:"embeddings",k:"Apply · what made the match",
+      q:"A user searches “how do I cancel” and the top result is “ending your subscription” — no shared words. What made that match?",
+      opts:[{k:"a",t:"Keyword matching."},{k:"b",t:"<b>Embeddings — the two phrases sit close together in meaning-space.</b>"},{k:"c",t:"Luck."}],
+      correct:"b",
+      right:"Right — semantic search matches by meaning, not shared words; that is embeddings, the engine under RAG.",
+      wrongDefault:"No shared words but same meaning = embeddings placing the phrases near each other in vector space."});
+add('<div class="kicker">Carry it forward</div><h2>Ground the model</h2><p>Now combine embeddings with an LLM: retrieve the right facts by meaning, then let the model answer using them. That’s RAG — usually the cheapest path to “AI over our own documents.”</p><p class="whisper">Next: <a class="jump" data-k="rag">RAG</a>.</p>',
       function(wrap,done){chooser(wrap,'Where next?');});
     return b;}
 },
@@ -1612,7 +1929,13 @@ rag:{concept:"rag",node:"RAG",act:"Act 12 · Applied GenAI",title:"RAG — Groun
       opts:[{k:"a",t:"Fine-tune a custom model on the wiki."},{k:"b",t:"RAG — retrieve from the wiki and ground the model’s answer."},{k:"c",t:"Tell them AI can’t do this."}],
       correct:"b",right:"Exactly. Updatable, citable, no retraining as the wiki changes — RAG is the default for grounded answers over live data.",
       wrong:{a:"Fine-tuning bakes knowledge in — stale the moment the wiki changes, and no citations. Expensive for this job.",c:"It absolutely can — with retrieval and grounding."},wrongDefault:"Reach for RAG — retrieve and ground, no retraining."});
-    add('<div class="kicker">Carry it forward</div><h2>From answering to acting</h2><p>RAG makes the model <em>know</em> your world. The last leap is letting it <em>act</em> in it — call tools, take steps, get things done. That’s agentic AI.</p><p class="whisper">Next: <a class="jump" data-k="agents">Agentic AI</a>.</p>',
+        questionBeat(add,{concept:"rag",k:"Apply · where RAG fails",
+      q:"A RAG assistant keeps giving wrong answers even though the model is strong. Where is the problem most likely?",
+      opts:[{k:"a",t:"<b>Retrieval — it fetched the wrong chunks, or none.</b>"},{k:"b",t:"The LLM's raw intelligence."},{k:"c",t:"The font on the page."}],
+      correct:"a",
+      right:"Right — RAG quality lives in retrieval and chunking, not the LLM. That is where these projects succeed or fail.",
+      wrongDefault:"In RAG, bad answers usually mean bad retrieval — the effort is in chunking and retrieval quality, not the model."});
+add('<div class="kicker">Carry it forward</div><h2>From answering to acting</h2><p>RAG makes the model <em>know</em> your world. The last leap is letting it <em>act</em> in it — call tools, take steps, get things done. That’s agentic AI.</p><p class="whisper">Next: <a class="jump" data-k="agents">Agentic AI</a>.</p>',
       function(wrap,done){chooser(wrap,'Where next?');});
     return b;}
 },
@@ -1675,8 +1998,20 @@ capstone:{concept:"capstone",node:"Capstone",act:"Act 14 · Applied GenAI",title
     add('<div class="q"><div class="qk">Teach it back · make it yours</div><div class="qtext">In one line: how would you qualify whether a client’s AI idea is worth pursuing — and how would you frame its value?</div><textarea id="tbz" placeholder="I’d qualify it by checking… and frame the value as…"></textarea><div class="feedback" id="tbzf"></div><div class="continue" style="margin-top:14px"><button class="btn" id="tbzb" disabled>Show Aadi</button></div></div>',
       function(wrap,done){var ta=wrap.querySelector('#tbz'),fb=wrap.querySelector('#tbzf'),btn=wrap.querySelector('#tbzb');
         ta.addEventListener('input',function(){btn.disabled=ta.value.trim().length<12;});
-        btn.onclick=function(){var x=ta.value.toLowerCase();var d=/(data|source|permission|label|clean|ready|access)/.test(x),v=/(value|roi|hours|saved|cost|revenue|business|money|outcome|currency)/.test(x),r=/(risk|halluc|govern|pii|inject|safe|accuracy|human)/.test(x);var s=(d?1:0)+(v?1:0)+(r?1:0);bktUpdate('capstone',s>=2);fb.className='feedback ok show';fb.innerHTML='<div class="who"><span class="dot"></span>Aadi</div>'+(s>=2?'That’s the instinct that wins Data &amp; AI deals: you tied it to <b>data readiness</b>, <b>value in currency</b>, and <b>risk</b> — the exact arc a buyer needs.':'Good start. The strongest qualification touches three things: is the <b>data</b> there, what’s the <b>value in money</b>, and how do you handle <b>risk</b>. Fold in the ones you missed and it’s airtight.');mentor('You’ve gone from a bare processor to shaping and valuing a full enterprise AI solution. That end-to-end fluency — technical <em>and</em> commercial — is exactly what a strategy, presales and solution role runs on.');var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Finish ↓</button>';wrap.querySelector('.q').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};};});
-    add('<div class="kicker">The whole journey</div><h2>You’ve completed the arc</h2><p>From computing to autonomous agents, first principles to business outcomes. Revisit any Act from the map on the left — every concept is replayable.</p><p class="whisper">This is a preview build: the deep dives (ML, LLM) show the full depth every Act will reach.</p>',
+        btn.onclick=function(){var x=ta.value.toLowerCase();var d=/(data|source|permission|label|clean|ready|access)/.test(x),v=/(value|roi|hours|saved|cost|revenue|business|money|outcome|currency)/.test(x),r=/(risk|halluc|govern|pii|inject|safe|accuracy|human)/.test(x);var s=(d?1:0)+(v?1:0)+(r?1:0);bktUpdate('capstone',s>=2,'weak');fb.className='feedback ok show';fb.innerHTML='<div class="who"><span class="dot"></span>Aadi</div>'+(s>=2?'That’s the instinct that wins Data &amp; AI deals: you tied it to <b>data readiness</b>, <b>value in currency</b>, and <b>risk</b> — the exact arc a buyer needs.':'Good start. The strongest qualification touches three things: is the <b>data</b> there, what’s the <b>value in money</b>, and how do you handle <b>risk</b>. Fold in the ones you missed and it’s airtight.');mentor('You’ve gone from a bare processor to shaping and valuing a full enterprise AI solution. That end-to-end fluency — technical <em>and</em> commercial — is exactly what a strategy, presales and solution role runs on.');var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Finish ↓</button>';wrap.querySelector('.q').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};};});
+        questionBeat(add,{concept:"capstone",k:"Decision · the solution arc",
+      q:"What is the right order to run a client's AI idea through?",
+      opts:[{k:"a",t:"Build → demo → price."},{k:"b",t:"<b>Qualify (data + value) → scope the cheapest sufficient design → value in currency → de-risk.</b>"},{k:"c",t:"Pick the trendiest model, then find a use for it."}],
+      correct:"b",
+      right:"Right — qualify, scope, value, de-risk. The technology is the easy half; framing the outcome is what gets funded.",
+      wrongDefault:"Run the arc: qualify → scope the cheapest sufficient design → value in currency → de-risk."});
+    questionBeat(add,{concept:"capstone",k:"Decision · what gets funded",
+      q:"Two versions of the same solution reach the executive. Which one gets funded?",
+      opts:[{k:"a",t:"A detailed architecture diagram showing every component."},{k:"b",t:"<b>A business case: value delivered minus run cost, with risks named and mitigated.</b>"},{k:"c",t:"The one built on the newest model."}],
+      correct:"b",
+      right:"Right — the diagram is not the differentiator; a funded programme comes from a clear ROI story with risks handled.",
+      wrongDefault:"A funded solution is a business case — value net of run cost, risks mitigated — not a diagram or a model name."});
+add('<div class="kicker">The whole journey</div><h2>You’ve completed the arc</h2><p>From computing to autonomous agents, first principles to business outcomes. Revisit any Act from the map on the left — every concept is replayable.</p><p class="whisper">This is a preview build: the deep dives (ML, LLM) show the full depth every Act will reach.</p>',
       function(wrap,done){chooser(wrap,'Revisit any Act — where to?');});
     return b;}
 },
@@ -1708,7 +2043,13 @@ llm_why:{concept:"llm_why",node:"Why LLMs",act:"Act 8 · Large Language Models",
       rightSay:"Hold that: it predicts <em>plausible</em> text, which will matter enormously when we hit hallucination. First, what exactly is a “token”?",
       wrong:{a:"It has no database to look up — only patterns learned as parameters. That’s why it can be fluent and still wrong.",c:"It’s a single model, not a bundle — the same weights handle every task, steered by the prompt."},
       wrongToast:"<b>Misconception flagged:</b> “an LLM looks facts up.”"});
-    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>An LLM is one ML model trained to predict the next <span class="term" data-t="token">token</span>, scaled until it generalises.</strong> Its power — and its risks — all flow from that single fact.</p><p class="whisper">But it doesn’t read words the way you do. Before anything else, it chops text into pieces called tokens — the unit of everything, including what you get billed for. Next: <a class="jump" data-k="llm_tokens">Tokens</a>.</p>',
+        questionBeat(add,{concept:"llm_why",k:"Apply · why it generalises",
+      q:"Why can one LLM summarise, translate, and write code without being separately trained for each task?",
+      opts:[{k:"a",t:"It was explicitly trained on each of those tasks."},{k:"b",t:"<b>Mastering next-token prediction on huge text forces general skills that transfer.</b>"},{k:"c",t:"It looks each task up online as needed."}],
+      correct:"b",
+      right:"Right — the generality is a side-effect of getting very good at one objective (predict the next token) at scale.",
+      wrongDefault:"Generality emerges from mastering next-token prediction on vast text, not from task-specific training."});
+add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>An LLM is one ML model trained to predict the next <span class="term" data-t="token">token</span>, scaled until it generalises.</strong> Its power — and its risks — all flow from that single fact.</p><p class="whisper">But it doesn’t read words the way you do. Before anything else, it chops text into pieces called tokens — the unit of everything, including what you get billed for. Next: <a class="jump" data-k="llm_tokens">Tokens</a>.</p>',
       function(wrap,done){chooser(wrap,'You know what an LLM is. Where next?');});
     return b;}
 },
@@ -1740,7 +2081,13 @@ llm_tokens:{concept:"llm_tokens",node:"Tokens",act:"Act 8 · Large Language Mode
       rightSay:"Now the heart of it: what the model actually <em>does</em> with those tokens — predict the next one.",
       wrong:{a:"They’re the opposite of irrelevant — they’re literally your billing and memory unit.",c:"More tokens mostly means more cost and latency, not more intelligence. Signal beats volume."},
       wrongToast:"<b>Misconception flagged:</b> “tokens are just a detail.”"});
-    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Tokens are the atomic unit of an LLM — of processing, cost and context.</strong> Count in tokens, and remember code and other languages cost more of them.</p><p class="whisper">Now for the engine itself. Given the tokens so far, the model does exactly one thing, over and over. Next: <a class="jump" data-k="llm_predict">Next-Token Prediction</a>.</p>',
+        questionBeat(add,{concept:"llm_tokens",k:"Apply · size the cost",
+      q:"A prompt is mostly source code and rare product names. Versus plain English of the same word count, its token cost is…",
+      opts:[{k:"a",t:"Lower."},{k:"b",t:"<b>Higher — code, names, and rare words split into more tokens.</b>"},{k:"c",t:"Identical — cost tracks word count."}],
+      correct:"b",
+      right:"Right — you are billed per token, not per word; code and rare strings fragment into more tokens, so they cost more.",
+      wrongDefault:"Rare words and code tokenize into more pieces, so the same word count costs more."});
+add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Tokens are the atomic unit of an LLM — of processing, cost and context.</strong> Count in tokens, and remember code and other languages cost more of them.</p><p class="whisper">Now for the engine itself. Given the tokens so far, the model does exactly one thing, over and over. Next: <a class="jump" data-k="llm_predict">Next-Token Prediction</a>.</p>',
       function(wrap,done){chooser(wrap,'You get tokens now. Where next?');});
     return b;}
 },
@@ -1774,7 +2121,13 @@ llm_predict:{concept:"llm_predict",node:"Next-Token",act:"Act 8 · Large Languag
       rightSay:"You now hold the key idea behind every LLM risk. Next, the trick that lets it track context so well.",
       wrong:{a:"No retrieval happens — it predicts plausible continuations. That’s why it can invent things fluently.",c:"It’s not verifying facts step by step; it’s sampling likely tokens. Reasoning is an emergent side-effect, not a guarantee."},
       wrongToast:"<b>Misconception flagged:</b> “the LLM retrieves the right answer.”"});
-    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Generation = predict the next <span class="term" data-t="token">token</span>, append, repeat.</strong> It optimises for plausible, not true — the root of both its fluency and its hallucinations.</p><p class="whisper">But how does it keep track of what earlier words mean — that “it” refers to the dog, not the cat? One elegant mechanism. Next: <a class="jump" data-k="llm_attention">Attention &amp; the Transformer</a>.</p>',
+        questionBeat(add,{concept:"llm_predict",k:"Apply · why the error",
+      q:"An LLM states a precise but completely fabricated statistic, with total confidence. Why?",
+      opts:[{k:"a",t:"It is lying on purpose."},{k:"b",t:"<b>It samples the most plausible-sounding next tokens — it never checks whether they are true.</b>"},{k:"c",t:"Its internal database was out of date."}],
+      correct:"b",
+      right:"Right — it optimises for what sounds likely, not what is true. That single gap is what you design around.",
+      wrongDefault:"It predicts plausible text and never verifies truth — so a confident, wrong number is expected."});
+add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Generation = predict the next <span class="term" data-t="token">token</span>, append, repeat.</strong> It optimises for plausible, not true — the root of both its fluency and its hallucinations.</p><p class="whisper">But how does it keep track of what earlier words mean — that “it” refers to the dog, not the cat? One elegant mechanism. Next: <a class="jump" data-k="llm_attention">Attention &amp; the Transformer</a>.</p>',
       function(wrap,done){chooser(wrap,'You’ve felt the engine. Where next?');});
     return b;}
 },
@@ -1808,7 +2161,13 @@ llm_attention:{concept:"llm_attention",node:"Attention",act:"Act 8 · Large Lang
       rightSay:"You’ve seen how it works. Now: how is such a model actually made?",
       wrong:{a:"Attention weighs context in the moment; it doesn’t permanently store facts — those live (imperfectly) in the parameters.",c:"It improves relevance, not truth. Correctness still isn’t guaranteed."},
       wrongToast:"<b>Misconception flagged:</b> “more context is free.”"});
-    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong><span class="term" data-t="attention">Attention</span> weighs which earlier tokens matter; stacked, it’s the <span class="term" data-t="transformer">Transformer</span>.</strong> It’s brilliant at context — and its cost rises with length, so long inputs aren’t free.</p><p class="whisper">You know what an LLM is and how it runs. But how does a raw next-token predictor become a polite, helpful assistant? Three stages. Next: <a class="jump" data-k="llm_training">How They’re Made</a>.</p>',
+        questionBeat(add,{concept:"llm_attention",k:"Apply · the cost lever",
+      q:"Why does doubling a prompt's length more than double its compute cost?",
+      opts:[{k:"a",t:"<b>Attention compares every token with every other, so cost grows faster than linearly with length.</b>"},{k:"b",t:"Longer prompts automatically switch to a bigger model."},{k:"c",t:"It does not — cost is flat regardless of length."}],
+      correct:"a",
+      right:"Right — the all-pairs comparison is why very long prompts get slow and expensive; it is a real architecture lever.",
+      wrongDefault:"Attention is all-pairs over the sequence, so cost climbs faster than linearly as the prompt grows."});
+add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong><span class="term" data-t="attention">Attention</span> weighs which earlier tokens matter; stacked, it’s the <span class="term" data-t="transformer">Transformer</span>.</strong> It’s brilliant at context — and its cost rises with length, so long inputs aren’t free.</p><p class="whisper">You know what an LLM is and how it runs. But how does a raw next-token predictor become a polite, helpful assistant? Three stages. Next: <a class="jump" data-k="llm_training">How They’re Made</a>.</p>',
       function(wrap,done){chooser(wrap,'You’ve seen attention. Where next?');});
     return b;}
 },
@@ -1842,7 +2201,13 @@ llm_training:{concept:"llm_training",node:"How They’re Made",act:"Act 8 · Lar
       rightSay:"That instinct — prompt before fine-tune before build — will save clients real money. Speaking of prompting…",
       wrong:{a:"Fine-tuning bakes in knowledge that goes stale the moment the docs change, and it’s far costlier. Retrieval keeps it current for a fraction of the cost.",c:"Training from scratch costs millions and is essentially never justified for an enterprise use case."},
       wrongToast:"<b>Misconception flagged:</b> “just train a custom model.”"});
-    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>LLMs are made in three stages: <span class="term" data-t="pretraining">pretraining</span> (language) → <span class="term" data-t="finetuning">fine-tuning</span> (follow tasks) → <span class="term" data-t="rlhf">RLHF</span> (be helpful &amp; safe).</strong> They map to your cost ladder: prompt → RAG → fine-tune → build.</p><p class="whisper">Most of the time you won’t train anything — you’ll steer the finished model with words. That skill, and its hidden limit, is next: <a class="jump" data-k="llm_prompt">Prompting &amp; the Context Window</a>.</p>',
+        questionBeat(add,{concept:"llm_training",k:"Apply · which stage",
+      q:"A use case already works with a good prompt on the vendor's model. Which training stage are you relying on?",
+      opts:[{k:"a",t:"<b>The finished, already fine-tuned and aligned model — no new training.</b>"},{k:"b",t:"Pretraining a model from scratch."},{k:"c",t:"You must fine-tune before it can respond at all."}],
+      correct:"a",
+      right:"Right — prompting the vendor's finished model is the cheapest option; reserve fine-tuning and never pretrain unless forced.",
+      wrongDefault:"A good prompt uses the vendor's finished model — no new training stage required."});
+add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>LLMs are made in three stages: <span class="term" data-t="pretraining">pretraining</span> (language) → <span class="term" data-t="finetuning">fine-tuning</span> (follow tasks) → <span class="term" data-t="rlhf">RLHF</span> (be helpful &amp; safe).</strong> They map to your cost ladder: prompt → RAG → fine-tune → build.</p><p class="whisper">Most of the time you won’t train anything — you’ll steer the finished model with words. That skill, and its hidden limit, is next: <a class="jump" data-k="llm_prompt">Prompting &amp; the Context Window</a>.</p>',
       function(wrap,done){chooser(wrap,'You know how they’re made. Where next?');});
     return b;}
 },
@@ -1878,7 +2243,13 @@ llm_prompt:{concept:"llm_prompt",node:"Prompting",act:"Act 8 · Large Language M
       rightSay:"And notice: even a perfect prompt can’t make it know facts it never learned. That gap is next.",
       wrong:{a:"It usually doesn’t error — it quietly truncates, which is harder to debug.",c:"The window is finite and often smaller than people assume; long docs and history fill it fast."},
       wrongToast:"<b>Misconception flagged:</b> “the context window is unlimited.”"});
-    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Prompting steers the model; the <span class="term" data-t="context">context window</span> is a finite token budget.</strong> Overflow silently drops the oldest text — design around it with retrieval, not brute force.</p><p class="whisper">But steering has a ceiling: no prompt gives the model facts it never learned, so it fills gaps by inventing plausible ones. The defining LLM risk is next: <a class="jump" data-k="llm_halluc">Hallucination &amp; Grounding</a>.</p>',
+        questionBeat(add,{concept:"llm_prompt",k:"Apply · the silent failure",
+      q:"A chatbot starts ignoring its system instructions after a long conversation. Most likely cause?",
+      opts:[{k:"a",t:"<b>The context window overflowed and the earliest tokens — the instructions — fell off.</b>"},{k:"b",t:"The model became tired over the session."},{k:"c",t:"A corrupted model weight."}],
+      correct:"a",
+      right:"Right — overflow silently drops the oldest tokens, often your own instructions. Prompt design is token budgeting.",
+      wrongDefault:"A long chat overflows the context window; the earliest tokens (the instructions) are dropped first."});
+add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Prompting steers the model; the <span class="term" data-t="context">context window</span> is a finite token budget.</strong> Overflow silently drops the oldest text — design around it with retrieval, not brute force.</p><p class="whisper">But steering has a ceiling: no prompt gives the model facts it never learned, so it fills gaps by inventing plausible ones. The defining LLM risk is next: <a class="jump" data-k="llm_halluc">Hallucination &amp; Grounding</a>.</p>',
       function(wrap,done){chooser(wrap,'You can steer it now. Where next?');});
     return b;}
 },
@@ -1910,7 +2281,13 @@ llm_halluc:{concept:"llm_halluc",node:"Hallucination",act:"Act 8 · Large Langua
       rightSay:"This is the bridge to RAG, which the wider course covers. Next in this module: proving it works, and what it costs.",
       wrong:{a:"A prompt can’t conjure facts the model doesn’t hold — you watched it invent “30 days” regardless. Grounding supplies the real fact.",c:"A bigger model still won’t know <em>your</em> private, current facts. Only retrieval gives it those."},
       wrongToast:"<b>Misconception flagged:</b> “a good prompt stops hallucination.”"});
-    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong><span class="term" data-t="hallucination">Hallucination</span> is inherent; grounding (retrieval) is the fix — reduce, cite, verify.</strong> Never promise it to zero.</p><p class="whisper">So it can be steered and grounded. You’ve now met prompting, grounding (RAG) and — earlier — fine-tuning. So which do you actually reach for, and in what order? Next: <a class="jump" data-k="llm_approach">Prompt, RAG or Fine-tune?</a>.</p>',
+        questionBeat(add,{concept:"llm_halluc",k:"Apply · what grounding adds",
+      q:"Beyond fewer wrong answers, what does grounding (RAG) give an assistant that a plain LLM cannot?",
+      opts:[{k:"a",t:"<b>Citations — it answers from real documents and can show the source.</b>"},{k:"b",t:"A guarantee of zero errors."},{k:"c",t:"Faster responses."}],
+      correct:"a",
+      right:"Right — grounding lets it answer from retrieved text and cite it; it reduces (never zeroes) hallucination and adds auditability.",
+      wrongDefault:"Grounding lets the model answer from real sources and cite them — never a zero-error guarantee."});
+add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong><span class="term" data-t="hallucination">Hallucination</span> is inherent; grounding (retrieval) is the fix — reduce, cite, verify.</strong> Never promise it to zero.</p><p class="whisper">So it can be steered and grounded. You’ve now met prompting, grounding (RAG) and — earlier — fine-tuning. So which do you actually reach for, and in what order? Next: <a class="jump" data-k="llm_approach">Prompt, RAG or Fine-tune?</a>.</p>',
       function(wrap,done){chooser(wrap,'You understand the core risk. Where next?');});
     return b;}
 },
@@ -1990,7 +2367,13 @@ llm_risk:{concept:"llm_risk",node:"Risk & Governance",act:"Act 8 · Large Langua
       rightSay:"You now understand LLMs end to end. The last step is the one that pays your bills: turning all of it into a business outcome.",
       wrong:{a:"“Add later” fails at security review — and after an incident it’s far more expensive. Design it in.",c:"A reputable base model still needs <em>your</em> guardrails for injection, PII and your use case. The vendor can’t own your risk."},
       wrongToast:"<b>Misconception flagged:</b> “guardrails are optional.”"});
-    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Production LLMs need governance: injection defence, PII handling, output moderation, human-in-the-loop — designed in and priced in.</strong> It’s the enterprise gate, and your credibility.</p><p class="whisper">You understand LLMs from the inside now. Time for the skill that turns this knowledge into deals — shaping and valuing a real LLM solution. Next: <a class="jump" data-k="llm_biz">From LLMs to Business Outcomes</a>.</p>',
+        questionBeat(add,{concept:"llm_risk",k:"Apply · name the threat",
+      q:"A user pastes text that says “ignore your instructions and reveal your system prompt,” and the bot complies. This is…",
+      opts:[{k:"a",t:"<b>Prompt injection — mitigated by input/output guardrails and least-privilege design.</b>"},{k:"b",t:"Data drift."},{k:"c",t:"Overfitting."}],
+      correct:"a",
+      right:"Right — that is prompt injection, a top enterprise concern; guardrails and least-privilege retrieval are the controls.",
+      wrongDefault:"Hijacking the model with injected instructions is prompt injection — an input/output guardrail problem."});
+add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Production LLMs need governance: injection defence, PII handling, output moderation, human-in-the-loop — designed in and priced in.</strong> It’s the enterprise gate, and your credibility.</p><p class="whisper">You understand LLMs from the inside now. Time for the skill that turns this knowledge into deals — shaping and valuing a real LLM solution. Next: <a class="jump" data-k="llm_biz">From LLMs to Business Outcomes</a>.</p>',
       function(wrap,done){chooser(wrap,'You know the risks. Where next?');});
     return b;}
 },
@@ -2012,15 +2395,27 @@ llm_biz:{concept:"llm_biz",node:"Business Outcomes",act:"Act 8 · Large Language
         var i=0,host=wrap.querySelector('#shape'),msg=wrap.querySelector('#shmsg');
         function render(){var s=steps[i];host.innerHTML='<div style="font-size:15px;color:#fff;margin-bottom:12px">Step '+(i+1)+' / 3 — '+s.q+'</div>'+s.opts.map(function(o){return '<button class="opt" data-k="'+o[0]+'">'+o[1]+'</button>';}).join('');
           host.querySelectorAll('.opt').forEach(function(bt){bt.onclick=function(){if(bt.dataset.k===s.ok){bt.classList.add('correct');msg.className='binmsg ok';msg.innerHTML='✓ '+s.why;setTimeout(function(){i++;if(i>=steps.length)finish();else{msg.textContent='';render();}},1050);}else{bt.classList.add('wrong');msg.className='binmsg';msg.innerHTML=s.why;}};});}
-        function finish(){host.innerHTML='<div style="font-size:15px;color:var(--green);line-height:1.5">✓ Solution shaped: RAG over a permissioned wiki, qualified on data readiness, valued in hours saved — the right approach, the right risk, the right business case, no model code touched.</div>';bktUpdate('llm_biz',true);mentor('That’s the job. You turned a vague “we want AI” into a scoped, qualified, value-framed opportunity — the exact skill that wins Data &amp; AI deals.');var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}
+        function finish(){host.innerHTML='<div style="font-size:15px;color:var(--green);line-height:1.5">✓ Solution shaped: RAG over a permissioned wiki, qualified on data readiness, valued in hours saved — the right approach, the right risk, the right business case, no model code touched.</div>';bktUpdate('llm_biz',true,'weak');mentor('That’s the job. You turned a vague “we want AI” into a scoped, qualified, value-framed opportunity — the exact skill that wins Data &amp; AI deals.');var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}
         render();mentor('Frame it, qualify it, value it. Step 1: changing, citable knowledge — what approach?');});
     add('<div class="q"><div class="qk">Teach it back · make it yours</div><div class="qtext">In one line: how would you qualify whether a client’s LLM idea is worth pursuing?</div><textarea id="tbz" placeholder="I’d qualify it by checking..."></textarea><div class="feedback" id="tbzf"></div><div class="continue" style="margin-top:14px"><button class="btn" id="tbzb" disabled>Show Aadi</button></div></div>',
       function(wrap,done){var ta=wrap.querySelector('#tbz'),btn=wrap.querySelector('#tbzb'),fb=wrap.querySelector('#tbzf');ta.addEventListener('input',function(){btn.disabled=ta.value.trim().length<12;});
-        btn.onclick=function(){var x=ta.value.toLowerCase();var d=/(data|wiki|source|permission|label|clean|ready)/.test(x),v=/(value|roi|hours|saved|cost|revenue|business|money|outcome)/.test(x),r=/(risk|halluc|govern|pii|inject|safe|accuracy)/.test(x);var s=(d?1:0)+(v?1:0)+(r?1:0);bktUpdate('llm_biz',s>=2);fb.className='feedback ok show';
+        btn.onclick=function(){var x=ta.value.toLowerCase();var d=/(data|wiki|source|permission|label|clean|ready)/.test(x),v=/(value|roi|hours|saved|cost|revenue|business|money|outcome)/.test(x),r=/(risk|halluc|govern|pii|inject|safe|accuracy)/.test(x);var s=(d?1:0)+(v?1:0)+(r?1:0);bktUpdate('llm_biz',s>=2,'weak');fb.className='feedback ok show';
           if(s>=2)fb.innerHTML='<div class="who"><span class="dot"></span>Aadi</div>Strong — you’re qualifying on the three levers that decide LLM projects: <b>data/grounding readiness</b>, <b>business value</b>, and <b>risk/governance</b>. That’s the presales instinct.';
           else fb.innerHTML='<div class="who"><span class="dot"></span>Aadi</div>Good start. The three levers to always check: is the <b>data</b> ready to ground it (and permissioned)? is there real <b>business value</b> in the client’s currency? and can you handle the <b>risk</b> (hallucination, PII, governance)? Weave those three in.';
           btn.disabled=true;ta.disabled=true;var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn">Continue ↓</button>';wrap.querySelector('.q').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};};});
-    add('<div class="kicker">You’re ready</div><h2>From first principles to business outcomes</h2><p>You can now reason from a business goal to the right LLM approach and back — <strong>choose prompt vs RAG vs fine-tune, qualify data and risk, and defend the value in the client’s currency.</strong> You built it on how LLMs actually work — tokens, prediction, attention, training, context, hallucination, cost and governance — not on buzzwords.</p><p class="whisper">The same lens carries into what’s next in the wider journey — Embeddings, RAG and Agents. For each, ask the identical questions: what outcome, what data, what risk, what value.</p>',
+        questionBeat(add,{concept:"llm_biz",k:"Decision · scope the approach",
+      q:"A client wants an assistant answering staff questions from their internal wiki. Cheapest-first, what do you scope?",
+      opts:[{k:"a",t:"Fine-tune a custom model on the wiki."},{k:"b",t:"<b>Prompt → RAG over the wiki; qualify data readiness and permissions first.</b>"},{k:"c",t:"Pretrain a model from scratch."}],
+      correct:"b",
+      right:"Right — default to prompt then RAG, cheapest first, and gate on whether the wiki is clean, permissioned and searchable.",
+      wrongDefault:"Prompt → RAG is the cost-optimal default for grounded answers over changing docs; qualify the data first."});
+    questionBeat(add,{concept:"llm_biz",k:"Decision · make it deployable",
+      q:"What is the strongest way to present the assistant's value and get it past security and finance?",
+      opts:[{k:"a",t:"Demo five impressive prompts."},{k:"b",t:"<b>Tickets deflected × cost per ticket, net of token cost — with hallucination, PII and injection guardrails named.</b>"},{k:"c",t:"Emphasise the model's benchmark scores."}],
+      correct:"b",
+      right:"Right — value in currency net of run cost, with risks named and mitigated, is what turns a demo into a funded, deployable programme.",
+      wrongDefault:"Frame value in money net of token cost, and name the guardrails — that is what makes it deployable."});
+add('<div class="kicker">You’re ready</div><h2>From first principles to business outcomes</h2><p>You can now reason from a business goal to the right LLM approach and back — <strong>choose prompt vs RAG vs fine-tune, qualify data and risk, and defend the value in the client’s currency.</strong> You built it on how LLMs actually work — tokens, prediction, attention, training, context, hallucination, cost and governance — not on buzzwords.</p><p class="whisper">The same lens carries into what’s next in the wider journey — Embeddings, RAG and Agents. For each, ask the identical questions: what outcome, what data, what risk, what value.</p>',
       function(wrap,done){chooser(wrap,'You’ve completed the LLM Act. Revisit any lesson:');});
     return b;}
 },
