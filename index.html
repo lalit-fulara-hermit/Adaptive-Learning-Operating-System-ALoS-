@@ -419,7 +419,8 @@ var concepts={
   llm_eval:{label:"Eval & Economics",p:0.0,depth:"deep",prereq:["llm_approach"]},
   llm_risk:{label:"Risk & Governance",p:0.0,depth:"deep",prereq:["llm_eval"]},
   llm_deploy:{label:"Model & Deployment",p:0.0,depth:"deep",prereq:["llm_risk"]},
-  llm_biz:{label:"LLM Business Outcomes",p:0.0,depth:"deep",prereq:["llm_deploy"]},
+  llm_tco:{label:"Business Case & TCO",p:0.0,depth:"deep",prereq:["llm_deploy"]},
+  llm_biz:{label:"LLM Business Outcomes",p:0.0,depth:"deep",prereq:["llm_tco"]},
   genai:{label:"Generative AI",p:0.0,depth:"deep",prereq:["llm_biz"]},
   multimodal:{label:"Multimodal & Docs",p:0.0,depth:"deep",prereq:["genai"]},
   embeddings:{label:"Embeddings",p:0.0,depth:"deep",prereq:["multimodal"]},
@@ -432,12 +433,13 @@ var PHASES=[
  {t:"Foundations",ids:["computing","networks","servers","virt"]},
  {t:"Cloud & Data",ids:["cloud","gcp","data"]},
  {t:"Machine Learning · deep dive",ids:["ml_why","ml_landscape","ml_data","ml_model","ml_train","ml_overfit","ml_families","ml_neural","ml_cluster","ml_eval","ml_bias","ml_explain","ml_ops","ml_buildbuy","ml_biz"]},
- {t:"Large Language Models · deep dive",ids:["llm_why","llm_tokens","llm_predict","llm_attention","llm_training","llm_prompt","llm_halluc","llm_approach","llm_eval","llm_risk","llm_deploy","llm_biz"]},
+ {t:"Large Language Models · deep dive",ids:["llm_why","llm_tokens","llm_predict","llm_attention","llm_training","llm_prompt","llm_halluc","llm_approach","llm_eval","llm_risk","llm_deploy","llm_tco","llm_biz"]},
  {t:"Applied GenAI · deep dive",ids:["genai","multimodal","embeddings","rag","funccall","agents","capstone"]}
 ];
-var UNLOCK=0.75, PLAYABLE=["computing","networks","servers","virt","cloud","gcp","data","ml_why","ml_landscape","ml_data","ml_model","ml_train","ml_overfit","ml_families","ml_neural","ml_cluster","ml_eval","ml_bias","ml_explain","ml_ops","ml_buildbuy","ml_biz","llm_why","llm_tokens","llm_predict","llm_attention","llm_training","llm_prompt","llm_halluc","llm_approach","llm_eval","llm_risk","llm_deploy","llm_biz","genai","multimodal","embeddings","rag","funccall","agents","capstone"];
+var UNLOCK=0.75, PLAYABLE=["computing","networks","servers","virt","cloud","gcp","data","ml_why","ml_landscape","ml_data","ml_model","ml_train","ml_overfit","ml_families","ml_neural","ml_cluster","ml_eval","ml_bias","ml_explain","ml_ops","ml_buildbuy","ml_biz","llm_why","llm_tokens","llm_predict","llm_attention","llm_training","llm_prompt","llm_halluc","llm_approach","llm_eval","llm_risk","llm_deploy","llm_tco","llm_biz","genai","multimodal","embeddings","rag","funccall","agents","capstone"];
 var misconceptions={}, ACTIVE="llm_why";
 var OUTCOMES={
+llm_tco:"build a defensible business case — value net of run cost — and pick the first lever when it's underwater.",
 ml_buildbuy:"decide when to build, buy, or skip ML — and gate feasibility before scoping.",
 ml_explain:"judge when a model must be explainable, and name how to get there.",
 multimodal:"spot where multimodal/document AI fits and scope a document-extraction use case.",
@@ -471,7 +473,7 @@ genai:"route a task to generative AI vs a deterministic / grounded approach.",
 embeddings:"explain semantic search and where embeddings are used.",
 rag:"explain the RAG pipeline and why it beats fine-tuning for changing facts.",
 agents:"describe the agent loop and place the human on the right step.",
-capstone:"assemble the full stack and frame it as a funded business case.",
+capstone:"run an AI opportunity end to end — qualify, shape, architect, de-risk, value and defend it.",
 computing:"name the three compute primitives (CPU, memory, storage).",
 networks:"explain how machines find and talk to each other.",
 servers:"explain what a server and OS do, and why sizing for peak wastes money.",
@@ -569,6 +571,12 @@ function offerDepth(key){var c=ACTIVE;var recFast=concepts[c].p>0.5||LEARNER.tie
 function lensBeat(add,so,tell,move){add('<div class="card lens"><div class="lskick">Strategist\u2019s Lens \u00b7 second-order &amp; business</div><div class="ls-row"><div class="ls-h">Second-order effect</div><div class="ls-b">'+so+'</div></div><div class="ls-row"><div class="ls-h">The tell \u2014 what to listen for</div><div class="ls-b">'+tell+'</div></div><div class="ls-row"><div class="ls-h">Your presales / solution-architecture move</div><div class="ls-b">'+move+'</div></div></div>');}
 
 var PRACTICE={
+llm_tco:[
+ {q:"An AI business case must subtract which cost from the benefit?",o:[["a","only the one-off build cost"],["b","the recurring run cost (tokens × volume + monitoring/retraining)"],["c","the demo cost"]],c:"b",why:"Run cost dominates TCO and recurs forever."},
+ {q:"The ~10× lever on AI unit cost is usually…",o:[["a","the model tier"],["b","the office rent"],["c","the logo"]],c:"a",why:"Model tier swings per-interaction cost the most."},
+ {q:"An underwater case (cost > benefit) at the frontier tier: first move?",o:[["a","absorb the loss"],["b","tier-down + retrieval to cut unit cost"],["c","cut users"]],c:"b",why:"Pull the cost lever before cutting scope."},
+ {q:"You present value to a CFO as…",o:[["a","accuracy percent"],["b","benefit net of run cost, with a volume/tier sensitivity"],["c","the model name"]],c:"b",why:"A defensible number, not a metric or a brand."}
+],
 ml_buildbuy:[
  {q:"“Flag orders over $500” is best solved by…",o:[["a","a custom model"],["b","a simple rule — skip ML"],["c","a bought API"]],c:"b",why:"A fixed threshold is a one-line rule."},
  {q:"Buy (a pretrained API) when…",o:[["a","the capability is a commodity, not your differentiator"],["b","always"],["c","never"]],c:"a",why:"Commodities like ASR/translation are cheaper to buy."},
@@ -869,6 +877,48 @@ function servePractice(cid,host){var arr=PRACTICE[cid]||[];var idx=PRACTICE_USED
   setTimeout(function(){wrap.scrollIntoView({behavior:'smooth',block:'start'});},100);}
 
 var EPISODES={
+llm_tco:{concept:"llm_tco",node:"Business Case & TCO",act:"Act 8 · Large Language Models",title:"The Business Case — Value Net of Run Cost",
+  intro:"A pilot that dazzles in the demo dies in the budget review. The number that actually decides it is value minus the cost to run it — and you should be able to build that number on a napkin, not just assert it.",
+  build:function(){var b=[];var add=function(h,g){b.push({html:h,gate:g});};
+    add('<div class="kicker">The number that funds the deal</div><h1>Benefit minus the cost to <em>run</em> it</h1><p class="lead">Executives don’t fund accuracy percentages — they fund a defensible business case. That case is one subtraction: the <strong>benefit</strong> (hours saved, tickets deflected × their cost, revenue) minus the <strong>total cost of ownership</strong> — and TCO is dominated not by the build, but by what it costs to <em>run</em>: tokens per interaction × volume, plus the monthly bill for monitoring, retraining and platform.</p><p>Build that number and you can defend it. Assert it and you can’t.</p>');
+    add('<span class="tierflag">'+({support:"Support pace",standard:"Standard pace",fast:"Fast pace"}[LEARNER.tier]||"Standard pace")+'</span>'+tierPick({
+      support:'<div class="kicker">First principles</div><h2>Value in, run cost out</h2><p>Two sides of one sum. <strong>Benefit</strong>: put a number on the outcome — hours saved × loaded hourly cost, or tickets deflected × cost per ticket, or extra revenue. <strong>Cost</strong> is the trap: beginners quote the <em>build</em>; the real bill is the <strong>run</strong> — the per-interaction <span class="term" data-t="token">token</span>/inference cost times your <em>volume</em>, plus a fixed monthly amount for monitoring, retraining and platform. <strong>Net = benefit − run cost.</strong> The single biggest lever is the <strong>model tier</strong> (it can swing cost ~10×), then retrieval, caching and prompt trimming. If the number is underwater, the fix is almost always a cheaper model plus retrieval — <em>not</em> cutting users or quietly absorbing the cost.</p>',
+      standard:'<div class="kicker">First principles</div><h2>Unit economics + fixed run cost</h2><p>Business case = quantified benefit − TCO. TCO = variable cost (per-interaction token/inference × volume) + fixed run cost (monitoring, retraining, platform). Quote run cost, not build cost — at scale the variable term dominates and the model tier is the ~10× lever. Present net-of-run-cost with a sensitivity to volume and tier; if net is negative, tier-down + retrieval before cutting scope.</p>',
+      fast:'<div class="kicker">First principles</div><h2>TCO and ROI</h2><p>ROI = benefit − TCO; TCO = Σ(unit cost × volume) + fixed opex (obs/retrain/platform). Unit cost is tier-dominated (~10× spread); optimise via tiering, caching, retrieval (context compression), and prompt discipline. Report net-of-run-cost with volume/tier sensitivity; negative net → adjust the cost frontier (tier/retrieval), not user scope. Build-cost is a rounding error against lifetime run cost.</p>'}));
+    add('<div class="card"><div class="kicker">Build the number</div><h2>Does the case clear, after run cost?</h2><p class="hint">A customer-facing AI feature: <b>3,000,000</b> interactions/month, each worth <b>$0.05</b> in value → <b>$150k/mo benefit</b>. Run overhead (monitoring + retraining + platform) is <b>$5k/mo</b> fixed. Pick a model tier and see whether the business case actually clears.</p><div style="display:flex;flex-wrap:wrap;gap:16px;margin:6px 0 12px;font-size:13.5px"><span>Benefit: <b style="color:var(--green)">$150k</b></span><span>Run cost: <b id="tcocost">— pick a tier —</b></span><span>Net / mo: <b id="tconet" style="color:var(--ink-faint)">—</b></span></div><div class="rulebtns" style="margin:0"><button class="rulebtn" data-t="front">Frontier model · $0.060/int</button><button class="rulebtn" data-t="mid">Mid model · $0.020/int</button><button class="rulebtn" data-t="small">Small + RAG · $0.008/int</button></div><div class="binmsg" id="tcomsg" style="margin-top:10px"></div></div>',
+      function(wrap,done){
+        var VOL=3000000,BEN=150000,OVER=5000,tiers={front:0.060,mid:0.020,small:0.008},fin=false;
+        var costEl=wrap.querySelector('#tcocost'),netEl=wrap.querySelector('#tconet'),msg=wrap.querySelector('#tcomsg');
+        function fmt(n){return (n<0?'-$':'$')+Math.round(Math.abs(n)/1000)+'k';}
+        wrap.querySelectorAll('.rulebtn').forEach(function(btn){btn.onclick=function(){wrap.querySelectorAll('.rulebtn').forEach(function(x){x.classList.remove('on');x.style.borderColor='';});btn.classList.add('on');
+          var cost=VOL*tiers[btn.dataset.t]+OVER,net=BEN-cost;
+          costEl.textContent=fmt(cost);costEl.style.color='var(--ink)';netEl.textContent=fmt(net)+'/mo';netEl.style.color=net>0?'var(--green)':'var(--red)';
+          if(net>0){btn.style.borderColor='var(--green)';msg.className='binmsg ok';msg.innerHTML='✓ Net-positive — a defensible case: <b>'+fmt(net)+'/mo</b> after run cost. The model tier swung the entire outcome; the frontier tier was underwater at this volume.';
+            if(!fin){fin=true;bktUpdate('llm_tco',true);mentor("That is the number a CFO can bank: benefit minus the <em>run</em> cost, with the model tier as the dominant lever. Build it, don’t assert it.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
+          else{btn.style.borderColor='var(--red)';msg.className='binmsg';msg.innerHTML='✗ Underwater: run cost <b>'+fmt(cost)+'</b> exceeds the <b>$150k</b> benefit. At this volume the frontier tier eats the value — drop to a smaller model (with retrieval) to clear it.';}
+        };});
+        mentor("Try the frontier model first — watch a great model turn a good idea into a monthly loss.");});
+    lensBeat(add,
+      "A business case you can defend is <em>value net of run cost, with the levers named</em> — not a headline accuracy or a model brand. The run cost (tokens × volume + monitoring/retraining), not the build, is what a CFO will probe, because that is the bill that recurs forever.",
+      "A stakeholder presenting an AI feature on quality metrics alone, with no per-unit run cost or volume in the model, hasn’t built a case a finance function can approve — and won’t know their frontier-model pilot is underwater until the first invoice.",
+      "Always build the number, live: benefit minus run cost (unit × volume + fixed ops), with a sensitivity to volume and model tier. When it’s underwater, reach for the cost frontier — tier-down, retrieval, caching — before you cut scope or absorb the cost. That single artifact is what converts a good demo into a funded programme.");
+    questionBeat(add,{concept:"llm_tco",k:"Check · what a case must net out",
+      q:tierPick({support:"A defensible AI business case must subtract which cost from the benefit?",standard:"The dominant cost in an AI TCO is usually…",fast:"AI TCO is dominated by…"}),
+      opts:[{k:"a",t:"Only the one-off build cost."},{k:"b",t:"<b>The run cost — per-interaction tokens × volume, plus monitoring/retraining/platform.</b>"},{k:"c",t:"The cost of the demo."}],
+      correct:"b",
+      right:"Right — the recurring run cost, not the build, dominates TCO and is what finance will scrutinise. Net it out explicitly.",
+      rightSay:"Quoting run cost, not build cost, is the tell of someone who has shipped — and it protects the client from a nasty invoice.",
+      wrongDefault:"Net out the recurring run cost (tokens × volume + monitoring/retraining), not just the one-off build."});
+    questionBeat(add,{concept:"llm_tco",k:"Apply · the case is underwater",
+      q:"Your business case is negative: at the frontier model tier, run cost exceeds the benefit. What’s your first lever?",
+      opts:[{k:"a",t:"Absorb the loss and ship the frontier model anyway."},{k:"b",t:"<b>Drop to a smaller model with retrieval to cut unit cost until it clears.</b>"},{k:"c",t:"Cut the number of users."}],
+      correct:"b",
+      right:"Right — the model tier is the ~10× lever; a smaller model + retrieval usually clears the case without cutting scope or eating the cost.",
+      wrongDefault:"Pull the cost lever first — tier-down + retrieval — before absorbing the loss or cutting users."});
+    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Net of run cost, or it isn’t a case.</strong> Business case = quantified benefit − TCO, and TCO is dominated by the recurring run cost (tokens × volume + monitoring/retraining/platform), with the model tier the ~10× lever. Build the number with a volume/tier sensitivity; if it’s underwater, adjust the cost frontier before cutting scope.</p><p class="whisper">Now fold the whole solution into one funded proposal. <a class="jump" data-k="llm_biz">From LLMs to Business Outcomes</a>.</p>',
+      function(wrap,done){chooser(wrap,'You can build a defensible case now. Where next?');});
+    return b;}
+},
 ml_buildbuy:{concept:"ml_buildbuy",node:"Build · Buy · Skip",act:"Act 7 · Machine Learning",title:"Build, Buy or Skip",
   intro:"The most valuable thing a strategist does often happens before any modelling: deciding whether to build a custom model, buy an off-the-shelf one, or not use ML at all. Getting this wrong burns budgets; getting it right wins trust.",
   build:function(){var b=[];var add=function(h,g){b.push({html:h,gate:g});};
@@ -2096,7 +2146,48 @@ capstone:{concept:"capstone",node:"Capstone",act:"Act 14 · Applied GenAI",title
       support:'<div class="kicker">First principles</div><h2>The arc that wins deals</h2><p>Great solutioning is an arc: <strong>Qualify</strong> (is the data there? is there real value?), <strong>Scope</strong> (the cheapest sufficient design — often prompt/RAG before fine-tuning), <strong>Value</strong> (translate it into money: hours saved, revenue retained, cost avoided), and <strong>De-risk</strong> (governance, guardrails, a human where it matters). Notice: the technology you’ve learned is the <em>easy</em> half — framing the outcome is what gets funded.</p>',
       standard:'<div class="kicker">First principles</div><h2>Solution arc</h2><p>Qualify (data + value) → Scope (cheapest sufficient architecture) → Value (outcome in currency) → De-risk (security, governance, human-in-the-loop). The reference architecture spans data → model → RAG → agent on GCP; the winning move is expressing it as a funded business case, not a tech diagram.</p>',
       fast:'<div class="kicker">First principles</div><h2>From architecture to business case</h2><p>Compose the stack (data/model/RAG/agent/GCP) under cost, security and governance constraints, then reduce it to an ROI statement. Differentiation in presales/SA is not the diagram — it’s qualification discipline and value framing in currency.</p>'}));
-    lensBeat(add,
+        add('<div class="card"><div class="kicker">Capstone · run the whole deal</div><h2>One opportunity, end to end</h2><p class="hint">A national retailer wants an AI assistant that answers store staff’s policy questions from their internal wiki. You’re in the room. Make the right call at each stage — a wrong call shows the consequence and lets you retry.</p><div id="dealprog" style="font-size:12px;color:var(--gold);letter-spacing:.04em;margin-bottom:8px"></div><div id="dealstage"></div><div class="binmsg" id="dealmsg" style="margin-top:10px"></div></div>',
+      function(wrap,done){
+        var stages=[
+          {t:"Qualify",q:"The prospect drops the ask. Your first move?",opts:[
+            {k:"a",t:"Start designing the model architecture.",ok:false,m:"Too early — you haven’t checked whether this is even feasible."},
+            {k:"b",t:"Qualify: is the wiki clean, permissioned and searchable — and what outcome actually matters?",ok:true,m:"Yes — qualify feasibility and the outcome before scoping anything."},
+            {k:"c",t:"Quote a price on the spot.",ok:false,m:"You can’t price what you haven’t qualified."}]},
+          {t:"Shape",q:"The wiki is decent and changes weekly. Cheapest approach that fits?",opts:[
+            {k:"a",t:"Fine-tune a model on the wiki.",ok:false,m:"Weekly changes go stale in the weights, and no citations. Wrong tool."},
+            {k:"b",t:"Prompt → RAG over the wiki.",ok:true,m:"Right — retrieve current policy at answer-time, cite it, no retraining."},
+            {k:"c",t:"Pretrain a custom model.",ok:false,m:"Enormously expensive and unnecessary here."}]},
+          {t:"Architect",q:"The wiki holds store and customer PII that must stay in the retailer’s region. Deployment?",opts:[
+            {k:"a",t:"Public hosted API.",ok:false,m:"PII with residency rules can’t leave the region — this fails security review."},
+            {k:"b",t:"Private / VPC endpoint in-region, zero-retention.",ok:true,m:"Right — the data constraint chooses the topology."},
+            {k:"c",t:"Whatever’s cheapest, hosted anywhere.",ok:false,m:"Cost can’t override a legal residency constraint."}]},
+          {t:"De-risk",q:"Security asks about failure modes. Which do you name — with guardrails?",opts:[
+            {k:"a",t:"None — RAG makes it perfectly safe.",ok:false,m:"Overclaiming loses trust — RAG reduces, never zeroes, hallucination."},
+            {k:"b",t:"Hallucination (→ grounding + citations) and PII exposure (→ redaction + least-privilege retrieval).",ok:true,m:"Right — name the real risks and their guardrails."},
+            {k:"c",t:"A bigger model fixes everything.",ok:false,m:"Scale doesn’t remove these risks."}]},
+          {t:"Value",q:"The CFO wants a number. How do you frame it?",opts:[
+            {k:"a",t:"It’s 94% accurate on our test set.",ok:false,m:"Accuracy isn’t a number a CFO can bank."},
+            {k:"b",t:"≈ 8,000 staff hours a year saved, net of token and run cost.",ok:true,m:"Right — value in currency, net of run cost."},
+            {k:"c",t:"It uses the newest model.",ok:false,m:"A model name isn’t a business case."}]},
+          {t:"Objection",q:"The CFO pushes: “Why not just buy an off-the-shelf chatbot tool?”",opts:[
+            {k:"a",t:"You’re right — let’s just buy one.",ok:false,m:"You gave away the deal — and an off-the-shelf tool can’t meet these constraints."},
+            {k:"b",t:"Off-the-shelf can’t ground on your private, weekly-changing wiki with citations and in-region residency — that grounding + topology work is the solution.",ok:true,m:"Right — you defended the scope on the exact constraints that rule out a generic tool."},
+            {k:"c",t:"Ours is trendier.",ok:false,m:"Not an argument a CFO will fund."}]}
+        ];
+        var idx=0,stageEl=wrap.querySelector('#dealstage'),prog=wrap.querySelector('#dealprog'),msg=wrap.querySelector('#dealmsg'),fin=false;
+        function render(){
+          if(idx>=stages.length)return;
+          var s=stages[idx];prog.textContent='STAGE '+(idx+1)+' / '+stages.length+' · '+s.t;
+          stageEl.innerHTML='<div style="background:#0b0f1b;border:1px solid var(--line-soft);border-radius:11px;padding:12px 14px"><div style="font-size:14px;color:#eef2fa;margin-bottom:10px">'+s.q+'</div>'+s.opts.map(function(o){return '<button class="opt" data-k="'+o.k+'" style="display:block;width:100%;text-align:left;margin-bottom:7px">'+o.t+'</button>';}).join('')+'</div>';
+          stageEl.querySelectorAll('.opt').forEach(function(btn){btn.onclick=function(){var o=s.opts.filter(function(x){return x.k===btn.dataset.k;})[0];
+            if(o.ok){btn.classList.add('correct');msg.className='binmsg ok';msg.innerHTML='✓ '+o.m;setTimeout(function(){idx++;if(idx<stages.length){msg.className='binmsg';msg.innerHTML='';render();stageEl.scrollIntoView({block:'center'});}else{winDeal();}},700);}
+            else{btn.classList.add('wrong');msg.className='binmsg';msg.innerHTML='✗ '+o.m+' <span style="color:var(--ink-faint)">Try again.</span>';}
+          };});
+        }
+        function winDeal(){prog.textContent='DEAL · all six stages cleared';stageEl.innerHTML='<div style="background:#0b0f1b;border:1px solid var(--green);border-radius:11px;padding:13px 15px;color:#eef2fa">🏆 <b>Deal qualified, shaped, architected, de-risked, valued and defended</b> — the whole arc, run live. That end-to-end judgement, technical <em>and</em> commercial, is the job.</div>';msg.className='binmsg ok';msg.innerHTML='';if(!fin){fin=true;bktUpdate('capstone',true);mentor("You didn’t just learn the pieces — you ran a deal end to end: qualify → shape → architect → de-risk → value → defend. That’s what a presales / solution architect gets paid for.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Finish ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
+        render();
+        mentor("Start at Qualify — the strategist’s instinct is to check feasibility before designing anything.");});
+lensBeat(add,
       "Executives buy outcomes in currency, not accuracy percentages. The same solution framed as “91% accurate” loses to one framed as “€1.2M of staff hours saved, net of run cost.”",
       "A stakeholder who keeps steering toward model metrics and features, away from the business case, hasn’t been given a number they can take to their CFO.",
       "Always close by translating the solution into money: value delivered minus run cost, with the risks named and mitigated. That single reframe is what turns a good demo into a funded programme.");
