@@ -386,13 +386,13 @@
 /* ===== engine ===== */
 var BKT={pT:0.35,pS:0.12,pG:0.22};
 var concepts={
-  computing:{label:"Computing",p:0.05,depth:"preview",prereq:[]},
-  networks:{label:"Networks",p:0.0,depth:"preview",prereq:["computing"]},
-  servers:{label:"Servers & OS",p:0.0,depth:"preview",prereq:["computing"]},
-  virt:{label:"Virtualization",p:0.0,depth:"preview",prereq:["servers"]},
-  cloud:{label:"Cloud",p:0.0,depth:"preview",prereq:["virt"]},
-  gcp:{label:"Google Cloud",p:0.0,depth:"preview",prereq:["cloud"]},
-  data:{label:"Data & APIs",p:0.0,depth:"preview",prereq:["gcp"]},
+  computing:{label:"Computing",p:0.05,depth:"deep",prereq:[]},
+  networks:{label:"Networks",p:0.0,depth:"deep",prereq:["computing"]},
+  servers:{label:"Servers & OS",p:0.0,depth:"deep",prereq:["computing"]},
+  virt:{label:"Virtualization",p:0.0,depth:"deep",prereq:["servers"]},
+  cloud:{label:"Cloud",p:0.0,depth:"deep",prereq:["virt"]},
+  gcp:{label:"Google Cloud",p:0.0,depth:"deep",prereq:["cloud"]},
+  data:{label:"Data & APIs",p:0.0,depth:"deep",prereq:["gcp"]},
   ml_why:{label:"Why ML",p:0.0,depth:"deep",prereq:["data"]},
   ml_landscape:{label:"The Map of ML",p:0.0,depth:"deep",prereq:["ml_why"]},
   ml_data:{label:"Data & Features",p:0.0,depth:"deep",prereq:["ml_landscape"]},
@@ -420,13 +420,13 @@ var concepts={
   llm_risk:{label:"Risk & Governance",p:0.0,depth:"deep",prereq:["llm_eval"]},
   llm_deploy:{label:"Model & Deployment",p:0.0,depth:"deep",prereq:["llm_risk"]},
   llm_biz:{label:"LLM Business Outcomes",p:0.0,depth:"deep",prereq:["llm_deploy"]},
-  genai:{label:"Generative AI",p:0.0,depth:"preview",prereq:["llm_biz"]},
+  genai:{label:"Generative AI",p:0.0,depth:"deep",prereq:["llm_biz"]},
   multimodal:{label:"Multimodal & Docs",p:0.0,depth:"deep",prereq:["genai"]},
   embeddings:{label:"Embeddings",p:0.0,depth:"deep",prereq:["multimodal"]},
   rag:{label:"RAG",p:0.0,depth:"deep",prereq:["embeddings"]},
   funccall:{label:"Function Calling",p:0.0,depth:"deep",prereq:["rag"]},
   agents:{label:"Agentic AI",p:0.0,depth:"deep",prereq:["funccall"]},
-  capstone:{label:"Capstone",p:0.0,depth:"preview",prereq:["agents"]}
+  capstone:{label:"Capstone",p:0.0,depth:"deep",prereq:["agents"]}
 };
 var PHASES=[
  {t:"Foundations",ids:["computing","networks","servers","virt"]},
@@ -1633,7 +1633,16 @@ computing:{concept:"computing",node:"Computing",act:"Act 1 · Foundations",title
       support:'<div class="kicker">First principles</div><h2>What “running code” means</h2><p>Code is a list of tiny instructions. The <strong>processor</strong> (CPU) reads them one after another, unbelievably fast. To work on something it first loads it from <strong>storage</strong> (the disk, where things stay when the power is off) into <strong>memory</strong> (RAM, where things are instantly reachable but vanish when powered down). More memory = it can juggle more at once; a faster processor = it juggles quicker.</p>',
       standard:'<div class="kicker">First principles</div><h2>CPU, memory, storage</h2><p>The <strong>CPU</strong> executes instructions; <strong>RAM</strong> holds what it is actively working on (fast, volatile); <strong>storage</strong> keeps data permanently (slower). Software is just instructions moving data between these. Scale any workload and you are simply buying more of these three.</p>',
       fast:'<div class="kicker">First principles</div><h2>The compute primitives</h2><p>Compute = CPU cycles × RAM × persistent storage × I/O. Every higher abstraction — VMs, containers, serverless, a GPU training run — is a way of packaging and billing these primitives. Cost and performance always decompose back to them.</p>'}));
-    lensBeat(add,
+        add('<div class="card"><div class="kicker">Match the resource</div><h2>Which part does each job?</h2><p class="hint">For each job, pick the compute resource it needs. One best answer each.</p><div id="cpsort"></div><div class="binmsg" id="cpsortmsg" style="margin-top:10px"></div></div>',
+      function(wrap,done){
+        var opts=[["cpu","Processor (CPU)"],["ram","Memory (RAM)"],["disk","Storage (disk)"]];
+        var probs=[{q:"“Run the program’s instructions, right now.”",a:"cpu",why:"The CPU executes instructions — that is the ‘thinking’."},{q:"“Hold the data the program is actively working on.”",a:"ram",why:"RAM is the fast, temporary desk for active work."},{q:"“Keep the files after the power is switched off.”",a:"disk",why:"Storage persists data; RAM forgets it when powered down."}];
+        var host=wrap.querySelector('#cpsort'),msg=wrap.querySelector('#cpsortmsg'),solved=0;
+        host.innerHTML=probs.map(function(p,i){return '<div style="background:#0b0f1b;border:1px solid var(--line-soft);border-radius:11px;padding:12px 14px;margin-bottom:9px"><div style="font-size:14px;color:#eef2fa;margin-bottom:9px">'+p.q+'</div><div class="rulebtns" data-i="'+i+'" style="margin:0">'+opts.map(function(o){return '<button class="rulebtn" data-t="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div><div data-w="'+i+'" style="font-size:12.5px;margin-top:8px;display:none"></div></div>';}).join('');
+        host.querySelectorAll('.rulebtns').forEach(function(row){var i=+row.dataset.i,locked=false;row.querySelectorAll('.rulebtn').forEach(function(btn){btn.onclick=function(){if(locked)return;var w=host.querySelector('[data-w="'+i+'"]');if(btn.dataset.t===probs[i].a){btn.classList.add('on');btn.style.borderColor='var(--green)';locked=true;solved++;w.style.display='block';w.style.color='var(--green)';w.innerHTML='\u2713 '+probs[i].why;
+          if(solved===probs.length){msg.className='binmsg ok';msg.innerHTML='✓ CPU thinks, memory holds the active work, storage keeps it forever — every cloud bill is these three plus network.';bktUpdate('computing',true);mentor("Hold that picture — CPU, memory, storage — because every price and every model size traces back to it.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue \u2193</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}else{btn.style.borderColor='var(--red)';w.style.display='block';w.style.color='var(--rose)';w.innerHTML='Ask: is this thinking (CPU), active data (RAM), or permanent files (storage)?';setTimeout(function(){btn.style.borderColor='';},700);}};});});
+        mentor("Start with running instructions — that is the processor’s job.");});
+lensBeat(add,
       "Because every workload reduces to CPU, memory and storage, any vendor’s pricing — however it’s dressed up — can be decomposed back to these. That’s your sanity check on a quote.",
       "When a proposal quotes a flat “platform fee” with no mention of compute, memory or storage, the real cost drivers are hidden — and usually grow with usage.",
       "Ask what happens to the bill as usage doubles. If the answer isn’t framed in compute/memory/storage/network, you haven’t seen the real cost model yet.");
@@ -1642,7 +1651,13 @@ computing:{concept:"computing",node:"Computing",act:"Act 1 · Foundations",title
       opts:[{k:"a",t:"Screen, keyboard and mouse."},{k:"b",t:"Processor, memory and storage (plus network)."},{k:"c",t:"Apps, files and windows."}],
       correct:"b",right:"Exactly. Processor, memory, storage — plus network. Master this and cloud pricing stops being mysterious.",
       wrong:{a:"Those are how you interact with it — not what does the work.",c:"Those are what you see on top; underneath it’s always CPU, memory and storage."},wrongDefault:"Underneath everything, it’s processor, memory and storage."});
-    add('<div class="kicker">Carry it forward</div><h2>One machine is a silo</h2><p>A single computer, however powerful, can only help the person sitting at it. The value multiplies the moment machines can talk to each other.</p><p class="whisper">Next: <a class="jump" data-k="networks">Networks</a> — how machines reach each other.</p>',
+        questionBeat(add,{concept:"computing",k:"Apply · read the bill",
+      q:"A cloud invoice ultimately decomposes into charges for…",
+      opts:[{k:"a",t:"the number of apps installed"},{k:"b",t:"<b>compute, memory, storage and network</b>"},{k:"c",t:"screen size and colour"}],
+      correct:"b",
+      right:"Right — every higher-level cloud service still bills back to these primitives.",
+      wrongDefault:"A cloud bill is compute, memory, storage and network, rented by the hour."});
+add('<div class="kicker">Carry it forward</div><h2>One machine is a silo</h2><p>A single computer, however powerful, can only help the person sitting at it. The value multiplies the moment machines can talk to each other.</p><p class="whisper">Next: <a class="jump" data-k="networks">Networks</a> — how machines reach each other.</p>',
       function(wrap,done){chooser(wrap,'You’ve got the machine. Where next?');});
     return b;}
 },
@@ -1654,7 +1669,16 @@ networks:{concept:"networks",node:"Networks",act:"Act 1 · Foundations",title:"N
       support:'<div class="kicker">First principles</div><h2>How a message finds you</h2><p>Every machine has an <strong>IP address</strong> — like a postal address. Because names are easier than numbers, <strong>DNS</strong> is the phone book that turns “google.com” into an address. When your app wants something, it (the <em>client</em>) sends a <strong>request</strong> to a <em>server</em>, which sends back a <strong>response</strong>. That request/response dance, over a protocol called HTTP, is the whole web.</p>',
       standard:'<div class="kicker">First principles</div><h2>Client, server, request, response</h2><p>Data travels as packets addressed by <strong>IP</strong>; <strong>DNS</strong> resolves human names to those addresses; the <strong>client → request → server → response</strong> pattern over HTTP underlies the web and every API. Latency and bandwidth bound what’s possible.</p>',
       fast:'<div class="kicker">First principles</div><h2>The networking substrate</h2><p>Packet-switched IP, DNS resolution, and the stateless HTTP request/response model compose into APIs. Latency (RTT, bounded by physics + hops) and bandwidth are the hard constraints; everything distributed is a negotiation with them.</p>'}));
-    lensBeat(add,
+        add('<div class="card"><div class="kicker">Name the piece</div><h2>What does each job?</h2><p class="hint">Match each description to the networking concept. One best answer each.</p><div id="nwsort"></div><div class="binmsg" id="nwsortmsg" style="margin-top:10px"></div></div>',
+      function(wrap,done){
+        var opts=[["dns","DNS"],["latency","Latency"],["packets","Packets"]];
+        var probs=[{q:"“Turn a name like google.com into a machine address.”",a:"dns",why:"DNS is the phone book mapping names to IP addresses."},{q:"“The round-trip time for a message to go and come back.”",a:"latency",why:"Latency is time; distance adds to it."},{q:"“Break a message into addressed pieces, reassembled at the far end.”",a:"packets",why:"Data crosses networks as addressed packets."}];
+        var host=wrap.querySelector('#nwsort'),msg=wrap.querySelector('#nwsortmsg'),solved=0;
+        host.innerHTML=probs.map(function(p,i){return '<div style="background:#0b0f1b;border:1px solid var(--line-soft);border-radius:11px;padding:12px 14px;margin-bottom:9px"><div style="font-size:14px;color:#eef2fa;margin-bottom:9px">'+p.q+'</div><div class="rulebtns" data-i="'+i+'" style="margin:0">'+opts.map(function(o){return '<button class="rulebtn" data-t="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div><div data-w="'+i+'" style="font-size:12.5px;margin-top:8px;display:none"></div></div>';}).join('');
+        host.querySelectorAll('.rulebtns').forEach(function(row){var i=+row.dataset.i,locked=false;row.querySelectorAll('.rulebtn').forEach(function(btn){btn.onclick=function(){if(locked)return;var w=host.querySelector('[data-w="'+i+'"]');if(btn.dataset.t===probs[i].a){btn.classList.add('on');btn.style.borderColor='var(--green)';locked=true;solved++;w.style.display='block';w.style.color='var(--green)';w.innerHTML='\u2713 '+probs[i].why;
+          if(solved===probs.length){msg.className='binmsg ok';msg.innerHTML='✓ DNS finds the address, packets carry the message, latency is the time it takes — the basics under every request.';bktUpdate('networks',true);mentor("These three explain most ‘why is it slow?’ conversations you will ever have.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue \u2193</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}else{btn.style.borderColor='var(--red)';w.style.display='block';w.style.color='var(--rose)';w.innerHTML='Is this about finding an address (DNS), timing (latency), or how data travels (packets)?';setTimeout(function(){btn.style.borderColor='';},700);}};});});
+        mentor("Start with turning a name into an address — that is DNS.");});
+lensBeat(add,
       "Latency is set partly by physics — data can’t outrun the speed of light across regions. So <em>where</em> compute and data sit becomes a design decision, not a detail.",
       "A client wanting a chatty, real-time AI experience but insisting all data stay in one distant region is describing a latency problem they haven’t named.",
       "Surface the latency/residency trade-off early: co-locate compute with data and users where you can, and set expectations on round-trip cost before it becomes a support ticket.");
@@ -1663,7 +1687,13 @@ networks:{concept:"networks",node:"Networks",act:"Act 1 · Foundations",title:"N
       opts:[{k:"a",t:"How pretty the interface looks."},{k:"b",t:"Latency (round-trip time) and bandwidth (throughput)."},{k:"c",t:"How many files you can store."}],
       correct:"b",right:"Right. Latency and bandwidth quietly shape architecture, cost and user experience everywhere.",
       wrong:{a:"That’s design, not networking.",c:"That’s storage; networking is about moving data, not keeping it."},wrongDefault:"It’s latency and bandwidth — time and throughput."});
-    add('<div class="kicker">Carry it forward</div><h2>Always-on machines</h2><p>If machines serve each other over a network, someone’s machine has to be <em>always on</em> to answer. That’s a server — and it raises a new problem.</p><p class="whisper">Next: <a class="jump" data-k="servers">Servers &amp; OS</a>.</p>',
+        questionBeat(add,{concept:"networks",k:"Apply · why the lag",
+      q:"A video call between two distant cities is laggy. An unavoidable part of the cause is…",
+      opts:[{k:"a",t:"<b>latency — distance adds round-trip time, capped partly by physics</b>"},{k:"b",t:"the app’s colour scheme"},{k:"c",t:"too much storage"}],
+      correct:"a",
+      right:"Right — data can’t outrun light; distance means latency, which co-locating reduces.",
+      wrongDefault:"Distance adds latency (round-trip time), a physical limit you design around."});
+add('<div class="kicker">Carry it forward</div><h2>Always-on machines</h2><p>If machines serve each other over a network, someone’s machine has to be <em>always on</em> to answer. That’s a server — and it raises a new problem.</p><p class="whisper">Next: <a class="jump" data-k="servers">Servers &amp; OS</a>.</p>',
       function(wrap,done){chooser(wrap,'Where next?');});
     return b;}
 },
@@ -1675,7 +1705,16 @@ servers:{concept:"servers",node:"Servers & OS",act:"Act 1 · Foundations",title:
       support:'<div class="kicker">First principles</div><h2>Processes and sharing</h2><p>The operating system runs each task as a <strong>process</strong> and rapidly switches between them, so one machine feels like it’s doing many things at once. A “service” is simply a process that stays running, waiting to answer requests. The catch: buy a big machine for your busiest moment and it sits idle the rest of the time — expensive waste.</p>',
       standard:'<div class="kicker">First principles</div><h2>Processes, uptime, waste</h2><p>The OS schedules <strong>processes</strong> across the CPU, giving concurrency on one box; a <strong>service</strong> is a long-running process answering requests. Sizing for peak means paying for idle capacity off-peak — the waste that virtualization and cloud exist to solve.</p>',
       fast:'<div class="kicker">First principles</div><h2>Concurrency vs utilisation</h2><p>OS scheduling multiplexes processes onto finite cores; services are persistent listeners. The core economic pain is provisioning for peak → low average utilisation. That inefficiency is the seed of virtualization, then elastic cloud.</p>'}));
-    lensBeat(add,
+        add('<div class="card"><div class="kicker">Name the piece</div><h2>Server, OS, or waste?</h2><p class="hint">Match each description. One best answer each.</p><div id="svsort"></div><div class="binmsg" id="svsortmsg" style="margin-top:10px"></div></div>',
+      function(wrap,done){
+        var opts=[["server","A server"],["os","The operating system"],["waste","Wasted capacity"]];
+        var probs=[{q:"“A computer whose job is to answer requests, always on.”",a:"server",why:"A server is an ordinary computer dedicated to serving requests."},{q:"“Referees many programs sharing one machine.”",a:"os",why:"The OS schedules processes so one machine serves many."},{q:"“Capacity bought for a rare peak that sits idle most of the time.”",a:"waste",why:"Idle peak capacity is the waste the cloud solves."}];
+        var host=wrap.querySelector('#svsort'),msg=wrap.querySelector('#svsortmsg'),solved=0;
+        host.innerHTML=probs.map(function(p,i){return '<div style="background:#0b0f1b;border:1px solid var(--line-soft);border-radius:11px;padding:12px 14px;margin-bottom:9px"><div style="font-size:14px;color:#eef2fa;margin-bottom:9px">'+p.q+'</div><div class="rulebtns" data-i="'+i+'" style="margin:0">'+opts.map(function(o){return '<button class="rulebtn" data-t="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div><div data-w="'+i+'" style="font-size:12.5px;margin-top:8px;display:none"></div></div>';}).join('');
+        host.querySelectorAll('.rulebtns').forEach(function(row){var i=+row.dataset.i,locked=false;row.querySelectorAll('.rulebtn').forEach(function(btn){btn.onclick=function(){if(locked)return;var w=host.querySelector('[data-w="'+i+'"]');if(btn.dataset.t===probs[i].a){btn.classList.add('on');btn.style.borderColor='var(--green)';locked=true;solved++;w.style.display='block';w.style.color='var(--green)';w.innerHTML='\u2713 '+probs[i].why;
+          if(solved===probs.length){msg.className='binmsg ok';msg.innerHTML='✓ A server serves, the OS shares the machine, and peak-sizing leaves capacity idle — the waste cloud fixes.';bktUpdate('servers',true);mentor("That idle-capacity insight is the seed of the whole cloud economic argument coming next.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue \u2193</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}else{btn.style.borderColor='var(--red)';w.style.display='block';w.style.color='var(--rose)';w.innerHTML='Is this the machine (server), the referee (OS), or idle over-provisioning (waste)?';setTimeout(function(){btn.style.borderColor='';},700);}};});});
+        mentor("Start with the always-on machine that answers requests — that is a server.");});
+lensBeat(add,
       "Owning servers means paying for your busiest second, every second. Utilisation — the gap between capacity bought and capacity used — is pure margin leaking away.",
       "A client proud of their “always-ready” on-prem servers is often quietly running at 15% utilisation and calling the waste “reliability.”",
       "Frame the migration case in utilisation and elasticity, not just hardware cost: the win is paying for what’s used, when it’s used.");
@@ -1684,7 +1723,13 @@ servers:{concept:"servers",node:"Servers & OS",act:"Act 1 · Foundations",title:
       opts:[{k:"a",t:"Servers are too small to be useful."},{k:"b",t:"You size for peak, so capacity sits idle most of the time."},{k:"c",t:"Operating systems can only run one task ever."}],
       correct:"b",right:"Exactly — provision for peak, pay for idle. Solving that waste is the entire pitch of the cloud.",
       wrong:{a:"Size isn’t the issue; idle capacity is.",c:"The OS runs many processes at once — concurrency is the point."},wrongDefault:"The pain is idle capacity bought for peak demand."});
-    add('<div class="kicker">Carry it forward</div><h2>Slice the machine</h2><p>What if one physical box could be safely sliced into many independent machines, spun up and down on demand? That’s virtualization.</p><p class="whisper">Next: <a class="jump" data-k="virt">Virtualization &amp; Containers</a>.</p>',
+        questionBeat(add,{concept:"servers",k:"Apply · the waste",
+      q:"Why is sizing a server for its peak load wasteful?",
+      opts:[{k:"a",t:"peaks never actually happen"},{k:"b",t:"<b>the extra capacity sits idle most of the time</b>"},{k:"c",t:"big servers are free"}],
+      correct:"b",
+      right:"Right — you pay for peak capacity that is unused most hours; elastic cloud bills only for what you use.",
+      wrongDefault:"Peak-sizing leaves capacity idle most of the time — the waste cloud elasticity removes."});
+add('<div class="kicker">Carry it forward</div><h2>Slice the machine</h2><p>What if one physical box could be safely sliced into many independent machines, spun up and down on demand? That’s virtualization.</p><p class="whisper">Next: <a class="jump" data-k="virt">Virtualization &amp; Containers</a>.</p>',
       function(wrap,done){chooser(wrap,'Where next?');});
     return b;}
 },
@@ -1696,7 +1741,16 @@ virt:{concept:"virt",node:"Virtualization",act:"Act 1 · Foundations",title:"Vir
       support:'<div class="kicker">First principles</div><h2>VMs vs containers</h2><p>A <strong>virtual machine</strong> carries a whole operating system — heavy but very isolated. A <strong>container</strong> shares the host’s operating system and packages just your app plus what it needs — much lighter and faster to start. Tools like <strong>Docker</strong> made containers the standard way to ship software, killing the old excuse “but it worked on my machine.”</p>',
       standard:'<div class="kicker">First principles</div><h2>Isolation vs weight</h2><p><strong>VMs</strong> virtualize hardware (own OS each, strong isolation, heavier). <strong>Containers</strong> virtualize the OS (share the kernel, package app + dependencies, lightweight, fast). <strong>Docker images</strong> make deployments reproducible and portable — the unit modern platforms deploy.</p>',
       fast:'<div class="kicker">First principles</div><h2>The deploy primitive</h2><p>Hypervisor-based VMs trade weight for hardware-level isolation; containers trade some isolation for density and cold-start speed by sharing the kernel. Immutable images = reproducibility. Containers are the atomic unit of modern CI/CD, orchestration, and even agent sandboxes.</p>'}));
-    lensBeat(add,
+        add('<div class="card"><div class="kicker">Match the tool</div><h2>VM, container, or serverless?</h2><p class="hint">For each need, pick the deployment unit that fits. One best answer each.</p><div id="vtsort"></div><div class="binmsg" id="vtsortmsg" style="margin-top:10px"></div></div>',
+      function(wrap,done){
+        var opts=[["vm","Virtual machine"],["container","Container"],["serverless","Serverless"]];
+        var probs=[{q:"“Full isolation, its own operating system — heavier but strongly separated.”",a:"vm",why:"A VM virtualises a whole machine, OS and all."},{q:"“Lightweight, shares the host OS, starts in seconds, portable.”",a:"container",why:"Containers package an app to run anywhere, fast and light."},{q:"“Just run my code on an event — I don’t want to manage any server.”",a:"serverless",why:"Serverless runs code on demand with no server to manage."}];
+        var host=wrap.querySelector('#vtsort'),msg=wrap.querySelector('#vtsortmsg'),solved=0;
+        host.innerHTML=probs.map(function(p,i){return '<div style="background:#0b0f1b;border:1px solid var(--line-soft);border-radius:11px;padding:12px 14px;margin-bottom:9px"><div style="font-size:14px;color:#eef2fa;margin-bottom:9px">'+p.q+'</div><div class="rulebtns" data-i="'+i+'" style="margin:0">'+opts.map(function(o){return '<button class="rulebtn" data-t="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div><div data-w="'+i+'" style="font-size:12.5px;margin-top:8px;display:none"></div></div>';}).join('');
+        host.querySelectorAll('.rulebtns').forEach(function(row){var i=+row.dataset.i,locked=false;row.querySelectorAll('.rulebtn').forEach(function(btn){btn.onclick=function(){if(locked)return;var w=host.querySelector('[data-w="'+i+'"]');if(btn.dataset.t===probs[i].a){btn.classList.add('on');btn.style.borderColor='var(--green)';locked=true;solved++;w.style.display='block';w.style.color='var(--green)';w.innerHTML='\u2713 '+probs[i].why;
+          if(solved===probs.length){msg.className='binmsg ok';msg.innerHTML='✓ VMs isolate heavily, containers are light and portable, serverless hides the server entirely — pick by weight and control.';bktUpdate('virt',true);mentor("This ladder — VM → container → serverless — is really a ladder of how much you stop managing.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue \u2193</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}else{btn.style.borderColor='var(--red)';w.style.display='block';w.style.color='var(--rose)';w.innerHTML='How much isolation vs lightness do you need — full VM, a container, or no server at all?';setTimeout(function(){btn.style.borderColor='';},700);}};});});
+        mentor("Start with full isolation and its own OS — that is a virtual machine.");});
+lensBeat(add,
       "Containers make “it works on my machine” portable and reproducible — which is why they became the unit of deployment for everything downstream, including how AI models and agents get shipped.",
       "A team still hand-configuring servers and hitting environment bugs on every release hasn’t adopted containers — a fixable source of delivery risk you can name.",
       "Point to containerisation as the low-drama modernisation win: reproducible deploys, faster releases, and the foundation the AI stack assumes you already have.");
@@ -1705,7 +1759,13 @@ virt:{concept:"virt",node:"Virtualization",act:"Act 1 · Foundations",title:"Vir
       opts:[{k:"a",t:"Containers share the host OS and package just the app; VMs carry a whole OS each."},{k:"b",t:"Containers are made of special hardware."},{k:"c",t:"There is no difference; the words are synonyms."}],
       correct:"a",right:"Right. Lighter, faster, reproducible — that portability is why the whole modern stack assumes containers.",
       wrong:{b:"No special hardware — it’s a software packaging difference.",c:"They differ: VMs virtualize hardware, containers virtualize the OS."},wrongDefault:"Containers share the OS and ship just the app; VMs carry a full OS each."});
-    add('<div class="kicker">Carry it forward</div><h2>Now rent it</h2><p>If machines can be sliced and spun up in seconds, why own any at all? Rent exactly what you need, when you need it. That’s the cloud.</p><p class="whisper">Next: <a class="jump" data-k="cloud">Cloud</a>.</p>',
+        questionBeat(add,{concept:"virt",k:"Apply · pick the unit",
+      q:"A team wants fast, lightweight, portable deployments that start in seconds. Best fit?",
+      opts:[{k:"a",t:"a full virtual machine per app"},{k:"b",t:"<b>containers</b>"},{k:"c",t:"one giant physical server"}],
+      correct:"b",
+      right:"Right — containers are the light, portable, fast-starting unit; VMs are heavier, full-OS isolation.",
+      wrongDefault:"Light, portable, fast-starting deployments point to containers."});
+add('<div class="kicker">Carry it forward</div><h2>Now rent it</h2><p>If machines can be sliced and spun up in seconds, why own any at all? Rent exactly what you need, when you need it. That’s the cloud.</p><p class="whisper">Next: <a class="jump" data-k="cloud">Cloud</a>.</p>',
       function(wrap,done){chooser(wrap,'Where next?');});
     return b;}
 },
@@ -1717,7 +1777,16 @@ cloud:{concept:"cloud",node:"Cloud",act:"Act 2 · Cloud & Data",title:"Cloud —
       support:'<div class="kicker">First principles</div><h2>How much do you rent?</h2><p>You can rent at different levels. <strong>IaaS</strong> = raw machines, you manage the rest. <strong>PaaS</strong> = a ready platform, you just bring your app. <strong>SaaS</strong> = finished software you just log into. Higher up = less to manage, less control. Providers run huge data centres in <strong>regions</strong> around the world, so you place things near your users. And a <strong>shared-responsibility</strong> line splits what the provider secures from what you must.</p>',
       standard:'<div class="kicker">First principles</div><h2>Service models and geography</h2><p><strong>IaaS / PaaS / SaaS</strong> is how much of the stack you rent vs manage. <strong>Regions and zones</strong> place capacity near users and provide resilience. The <strong>shared-responsibility model</strong> divides security duties between provider and customer — a frequent gap in deals.</p>',
       fast:'<div class="kicker">First principles</div><h2>Elasticity as economics</h2><p>Cloud converts capex → opex and lets you track demand with supply (autoscaling). IaaS/PaaS/SaaS trade control for managed surface; regions/zones give locality + fault isolation; shared responsibility partitions the security model. The second-order risk is unbounded elastic spend.</p>'}));
-    lensBeat(add,
+        add('<div class="card"><div class="kicker">Make the call</div><h2>Cloud win, or not?</h2><p class="hint">For each workload, decide whether the cloud’s rent-what-you-use model is a clear win. One best answer each.</p><div id="cdsort"></div><div class="binmsg" id="cdsortmsg" style="margin-top:10px"></div></div>',
+      function(wrap,done){
+        var opts=[["cloud","Cloud — elastic, pay-as-you-go"],["own","Owned / reserved may be cheaper"]];
+        var probs=[{q:"“Spiky, unpredictable traffic — busy one hour, quiet the next.”",a:"cloud",why:"Elastic scale-up/down and pay-per-use is exactly cloud’s strength."},{q:"“A brand-new startup with no capital for hardware.”",a:"cloud",why:"No upfront capex — rent capacity and pay as you grow."},{q:"“A steady, predictable 24/7 load at massive scale, cost is everything.”",a:"own",why:"At steady huge scale, owning or reserving can undercut on-demand cloud."}];
+        var host=wrap.querySelector('#cdsort'),msg=wrap.querySelector('#cdsortmsg'),solved=0;
+        host.innerHTML=probs.map(function(p,i){return '<div style="background:#0b0f1b;border:1px solid var(--line-soft);border-radius:11px;padding:12px 14px;margin-bottom:9px"><div style="font-size:14px;color:#eef2fa;margin-bottom:9px">'+p.q+'</div><div class="rulebtns" data-i="'+i+'" style="margin:0">'+opts.map(function(o){return '<button class="rulebtn" data-t="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div><div data-w="'+i+'" style="font-size:12.5px;margin-top:8px;display:none"></div></div>';}).join('');
+        host.querySelectorAll('.rulebtns').forEach(function(row){var i=+row.dataset.i,locked=false;row.querySelectorAll('.rulebtn').forEach(function(btn){btn.onclick=function(){if(locked)return;var w=host.querySelector('[data-w="'+i+'"]');if(btn.dataset.t===probs[i].a){btn.classList.add('on');btn.style.borderColor='var(--green)';locked=true;solved++;w.style.display='block';w.style.color='var(--green)';w.innerHTML='\u2713 '+probs[i].why;
+          if(solved===probs.length){msg.className='binmsg ok';msg.innerHTML='✓ Cloud wins on spiky demand and no-capex starts; steady huge scale can favour owning — match the model to the pattern.';bktUpdate('cloud',true);mentor("Cloud isn’t automatically cheaper — it’s cheaper for the right shapes of demand. Knowing when it isn’t is the strategist’s edge.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue \u2193</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}else{btn.style.borderColor='var(--red)';w.style.display='block';w.style.color='var(--rose)';w.innerHTML='Is the demand spiky or capex-constrained (cloud), or steady-huge-and-cost-driven (owning may win)?';setTimeout(function(){btn.style.borderColor='';},700);}};});});
+        mentor("Start with the spiky traffic — paying only for what you use is cloud’s home turf.");});
+lensBeat(add,
       "Elasticity cuts both ways: the same knob that scales you up to meet demand can scale your bill up without a ceiling. Capex became opex — and opex can run away.",
       "A client excited about “infinite scale” who hasn’t mentioned budgets, quotas or cost alerts is describing a future bill shock.",
       "Pair every elasticity pitch with guardrails: budgets, autoscaling limits, and cost visibility. The maturity signal is designing the ceiling, not just the growth.");
@@ -1726,7 +1795,13 @@ cloud:{concept:"cloud",node:"Cloud",act:"Act 2 · Cloud & Data",title:"Cloud —
       opts:[{k:"a",t:"You buy bigger servers up front."},{k:"b",t:"Capacity (and cost) flexes with use — capex becomes opex."},{k:"c",t:"You never have to think about cost again."}],
       correct:"b",right:"Exactly. Pay-for-use is the shift — powerful, but it moves cost management from purchasing to ongoing design.",
       wrong:{a:"That’s the old owned-hardware model the cloud replaces.",c:"The opposite — cost needs <em>more</em> active design, because it flexes with use."},wrongDefault:"Capacity and cost flex with usage; capex becomes opex."});
-    add('<div class="kicker">Carry it forward</div><h2>Pick a provider</h2><p>“Cloud” is abstract; you deliver on a real platform, with real services and a real bill. Let’s ground it in Google Cloud.</p><p class="whisper">Next: <a class="jump" data-k="gcp">Google Cloud</a>.</p>',
+        questionBeat(add,{concept:"cloud",k:"Apply · the startup",
+      q:"A startup with spiky traffic and no capital for hardware should…",
+      opts:[{k:"a",t:"buy a data centre upfront"},{k:"b",t:"<b>use the cloud — rent elastic capacity and pay for use</b>"},{k:"c",t:"size for peak and own it"}],
+      correct:"b",
+      right:"Right — elastic, pay-as-you-go with no upfront cost is exactly what the cloud is for.",
+      wrongDefault:"Spiky demand plus no capex is the classic cloud win — rent elastic capacity."});
+add('<div class="kicker">Carry it forward</div><h2>Pick a provider</h2><p>“Cloud” is abstract; you deliver on a real platform, with real services and a real bill. Let’s ground it in Google Cloud.</p><p class="whisper">Next: <a class="jump" data-k="gcp">Google Cloud</a>.</p>',
       function(wrap,done){chooser(wrap,'Where next?');});
     return b;}
 },
@@ -1738,7 +1813,16 @@ gcp:{concept:"gcp",node:"Google Cloud",act:"Act 2 · Cloud & Data",title:"Google
       support:'<div class="kicker">First principles</div><h2>The short menu</h2><p><strong>Compute</strong>, from most to least hands-on: <em>Compute Engine</em> (a virtual machine), <em>Cloud Run</em> (just run a container, it scales for you), <em>GKE</em> (run lots of containers, orchestrated). <strong>Storage</strong>: <em>Cloud Storage</em> for files, <em>BigQuery</em> for analysing huge tables. And <strong>Vertex AI</strong> is where Google’s machine-learning and model services live — the door to everything in the next Acts.</p>',
       standard:'<div class="kicker">First principles</div><h2>Compute, storage, AI</h2><p>Compute is a ladder: <strong>Compute Engine</strong> (VM) → <strong>Cloud Run</strong> (managed container) → <strong>GKE</strong> (orchestrated containers). Storage: <strong>Cloud Storage</strong> (objects) and <strong>BigQuery</strong> (warehouse). <strong>Vertex AI</strong> hosts the ML/model services the AI Acts build on. <strong>IAM</strong> enforces least-privilege throughout.</p>',
       fast:'<div class="kicker">First principles</div><h2>Mapping needs to primitives</h2><p>Match the workload to the least-effort sufficient primitive: stateless HTTP → Cloud Run; bespoke/stateful → Compute Engine; multi-service scale → GKE; analytics → BigQuery; blobs → Cloud Storage; ML/serving → Vertex AI. IAM = least privilege by default. The skill is not over-provisioning the abstraction.</p>'}));
-    lensBeat(add,
+        add('<div class="card"><div class="kicker">Match the service</div><h2>Which Google Cloud block?</h2><p class="hint">Match each need to the Google Cloud service. One best answer each.</p><div id="gcsort"></div><div class="binmsg" id="gcsortmsg" style="margin-top:10px"></div></div>',
+      function(wrap,done){
+        var opts=[["run","Cloud Run"],["storage","Cloud Storage"],["vertex","Vertex AI"]];
+        var probs=[{q:"“Run a container as a scalable web service, scale to zero, no servers to manage.”",a:"run",why:"Cloud Run serves containers with autoscaling and scale-to-zero."},{q:"“Keep files and objects cheaply and durably.”",a:"storage",why:"Cloud Storage is object storage for files/blobs."},{q:"“Build, tune and deploy ML and LLM models.”",a:"vertex",why:"Vertex AI is Google Cloud’s ML/LLM platform."}];
+        var host=wrap.querySelector('#gcsort'),msg=wrap.querySelector('#gcsortmsg'),solved=0;
+        host.innerHTML=probs.map(function(p,i){return '<div style="background:#0b0f1b;border:1px solid var(--line-soft);border-radius:11px;padding:12px 14px;margin-bottom:9px"><div style="font-size:14px;color:#eef2fa;margin-bottom:9px">'+p.q+'</div><div class="rulebtns" data-i="'+i+'" style="margin:0">'+opts.map(function(o){return '<button class="rulebtn" data-t="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div><div data-w="'+i+'" style="font-size:12.5px;margin-top:8px;display:none"></div></div>';}).join('');
+        host.querySelectorAll('.rulebtns').forEach(function(row){var i=+row.dataset.i,locked=false;row.querySelectorAll('.rulebtn').forEach(function(btn){btn.onclick=function(){if(locked)return;var w=host.querySelector('[data-w="'+i+'"]');if(btn.dataset.t===probs[i].a){btn.classList.add('on');btn.style.borderColor='var(--green)';locked=true;solved++;w.style.display='block';w.style.color='var(--green)';w.innerHTML='\u2713 '+probs[i].why;
+          if(solved===probs.length){msg.className='binmsg ok';msg.innerHTML='✓ Cloud Run serves apps, Cloud Storage holds objects, Vertex AI is the door to ML/LLMs — the blocks you’ll name most.';bktUpdate('gcp',true);mentor("You don’t need the whole GCP menu — a handful of blocks covers most solution diagrams you’ll draw.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue \u2193</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}else{btn.style.borderColor='var(--red)';w.style.display='block';w.style.color='var(--rose)';w.innerHTML='Is the need to run an app (Cloud Run), store objects (Cloud Storage), or do ML (Vertex AI)?';setTimeout(function(){btn.style.borderColor='';},700);}};});});
+        mentor("Start with running a container as a web service — that is Cloud Run.");});
+lensBeat(add,
       "Every service is a point on a control-vs-effort curve. Picking a heavier primitive than the job needs is the most common quiet source of cost and operational drag.",
       "A client defaulting to Kubernetes (GKE) for a simple stateless web service is buying orchestration complexity they don’t need yet.",
       "Recommend the cheapest sufficient primitive — often Cloud Run over GKE, managed over self-run — and let them graduate up only when scale demands it.");
@@ -1747,7 +1831,13 @@ gcp:{concept:"gcp",node:"Google Cloud",act:"Act 2 · Cloud & Data",title:"Google
       opts:[{k:"a",t:"GKE (full Kubernetes orchestration)."},{k:"b",t:"Cloud Run (managed containers, scales for you)."},{k:"c",t:"A rack of physical servers."}],
       correct:"b",right:"Right — Cloud Run gives you scale without orchestration overhead. Reach for GKE only when complexity truly demands it.",
       wrong:{a:"Kubernetes is powerful but heavy — overkill for one simple service.",c:"That’s the owned-hardware model the cloud exists to replace."},wrongDefault:"Cloud Run — managed containers, minimal ops."});
-    add('<div class="kicker">Carry it forward</div><h2>Fuel and plumbing</h2><p>Compute is useless without data to work on and interfaces to move it. Every AI system stands on data and APIs.</p><p class="whisper">Next: <a class="jump" data-k="data">Data &amp; APIs</a>.</p>',
+        questionBeat(add,{concept:"gcp",k:"Apply · pick the service",
+      q:"You need to serve a containerised app with scale-to-zero and no server management. Which service?",
+      opts:[{k:"a",t:"<b>Cloud Run</b>"},{k:"b",t:"Cloud Storage"},{k:"c",t:"BigQuery"}],
+      correct:"a",
+      right:"Right — Cloud Run runs containers with autoscaling and scale-to-zero, no infrastructure to manage.",
+      wrongDefault:"A containerised app with scale-to-zero and no ops points to Cloud Run."});
+add('<div class="kicker">Carry it forward</div><h2>Fuel and plumbing</h2><p>Compute is useless without data to work on and interfaces to move it. Every AI system stands on data and APIs.</p><p class="whisper">Next: <a class="jump" data-k="data">Data &amp; APIs</a>.</p>',
       function(wrap,done){chooser(wrap,'Where next?');});
     return b;}
 },
@@ -1759,7 +1849,16 @@ data:{concept:"data",node:"Data & APIs",act:"Act 2 · Cloud & Data",title:"Data 
       support:'<div class="kicker">First principles</div><h2>Where data sits and how it moves</h2><p>A <strong>database</strong> stores data in an organised way you can query — <em>SQL</em> databases use neat tables; <em>NoSQL</em> ones are more flexible. <strong>ETL / pipelines</strong> take messy raw data and turn it into something usable. An <strong>API</strong> is how one system asks another for data or an action — usually as a web request returning <strong>JSON</strong> (a simple text format for structured data). Later, when AI “agents” call tools, they’re calling APIs.</p>',
       standard:'<div class="kicker">First principles</div><h2>Stores, pipelines, contracts</h2><p><strong>SQL vs NoSQL</strong> stores; <strong>warehouse vs lake</strong>; <strong>batch vs streaming</strong> pipelines (ETL) that make data usable. <strong>REST APIs</strong> exchanging <strong>JSON</strong> are the integration fabric — and the exact mechanism agents use to act. Data quality and PII governance gate everything.</p>',
       fast:'<div class="kicker">First principles</div><h2>The data substrate</h2><p>OLTP stores, warehouses/lakes, and batch/stream ETL produce model-ready data; REST/JSON APIs are the integration + tool-calling surface reused later by agents. Governance (quality, lineage, PII) is the real bottleneck — models are cheap, trustworthy data isn’t.</p>'}));
-    lensBeat(add,
+        add('<div class="card"><div class="kicker">The first qualifying question</div><h2>Is the data ready?</h2><p class="hint">A prospect wants ‘AI on our data.’ For each situation, judge the data readiness. One best answer each.</p><div id="dasort"></div><div class="binmsg" id="dasortmsg" style="margin-top:10px"></div></div>',
+      function(wrap,done){
+        var opts=[["quality","Not ready — data quality"],["access","Not ready — access / permission"],["ready","Ready to build"]];
+        var probs=[{q:"“The data exists but is full of blanks, duplicates and typos.”",a:"quality",why:"Dirty data caps model quality — it needs cleaning first."},{q:"“It’s scattered across systems and we’re not permitted to use it for this.”",a:"access",why:"Access and permissioning gaps block the project before modelling."},{q:"“Clean, accessible, permissioned, labelled examples already exist.”",a:"ready",why:"That is a green light — the data foundation is in place."}];
+        var host=wrap.querySelector('#dasort'),msg=wrap.querySelector('#dasortmsg'),solved=0;
+        host.innerHTML=probs.map(function(p,i){return '<div style="background:#0b0f1b;border:1px solid var(--line-soft);border-radius:11px;padding:12px 14px;margin-bottom:9px"><div style="font-size:14px;color:#eef2fa;margin-bottom:9px">'+p.q+'</div><div class="rulebtns" data-i="'+i+'" style="margin:0">'+opts.map(function(o){return '<button class="rulebtn" data-t="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div><div data-w="'+i+'" style="font-size:12.5px;margin-top:8px;display:none"></div></div>';}).join('');
+        host.querySelectorAll('.rulebtns').forEach(function(row){var i=+row.dataset.i,locked=false;row.querySelectorAll('.rulebtn').forEach(function(btn){btn.onclick=function(){if(locked)return;var w=host.querySelector('[data-w="'+i+'"]');if(btn.dataset.t===probs[i].a){btn.classList.add('on');btn.style.borderColor='var(--green)';locked=true;solved++;w.style.display='block';w.style.color='var(--green)';w.innerHTML='\u2713 '+probs[i].why;
+          if(solved===probs.length){msg.className='binmsg ok';msg.innerHTML='✓ Data readiness has three tests — quality, access/permission, and labels. Fail any and you’re not scoping a model yet.';bktUpdate('data',true);mentor("This is the single most valuable question you can ask early: ‘do you even have clean, permissioned data?’ It saves doomed projects.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue \u2193</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}else{btn.style.borderColor='var(--red)';w.style.display='block';w.style.color='var(--rose)';w.innerHTML='Is the blocker dirty data (quality), permissions/access, or is it actually ready?';setTimeout(function(){btn.style.borderColor='';},700);}};});});
+        mentor("Start with the messy, blank-filled data — that’s a data-quality block, not a green light.");});
+lensBeat(add,
       "Models are commoditising; usable, governed data is not. The scarce ingredient in almost every AI project is clean, accessible, permissioned data — and the API access to reach it.",
       "A client dazzled by model demos who can’t say where their data lives, how clean it is, or who’s allowed to see it is not ready to build — they’re ready to discover a data project.",
       "Make “data readiness” the first qualifying gate: source, quality, access, permissions. Scoping data work honestly up front is what separates a deliverable from a demo.");
@@ -1768,7 +1867,13 @@ data:{concept:"data",node:"Data & APIs",act:"Act 2 · Cloud & Data",title:"Data 
       opts:[{k:"a",t:"Whether they picked the trendiest model."},{k:"b",t:"Whether clean, accessible, permissioned data exists."},{k:"c",t:"How fast their laptops are."}],
       correct:"b",right:"Exactly. “Do they even have the data?” is the first qualifying question — and APIs are how you reach it.",
       wrong:{a:"Model choice rarely decides feasibility; data readiness does.",c:"Hardware isn’t the constraint — trustworthy data is."},wrongDefault:"It’s whether clean, accessible, permissioned data exists."});
-    add('<div class="kicker">Carry it forward</div><h2>Let the data teach</h2><p>You have compute, cloud and data. Now the leap: instead of hand-writing rules, let the machine learn patterns from that data. Welcome to the deep dive.</p><p class="whisper">Next: <a class="jump" data-k="ml_why">Machine Learning</a> — a full deep-dive Act begins.</p>',
+        questionBeat(add,{concept:"data",k:"Apply · qualify the deal",
+      q:"A prospect says “use AI on our data,” but it’s unlabelled, messy and access is restricted. Your first move?",
+      opts:[{k:"a",t:"Start building the model immediately."},{k:"b",t:"<b>Qualify and fix data readiness — clean, accessible, permissioned — before scoping.</b>"},{k:"c",t:"Pick the trendiest model."}],
+      correct:"b",
+      right:"Right — data readiness is the first feasibility gate; qualify it before promising a model.",
+      wrongDefault:"Qualify data readiness (quality, access, labels) before scoping — no data, no AI."});
+add('<div class="kicker">Carry it forward</div><h2>Let the data teach</h2><p>You have compute, cloud and data. Now the leap: instead of hand-writing rules, let the machine learn patterns from that data. Welcome to the deep dive.</p><p class="whisper">Next: <a class="jump" data-k="ml_why">Machine Learning</a> — a full deep-dive Act begins.</p>',
       function(wrap,done){chooser(wrap,'Ready for the ML deep dive?');});
     return b;}
 },
