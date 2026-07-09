@@ -339,7 +339,7 @@
 .j-ph-bar{height:5px;background:var(--line);border-radius:5px;overflow:hidden;margin-bottom:10px}
 .j-ph-bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-soft),var(--glow))}
 .j-chips{display:flex;flex-wrap:wrap;gap:6px}
-.j-chip{display:inline-flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--line);color:var(--ink-soft);border-radius:999px;padding:5px 11px;font-size:12px;cursor:pointer;font-family:var(--sans)}
+.j-chip{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;max-width:100%;background:var(--panel);border:1px solid var(--line);color:var(--ink-soft);border-radius:999px;padding:5px 11px;font-size:12px;cursor:pointer;font-family:var(--sans)}
 .j-chip:hover{border-color:var(--gold-soft);color:#fff}
 .j-cdot{width:7px;height:7px;border-radius:50%;background:var(--ink-faint);flex:0 0 auto}
 .j-chip.done .j-cdot{background:var(--green)}
@@ -347,6 +347,7 @@
 .j-chip.open .j-cdot{background:var(--glow)}
 .j-chip.lock{opacity:.5}
 .j-cpct{color:var(--ink-faint);font-size:10.5px;font-family:var(--mono,ui-monospace,monospace)}
+.outcomebar{max-width:760px;margin:0 auto;padding:0 22px}.outcomebar:empty{display:none}.outcomebar{font-size:13px;color:var(--ink-soft);line-height:1.5;border-left:2px solid var(--gold-soft);padding:8px 14px;margin:14px auto 0;background:rgba(59,157,255,.05);border-radius:0 8px 8px 0}.outcomebar .ob-k{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-right:8px}
 </style>
 </head>
 <body>
@@ -366,6 +367,7 @@
       <span class="prog"><i id="progbar"></i></span>
       <button class="menubtn" id="menuBtn" aria-label="Menu" title="Menu">&#9776;</button>
     </div></div>
+    <div class="outcomebar" id="epoutcome"></div>
     <div class="col" id="col"></div>
   </main>
   <aside class="tutorrail">
@@ -411,7 +413,7 @@ var concepts={
   llm_training:{label:"How They’re Made",p:0.0,depth:"deep",prereq:["llm_attention"]},
   llm_prompt:{label:"Prompting",p:0.0,depth:"deep",prereq:["llm_training"]},
   llm_halluc:{label:"Hallucination",p:0.0,depth:"deep",prereq:["llm_prompt"]},
-  llm_approach:{label:"Prompt·RAG·Fine-tune",p:0.0,depth:"deep",prereq:["llm_halluc"]},
+  llm_approach:{label:"Prompt/RAG/FT",p:0.0,depth:"deep",prereq:["llm_halluc"]},
   llm_eval:{label:"Eval & Economics",p:0.0,depth:"deep",prereq:["llm_approach"]},
   llm_risk:{label:"Risk & Governance",p:0.0,depth:"deep",prereq:["llm_eval"]},
   llm_biz:{label:"LLM Business Outcomes",p:0.0,depth:"deep",prereq:["llm_risk"]},
@@ -430,14 +432,52 @@ var PHASES=[
 ];
 var UNLOCK=0.75, PLAYABLE=["computing","networks","servers","virt","cloud","gcp","data","ml_why","ml_landscape","ml_data","ml_model","ml_train","ml_overfit","ml_families","ml_neural","ml_cluster","ml_eval","ml_bias","ml_ops","ml_biz","llm_why","llm_tokens","llm_predict","llm_attention","llm_training","llm_prompt","llm_halluc","llm_approach","llm_eval","llm_risk","llm_biz","genai","embeddings","rag","agents","capstone"];
 var misconceptions={}, ACTIVE="llm_why";
+var OUTCOMES={
+ml_why:"spot when a problem needs ML instead of hand-written rules.",
+ml_landscape:"name whether an ask is classification, regression, or clustering.",
+ml_data:"explain why data quality caps model quality, and scope the data work.",
+ml_model:"describe a classifier as a learned decision boundary.",
+ml_train:"explain how a model learns (gradient descent) and what the learning rate risks.",
+ml_overfit:"tell overfitting from underfitting, and why you judge on held-out data.",
+ml_families:"match a model family (linear / tree / neural) to the shape of the pattern.",
+ml_neural:"explain why stacking neurons into layers captures patterns a single line can't.",
+ml_cluster:"recognise an unsupervised (clustering) problem and what it needs.",
+ml_eval:"choose an operating point using precision/recall — not accuracy — on imbalanced data.",
+ml_ops:"scope the model lifecycle (monitoring, drift, retraining) and its recurring cost.",
+ml_bias:"spot and measure model bias, and name a mitigation.",
+ml_biz:"qualify and frame an ML opportunity as a business outcome in currency.",
+llm_why:"explain why one next-token model generalises across many tasks.",
+llm_tokens:"reason about cost and context limits in tokens, not words.",
+llm_predict:"explain why an LLM sounds right rather than is right.",
+llm_attention:"explain what attention does and why long prompts cost more.",
+llm_training:"map pretraining / fine-tuning / RLHF to real solution options.",
+llm_prompt:"budget a prompt against the context window.",
+llm_halluc:"explain why hallucination is inherent and how grounding reduces it.",
+llm_approach:"choose prompt vs RAG vs fine-tune for a given ask.",
+llm_eval:"evaluate an LLM app with a rubric and size its token cost.",
+llm_risk:"name the main LLM risks and their guardrails for an enterprise deal.",
+llm_biz:"qualify and frame an LLM opportunity as a business outcome.",
+genai:"route a task to generative AI vs a deterministic / grounded approach.",
+embeddings:"explain semantic search and where embeddings are used.",
+rag:"explain the RAG pipeline and why it beats fine-tuning for changing facts.",
+agents:"describe the agent loop and place the human on the right step.",
+capstone:"assemble the full stack and frame it as a funded business case.",
+computing:"name the three compute primitives (CPU, memory, storage).",
+networks:"explain how machines find and talk to each other.",
+servers:"explain what a server and OS do, and why sizing for peak wastes money.",
+virt:"tell VMs from containers and when to use each.",
+cloud:"explain the cloud's rent-what-you-use economics.",
+gcp:"name the core Google Cloud building blocks you'll reference.",
+data:"explain why data readiness gates every AI project."
+};
 var LEARNER={tier:"standard"};
 function tierPick(o){return o[LEARNER.tier]!==undefined?o[LEARNER.tier]:o.standard;}
 
-function bktUpdate(id,correct){var c=concepts[id];var p=c.p;
+function bktUpdate(id,correct,weight){var c=concepts[id];var p=c.p;var _pT=(weight==='weak')?0.08:BKT.pT;
   var num=correct?p*(1-BKT.pS):p*BKT.pS;var den=correct?(p*(1-BKT.pS)+(1-p)*BKT.pG):(p*BKT.pS+(1-p)*(1-BKT.pG));
-  var cond=num/den;c.p=Math.max(0,Math.min(0.999,cond+(1-cond)*BKT.pT));
+  var cond=num/den;c.p=Math.max(0,Math.min(0.999,cond+(1-cond)*_pT));
   renderGraph();renderOrb();renderBKT();
-  if(typeof awardXP==="function"&&correct)awardXP(12);
+  if(typeof awardXP==="function"&&correct&&weight!=="weak")awardXP(12);
   if(typeof saveState==="function")saveState();
   // continuous adaptivity: repeated struggle nudges the tier down
   if(!correct){LEARNER._miss=(LEARNER._miss||0)+1; if(LEARNER._miss>=2 && LEARNER.tier==="fast"){setTier("standard");mentor("I’ll ease the pace a touch — switching you to <b>Standard</b> so we build this more carefully.");}
@@ -508,7 +548,7 @@ function videoBeat(add,cfg){add('<div class="card"><div style="font-size:11px;le
 
 function setTier(tn){LEARNER.tier=tn;var nm={support:"Support",standard:"Standard",fast:"Fast"}[tn];document.getElementById('tierName').textContent=nm;var _mt=document.getElementById('mTier');if(_mt)_mt.innerHTML='Pace: <b>'+nm+'</b>';if(typeof STATE!=="undefined"){STATE.tier=tn;if(typeof saveState==="function")saveState();}renderBKT();}
 
-function loadEpisode(key){var e=EPISODES[key];ACTIVE=e.concept;beats=e.build();beatIdx=0;col.innerHTML="";document.getElementById('saystack').innerHTML="";document.getElementById('acttag').textContent=e.act;document.getElementById('eptitle').textContent=e.title;document.getElementById('book').scrollTop=0;renderGraph();renderOrb();mentor(e.intro);offerDepth(key);}
+function loadEpisode(key){var e=EPISODES[key];ACTIVE=e.concept;beats=e.build();beatIdx=0;col.innerHTML="";document.getElementById('saystack').innerHTML="";document.getElementById('acttag').textContent=e.act;document.getElementById('eptitle').textContent=e.title;var _ob=document.getElementById('epoutcome');if(_ob)_ob.innerHTML=(typeof OUTCOMES!=='undefined'&&OUTCOMES[key])?('<span class="ob-k">Outcome</span> By the end, you can '+OUTCOMES[key]):'';document.getElementById('book').scrollTop=0;renderGraph();renderOrb();mentor(e.intro);offerDepth(key);}
 function offerDepth(key){var c=ACTIVE;var recFast=concepts[c].p>0.5||LEARNER.tier==="fast"||(concepts[c].prereq.length>0&&concepts[c].prereq.every(function(p){return concepts[p].p>=0.9;}));
   var recTxt=recFast?"You’ve got the groundwork — jump straight to the hands-on core, or take the full story.":"Take the full story so it builds properly, or fast-forward to the hands-on part.";
   var prim=recFast?{t:"⚡ Fast-track to the hands-on",i:2}:{t:"Start from the story",i:0};var sec=recFast?{t:"Full story",i:0}:{t:"⚡ Fast-track",i:2};
@@ -815,7 +855,7 @@ ml_ops:{concept:"ml_ops",node:"MLOps & Lifecycle",act:"Act 7 · Machine Learning
           if(a<0.85&&!alerted){alerted=true;msg.className='binmsg';msg.innerHTML='🔔 <b>Alert:</b> accuracy crossed the 85% SLA. In the real world you catch this from your <b>monitoring</b> — or from a furious customer. Retrain to recover.';}};
         wrap.querySelector('#mlretrain').onclick=function(){retr++;cost+=8000;var a=Math.min(0.93,acc[acc.length-1]+0.15+Math.random()*0.05);acc.push(a);wk++;alerted=false;upd();
           msg.className='binmsg ok';msg.innerHTML='✓ Retrained on fresh data — accuracy recovers. But watch the <b>run cost</b> climb: monitoring + retraining is the bill that never stops, and it’s the line you must scope and price.';
-          if(!did){did=true;bktUpdate('ml_ops',true);mentor("This loop — drift, detect, retrain — is the real ML product. Scope it and you win the renewal; ignore it and the model quietly dies in month three.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}};
+          if(!did){did=true;bktUpdate('ml_ops',true,'weak');mentor("This loop — drift, detect, retrain — is the real ML product. Scope it and you win the renewal; ignore it and the model quietly dies in month three.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}};
         mentor("Advance a few weeks first — watch the line fall toward the SLA on its own.");});
     lensBeat(add,
       "A model is the only deliverable that gets <em>worse</em> after you ship it — silently, with no code change. That single fact turns an AI project from a one-off build into an operating commitment (monitoring, retraining compute, data pipelines, on-call), which is usually the larger, recurring cost.",
@@ -829,6 +869,14 @@ ml_ops:{concept:"ml_ops",node:"MLOps & Lifecycle",act:"Act 7 · Machine Learning
       rightSay:"That instinct — models decay, plan for it — is what separates a proposal that survives contact with production from one that doesn’t.",
       wrongDefault:"Code doesn’t wear out. The <b>data</b> drifts away from what the model learned — so accuracy slides until you retrain.",
       wrongToast:"<b>Misconception flagged:</b> treating a model as a static, finished artifact."});
+    questionBeat(add,{concept:"ml_ops",k:"Decision · drift on a live model",
+      q:tierPick({support:"A deployed model has drifted below its accuracy SLA over eight weeks and the input data has clearly shifted. What's the right move?",standard:"Sustained drift below SLA; inputs have shifted. Best move?",fast:"Non-stationary perf below SLO, distribution shifted. Action?"}),
+      opts:[{k:"a",t:"Rewrite the application code."},{k:"b",t:"<b>Retrain on fresh, recent data</b> and redeploy."},{k:"c",t:"Nothing — accuracy always fluctuates."}],
+      correct:"b",flag:"drift_action",
+      right:"Right. Drift is a data problem — retrain on recent data and redeploy, and price that recurring loop into the deal.",
+      rightSay:"That's the lifecycle instinct: the model isn't broken, the world moved — so you refresh it on a cadence.",
+      wrong:{a:"The code didn't change; the data drifted away from what the model learned.",c:"This is sustained drift below SLA, not noise — it needs a retrain."},
+      wrongDefault:"Sustained drift below SLA = retrain on fresh data and redeploy."});
     add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Ship is the start, not the end.</strong> Live models drift; MLOps keeps them alive with monitoring, alerting and retraining. Build is one-off; run is forever — and it’s usually the bigger number. Scope the lifecycle, or the project dies quietly.</p><p class="whisper">You’ve got the full lifecycle. Now turn all of it into a deal — in the client’s currency. <a class="jump" data-k="ml_biz">From ML to Business Outcomes</a>.</p>',
       function(wrap,done){chooser(wrap,'You can price the whole lifecycle now. Where next?');});
     return b;}
@@ -953,7 +1001,7 @@ ml_data:{concept:"ml_data",node:"Data & Features",act:"Act 7 · Machine Learning
           if(on.model&&!dataDone)msg.innerHTML='The fancier algorithm added just <b>+2%</b>. The messy data is still holding you back.';
           else if(dataDone){msg.className='binmsg ok';msg.innerHTML='✓ Clean data + one good feature added <b>31 points</b>. The fancier algorithm added <b>2</b>. In real ML, <em>data</em> is the lever.';}
           draw();
-          if(dataDone&&!wrap._done){wrap._done=true;bktUpdate('ml_data',true);mentor("Feel that? You didn’t touch the model and gained 30 points. This is why practitioners spend most of their time on data, not algorithms.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
+          if(dataDone&&!wrap._done){wrap._done=true;bktUpdate('ml_data',true,'weak');mentor("Feel that? You didn’t touch the model and gained 30 points. This is why practitioners spend most of their time on data, not algorithms.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
         draw();upd();mentor("Turn on the three data fixes first, then try the fancy algorithm — compare how much each one actually buys you.");});
     questionBeat(add,{concept:"ml_data",k:"Check · what moves the needle",
       q:tierPick({support:'In most real ML projects, what improves results the most?',standard:'On most real projects, the biggest lever on results is usually:',fast:'For most tabular problems, the largest, most reliable metric gains typically come from:'}),
@@ -991,7 +1039,7 @@ ml_families:{concept:"ml_families",node:"Model Families",act:"Act 7 · Machine L
           if(m==='net'){triedNet=true;wrap.querySelector('#fmsg2').className='binmsg ok';wrap.querySelector('#fmsg2').innerHTML='✓ The neural net bends the boundary into a circle around the blob — something no straight line could ever do. Scaled up, this is deep learning.';}
           else if(m==='lin')wrap.querySelector('#fmsg2').innerHTML='A single line slices the blob in half — it simply cannot wrap around it.';
           else wrap.querySelector('#fmsg2').innerHTML='The tree boxes the blob with straight cuts — better, but blocky at the edges.';
-          if(triedNet&&!wrap._done){wrap._done=true;bktUpdate('ml_families',true);mentor("That’s the leap to deep learning: stacked simple units bending the boundary into any shape. The exact same idea, scaled to billions of units, is what you’ll meet later as an LLM.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
+          if(triedNet&&!wrap._done){wrap._done=true;bktUpdate('ml_families',true,'weak');mentor("That’s the leap to deep learning: stacked simple units bending the boundary into any shape. The exact same idea, scaled to billions of units, is what you’ll meet later as an LLM.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
         wrap.querySelectorAll('#mtog button').forEach(function(btn){btn.onclick=function(){wrap.querySelectorAll('#mtog button').forEach(function(x){x.classList.remove('on');});btn.classList.add('on');draw(btn.dataset.m);};});
         draw('lin');mentor("Start on Linear — watch it fail — then work up to the Neural Net and see the boundary curve.");});
     questionBeat(add,{concept:"ml_families",k:"Check · why more than a line",
@@ -1030,7 +1078,7 @@ ml_cluster:{concept:"ml_cluster",node:"Unsupervised",act:"Act 7 · Machine Learn
           for(var it=0;it<6;it++){blobs.forEach(function(p,pi){var best=0,bd=1e9;cents.forEach(function(c,ci){var d=(p[0]-c[0])*(p[0]-c[0])+(p[1]-c[1])*(p[1]-c[1]);if(d<bd){bd=d;best=ci;}});assign[pi]=best;});
             for(var ci=0;ci<k;ci++){var sx=0,sy=0,n=0;blobs.forEach(function(p,pi){if(assign[pi]===ci){sx+=p[0];sy+=p[1];n++;}});if(n){cents[ci]=[sx/n,sy/n];}}}
           render(assign,cents);wrap.querySelector('#cmsg').className='binmsg ok';wrap.querySelector('#cmsg').innerHTML='✓ With <b>k='+k+'</b>, the algorithm found the groups by nearness alone — no labels, no answer key. That’s unsupervised learning.';
-          if(!wrap._done){wrap._done=true;bktUpdate('ml_cluster',true);mentor("Look — it recovered the segments purely from similarity. Try k=2 or 4 and watch the groups redraw. This is a whole different mode of learning from everything before.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}};
+          if(!wrap._done){wrap._done=true;bktUpdate('ml_cluster',true,'weak');mentor("Look — it recovered the segments purely from similarity. Try k=2 or 4 and watch the groups redraw. This is a whole different mode of learning from everything before.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}};
         mentor("Leave k at 3 and hit Cluster — watch three groups appear from unlabeled dots. Then try other k values.");});
     questionBeat(add,{concept:"ml_cluster",k:"Check · the key difference",
       q:tierPick({support:'How is clustering different from the fraud classifier?',standard:'What sets clustering apart from a classifier?',fast:'What defines the unsupervised setting here?'}),
@@ -1067,7 +1115,7 @@ ml_bias:{concept:"ml_bias",node:"Bias & Fairness",act:"Act 7 · Machine Learning
           if(gap<=10){msg.className='binmsg ok';msg.innerHTML='✓ You closed the approval gap to <b>'+gap+'%</b> while accuracy held at <b>'+acc+'%</b>. Fairness wasn’t automatic — you measured it and fixed it, at almost no cost.';}
           else if(any)msg.innerHTML='Better — the gap is shrinking. Add the other mitigation too.';
           else msg.innerHTML='A <b>31-point</b> approval gap between groups — learned straight from biased history. Apply a mitigation.';
-          if(any&&!wrap._done){wrap._done=true;bktUpdate('ml_bias',true);mentor("This is the difference between a competent and a responsible practitioner: you don’t assume the model is fair because it’s math — you measure across groups and correct it. Often it’s nearly free; you just have to look.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
+          if(any&&!wrap._done){wrap._done=true;bktUpdate('ml_bias',true,'weak');mentor("This is the difference between a competent and a responsible practitioner: you don’t assume the model is fair because it’s math — you measure across groups and correct it. Often it’s nearly free; you just have to look.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
         upd();mentor("First just look at the gap — 31 points. Then apply a mitigation and watch it close while accuracy barely moves.");});
     questionBeat(add,{concept:"ml_bias",k:"Check · is the model neutral?",
       q:tierPick({support:'Is a model automatically fair because it’s “just math”?',standard:'Is a model objective simply because it’s mathematical?',fast:'Why is “the model is neutral because it’s math” wrong?'}),
@@ -1103,7 +1151,7 @@ ml_why:{concept:"ml_why",node:"Why ML",act:"Act 7 · Machine Learning",title:"Wh
           wrap.querySelector('#acc').textContent=(correct*10)+'%';
           var any=rules.big||rules.nw||rules.ru;var msg=wrap.querySelector('#rmsg');
           if(any&&(caught<5||blocked>0)){msg.className='binmsg';msg.innerHTML='See the trade-off? Catch more fraud and you block honest customers; protect customers and fraud slips through. <b>No rule set is clean.</b>';}
-          if(any&&tried){draw();if(!wrap._done){wrap._done=true;bktUpdate('ml_why',true);mentor("That ceiling is the whole reason ML exists. Rules force a brutal trade-off; a model <em>learned from examples</em> can carve a smarter boundary than any if-then you’d write by hand.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">I see the ceiling — continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
+          if(any&&tried){draw();if(!wrap._done){wrap._done=true;bktUpdate('ml_why',true,'weak');mentor("That ceiling is the whole reason ML exists. Rules force a brutal trade-off; a model <em>learned from examples</em> can carve a smarter boundary than any if-then you’d write by hand.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">I see the ceiling — continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
           else draw();}
         draw();compute();mentor("Try 'new account' + 'rushed shipping' together — you’ll catch all the fraud but block two honest customers. There’s no clean rule.");});
     questionBeat(add,{concept:"ml_why",k:"Check · the core shift",q:tierPick({support:'What makes machine learning different from the hand-written rules Priya tried?',standard:'What is the essential difference between ML and hand-written rules?',fast:'In supervised learning, where does the decision rule come from?'}),
@@ -1133,7 +1181,7 @@ ml_model:{concept:"ml_model",node:"The Model",act:"Act 7 · Machine Learning",ti
         pts.forEach(function(p){place(p[0],p[1],p[2]);});
         wrap.querySelector('#mltrain').onclick=function(){if(trained)return;trained=true;plot.insertAdjacentHTML('beforeend','<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"><line x1="0" y1="100" x2="100" y2="0" stroke="#5cc8ff" stroke-width="0.9"/></svg>');msg.className='binmsg';msg.innerHTML='Trained. That line is the rule the model <i>found</i> from the examples — click anywhere to classify a new order.';mentor("Nobody drew that line — the model derived it. Click a spot to see it judge an order it has never seen.");};
         plot.onclick=function(ev){if(!trained){msg.textContent='Train first, then test.';return;}var r=plot.getBoundingClientRect();var x=(ev.clientX-r.left)/r.width*100;var y=100-(ev.clientY-r.top)/r.height*100;var cls=(x>y)?'fraud':'legit';place(x,y,'test '+cls);msg.className='binmsg';msg.innerHTML='Classified as <b style="color:'+(cls==='fraud'?'var(--red)':'var(--green)')+'">'+cls+'</b> — purely by which side of the boundary it fell.';
-          if(!tested){tested=true;bktUpdate('ml_model',true);var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}};
+          if(!tested){tested=true;bktUpdate('ml_model',true,'weak');var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}};
         mentor("First click 'Train on examples', then click anywhere in the box to test a new order.");});
     questionBeat(add,{concept:"ml_model",k:"Check · what the model is",q:tierPick({support:'After training, what has the model actually got?',standard:'What is the trained model, concretely?',fast:'What does the trained classifier represent, and how does inference work?'}),
       opts:[{k:"a",t:"A saved copy of all the training orders."},{k:"b",t:"A learned <b>boundary</b> in feature space; it predicts by which side a new point falls on."},{k:"c",t:"A list of if-then rules the programmer wrote after looking at the plot."}],
@@ -1162,7 +1210,7 @@ ml_train:{concept:"ml_train",node:"Training",act:"Act 7 · Machine Learning",tit
         function draw(){ctx.clearRect(0,0,W,H);ctx.strokeStyle='#2a5f8f';ctx.lineWidth=2;ctx.beginPath();for(var px=0;px<=1;px+=0.008){var X=34+px*(W-50),Y=(H-28)-L(px)/N*(H-56);if(px===0)ctx.moveTo(X,Y);else ctx.lineTo(X,Y);}ctx.stroke();
           var bx=34+Math.max(0,Math.min(1,xb))*(W-50),by=(H-28)-L(Math.max(0,Math.min(1,xb)))/N*(H-56);ctx.fillStyle='#5cc8ff';ctx.beginPath();ctx.arc(bx,by,7,0,7);ctx.fill();
           ctx.fillStyle='#9fadc0';ctx.font='13px "JetBrains Mono",monospace';ctx.fillText('error = '+L(xb).toFixed(3),W-150,22);}
-        function check(){if(L(xb)<0.006&&!solved){solved=true;wrap.querySelector('#lmsg').className='binmsg ok';wrap.querySelector('#lmsg').innerHTML='✓ Bottom of the valley — minimum error. That descent, repeated over a model’s parameters, <b>is</b> training.';bktUpdate('ml_train',true);mentor("That’s it — the model learned by repeatedly nudging itself downhill on its own error. Try cranking the learning rate up high and stepping: watch it overshoot and bounce. That’s why step size matters.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
+        function check(){if(L(xb)<0.006&&!solved){solved=true;wrap.querySelector('#lmsg').className='binmsg ok';wrap.querySelector('#lmsg').innerHTML='✓ Bottom of the valley — minimum error. That descent, repeated over a model’s parameters, <b>is</b> training.';bktUpdate('ml_train',true,'weak');mentor("That’s it — the model learned by repeatedly nudging itself downhill on its own error. Try cranking the learning rate up high and stepping: watch it overshoot and bounce. That’s why step size matters.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
         function step(){xb-=lr()*g(xb);if(xb<-0.3||xb>1.3){diverged=true;wrap.querySelector('#lmsg').className='binmsg';wrap.querySelector('#lmsg').innerHTML='Diverged! The step was too big — it flew out of the valley. Lower the learning rate and reset.';xb=Math.max(-0.02,Math.min(1.02,xb));}draw();check();}
         wrap.querySelector('#lr').oninput=function(){wrap.querySelector('#lrv').textContent=lr().toFixed(2);};
         wrap.querySelector('#lstep').onclick=step;
@@ -1203,7 +1251,7 @@ ml_overfit:{concept:"ml_overfit",node:"Generalization",act:"Act 7 · Machine Lea
           if(cx>=6)msg.innerHTML='<span style="color:var(--red)">Overfitting.</span> Train accuracy keeps climbing while <b>test accuracy falls</b> — it’s memorizing noise, not the pattern.';
           else if(cx<=2)msg.innerHTML='<span style="color:var(--xp)">Underfitting.</span> Too simple to capture the real pattern — poor on both.';
           else msg.innerHTML='<span style="color:var(--green)">Nice.</span> Complex enough to catch the pattern, simple enough to ignore the noise — best test accuracy.';
-          if(sawHigh&&!wrap._done){wrap._done=true;bktUpdate('ml_overfit',true);mentor("There it is — past the sweet spot, training accuracy rises but <em>test</em> accuracy drops. That gap is overfitting. The best model isn’t the one that aces the past; it’s the one that generalizes.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
+          if(sawHigh&&!wrap._done){wrap._done=true;bktUpdate('ml_overfit',true,'weak');mentor("There it is — past the sweet spot, training accuracy rises but <em>test</em> accuracy drops. That gap is overfitting. The best model isn’t the one that aces the past; it’s the one that generalizes.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
         wrap.querySelector('#cx').oninput=upd;upd();mentor("Slide complexity up to 8–9 and watch test accuracy fall even as training accuracy climbs. Then find the sweet spot in the middle.");});
     questionBeat(add,{concept:"ml_overfit",k:"Check · the 100% trap",q:tierPick({support:'A model scores 100% on the past orders it trained on. Is it the best model?',standard:'Is 100% training accuracy a sign of the best model?',fast:'Why can 100% training accuracy indicate a worse model, and what do you optimize instead?'}),
       opts:[{k:"a",t:"Yes — 100% on training data means it’s the best possible model."},{k:"b",t:"No — that often means <b>overfitting</b> (memorizing noise). What matters is accuracy on <b>unseen</b> data."},{k:"c",t:"Yes, and you should always increase complexity for an even better model."}],
@@ -1240,12 +1288,12 @@ ml_eval:{concept:"ml_eval",node:"Evaluate & Deploy",act:"Act 7 · Machine Learni
           if(t>=0.95)msg.innerHTML='Threshold this high flags almost nothing: <b>'+acc+'% accuracy</b> — yet recall is <b>'+rec+'%</b>. Accuracy looks fine while the model catches no fraud. That’s the trap.';
           else if(t<=0.1)msg.innerHTML='Very low threshold: recall is high but you’re flagging honest customers — <b>precision drops</b>. Too many false alarms.';
           else msg.innerHTML='Moving the threshold trades <b>recall</b> (catching fraud) against <b>precision</b> (not blocking honest buyers). Pick by which mistake costs more.';
-          if(!moved){moved=true;bktUpdate('ml_eval',true);mentor("This is the honest way to judge a model. Notice: push the threshold near 1.0 and accuracy stays high while recall collapses. Accuracy alone would’ve fooled you.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
+          if(!moved){moved=true;bktUpdate('ml_eval',true,'weak');mentor("This is the honest way to judge a model. Notice: push the threshold near 1.0 and accuracy stays high while recall collapses. Accuracy alone would’ve fooled you.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
         wrap.querySelector('#thr').oninput=upd;upd();wrap.querySelector('#emsg').textContent='';mentor("Drag the threshold up toward 0.95 — watch recall crash while accuracy barely moves. Then bring it back to a sensible spot.");});
     add('<div class="kicker">You Do · simulated console</div><h2>Deploy the fraud model</h2><p>Package the trained model, set the threshold you chose, and put it behind an endpoint on Vertex AI — a live fraud scorer for every new order. Faithful simulation; the same commands run against real GCP later.</p><div class="console"><div class="cbar"><i style="background:#f43f5e"></i><i style="background:#38d0ff"></i><i style="background:#34d399"></i> &nbsp;cloud-shell — fraud-model</div><div class="body" id="dterm"><span class="muted">Click to train, evaluate, and deploy the model.</span></div></div><div class="continue"><button class="btn" id="ddeploy">▷ Train & deploy</button></div>',
       function(wrap,done){var term=wrap.querySelector('#dterm'),btn=wrap.querySelector('#ddeploy');
         var L=[['<span class="cmd">$ alos ml train --data orders.csv --split 0.8</span>',450],['Fitting classifier · descending loss · 200 steps…',800],['<span class="ok">✓ train acc 94% · test acc 91% (no overfit)</span>',500],['<span class="cmd">$ alos ml eval --threshold 0.45</span>',500],['<span class="ok">✓ recall 80% · precision 71% — operating point set</span>',550],['<span class="cmd">$ gcloud ai endpoints deploy-model fraud-scorer --region us-central1</span>',600],['Deploying to Vertex AI…',800],['<span class="ok">✓ live</span> → <span class="url">https://fraud-scorer.aiplatform.run</span>',450],['<span class="muted">Every new order is now scored in real time. Portfolio artifact saved.</span>',300]];
-        btn.onclick=function(){btn.disabled=true;term.innerHTML="";var i=0;(function step(){if(i>=L.length){bktUpdate('ml_eval',true);toast('<b>Fraud model deployed.</b> Trained, evaluated honestly, and live on Vertex AI.');done();return;}var it=L[i++];var d=document.createElement('div');d.innerHTML=it[0];term.appendChild(d);term.scrollTop=term.scrollHeight;setTimeout(step,it[1]);})();};});
+        btn.onclick=function(){btn.disabled=true;term.innerHTML="";var i=0;(function step(){if(i>=L.length){bktUpdate('ml_eval',true,'weak');toast('<b>Fraud model deployed.</b> Trained, evaluated honestly, and live on Vertex AI.');done();return;}var it=L[i++];var d=document.createElement('div');d.innerHTML=it[0];term.appendChild(d);term.scrollTop=term.scrollHeight;setTimeout(step,it[1]);})();};});
     questionBeat(add,{concept:"ml_eval",k:"Check · judging a model",q:tierPick({support:'Fraud is rare. Why isn’t high accuracy enough to trust the model?',standard:'On rare-fraud data, why is accuracy a poor measure — and what do you use instead?',fast:'On heavily imbalanced classes, why is accuracy misleading, and which metrics capture real performance?'}),
       opts:[{k:"a",t:"Accuracy is always the single best measure of a model."},{k:"b",t:"With rare fraud, “flag nothing” scores high accuracy yet catches none — so you use <b>precision and recall</b>, tuned by threshold."},{k:"c",t:"You should pick the threshold that maximizes accuracy, always."}],
       correct:"b",flag:"accuracy_enough",
@@ -1254,6 +1302,14 @@ ml_eval:{concept:"ml_eval",node:"Evaluate & Deploy",act:"Act 7 · Machine Learni
       wrong:{a:'Not on imbalanced data — a do-nothing model can look accurate while catching zero fraud. Precision and recall expose that; accuracy hides it.',c:'Maximizing accuracy on rare fraud often means flagging nothing. You choose the threshold by the business cost of misses vs. false alarms, not accuracy.'},
       wrongToast:'<b>Misconception flagged:</b> "accuracy is enough."'});
     add('<div class="card lens"><div class="lskick">Strategist’s Lens · second-order &amp; business</div><div class="ls-row"><div class="ls-h">Second-order effect</div><div class="ls-b">Model metrics are meaningless until converted to money — and the conversion swings wildly: on rare events a tiny recall gain can be worth millions, while “95% accurate” can be worthless. The right metric is set by the asymmetric cost of the two error types, which is a <em>business</em> question, not a data-science one.</div></div><div class="ls-row"><div class="ls-h">The tell — what to listen for</div><div class="ls-b">When someone leads with “accuracy,” especially on a rare event (fraud, churn, defects), they’re usually hiding a weak model. The real question is the cost of a false positive versus a false negative.</div></div><div class="ls-row"><div class="ls-h">Your presales / solution-architecture move</div><div class="ls-b">Co-build the value case in the client’s currency: expected value = (true positives × value saved) − (false positives × intervention cost) − (false negatives × miss cost). That equation both justifies the spend to a CFO and sets the operating threshold. Cost-weighted framing — not accuracy — is what closes and defends the deal.</div></div></div>');
+    questionBeat(add,{concept:"ml_eval",k:"Decision · pick the operating point",
+      q:tierPick({support:"Fraud is about 1 in 8 orders, and missing fraud costs far more than a false alarm. Which operating point do you choose?",standard:"Missing fraud costs more than a false alarm here. Which operating point?",fast:"Cost(FN) ≫ Cost(FP) on imbalanced data. Operating point?"}),
+      opts:[{k:"a",t:"A high threshold — flag only the surest cases (max precision)."},{k:"b",t:"<b>A lower threshold</b> — accept more false alarms to catch most fraud (higher recall)."},{k:"c",t:"Whatever gives the highest overall accuracy."}],
+      correct:"b",flag:"operating_point",
+      right:"Right. When a missed fraud is the costly error, you lower the threshold for recall — and you ignore raw accuracy, which the legit majority inflates.",
+      rightSay:"That's the judgement the confusion matrix exists to support — cost of the error decides the threshold, not accuracy.",
+      wrong:{a:"Max precision misses too much fraud — the expensive error here.",c:"Accuracy is dominated by the legit majority; it hides the fraud you're paid to catch."},
+      wrongDefault:"Lower the threshold for higher recall when a missed fraud is the costly error."});
     add('<div class="kicker">Almost there</div><h2>You can reason about ML now</h2><p>You went from "why not just write rules?" to <strong>motivating, modeling, training, generalizing, evaluating and deploying</strong> a real classifier — and you can defend every step. That’s the difference between using ML and understanding it.</p><p class="whisper">One last thing separates a competent practitioner from a responsible one: a model learns <em>everything</em> in its data — including our past unfairness. Before you ship, you have to look for it. Next: <a class="jump" data-k="ml_bias">Bias &amp; Fairness</a>.</p>',
       function(wrap,done){chooser(wrap,'You’ve completed the Machine Learning Act. Revisit any lesson:');});
     return b;}
@@ -1413,6 +1469,30 @@ ml_neural:{concept:"ml_neural",node:"Neural Networks",act:"Act 8 · Machine Lear
       support:'<div class="kicker">First principles</div><h2>Neuron → layer → “deep”</h2><p>Picture one neuron as a tiny voter: each input gets a <strong>weight</strong> (its say), the votes are summed, and a <strong>switch</strong> (an “activation”) turns that sum into an output. Stack a row of neurons into a <strong>layer</strong>; stack many layers and the network is <strong>“deep”</strong> — that’s where <strong>deep learning</strong> gets its name. Early layers spot simple patterns, later layers combine them into complex ones. <strong>Training</strong> is just nudging every weight, over and over, until the network’s answers get better — exactly the gradient-descent idea you already saw, at massive scale.</p>',
       standard:'<div class="kicker">First principles</div><h2>Composing simple units</h2><p>A neuron = weighted sum of inputs → non-linear <strong>activation</strong>. A <strong>layer</strong> is many neurons in parallel; stacking layers (a <strong>deep</strong> network) lets it learn arbitrarily curved decision boundaries that linear models and single trees can’t. <strong>Learning = tuning the weights</strong> by gradient descent. Same ML machinery you know — just far more parameters, composed in depth.</p>',
       fast:'<div class="kicker">First principles</div><h2>Depth = representational power</h2><p>Neurons apply an affine map + non-linearity; stacked layers compose these into a universal function approximator. Depth buys hierarchical feature reuse; training is gradient descent over the weights (backprop). Scale this architecture on sequence data and you arrive at Transformers — the LLM substrate. The mental model is unchanged; only size and structure grow.</p>'}));
+    add('<div class="card"><div class="kicker">Try it · carve the boundary</div><h2>Stack neurons until the shape separates</h2><p class="hint">These two classes are interleaved (an “XOR” pattern) — no single straight line can split them. Add capacity and watch the boundary bend. Reach a clean split to continue.</p><canvas id="nncv" width="600" height="240" style="width:100%;height:auto;background:#0b0f1b;border:1px solid var(--line-soft);border-radius:12px"></canvas><div style="display:flex;gap:18px;margin:10px 0;font-size:13px"><span>Capacity: <b id="nncap">— pick one —</b></span><span>Accuracy: <b id="nnacc" style="color:var(--ink-faint)">—</b></span></div><div class="rulebtns" style="margin:0"><button class="rulebtn" data-l="0">1 neuron (a line)</button><button class="rulebtn" data-l="1">Small layer (4 units)</button><button class="rulebtn" data-l="2">Deeper net (8+ units)</button></div><div class="binmsg" id="nnmsg" style="margin-top:10px"></div></div>',
+      function(wrap,done){
+        var cv=wrap.querySelector('#nncv'),ctx=cv.getContext('2d'),W=600,H=240,fin=false;
+        var pts=[];
+        function cluster(cx,cy,cls){for(var i=0;i<7;i++)pts.push([cx+(Math.random()*16-8),cy+(Math.random()*16-8),cls]);}
+        cluster(28,28,'A');cluster(72,72,'A');cluster(28,72,'B');cluster(72,28,'B');
+        function pred(l,x,y){var rx=x>50,ry=y>50;if(l===0)return rx?'A':'B';if(l===1)return (rx&&ry)?'A':'B';return (rx===ry)?'A':'B';}
+        function acc(l){var ok=0;pts.forEach(function(p){if(pred(l,p[0],p[1])===p[2])ok++;});return Math.round(ok/pts.length*100);}
+        function X(v){return 30+v/100*(W-60);}function Y(v){return H-20-v/100*(H-40);}
+        function draw(l){ctx.clearRect(0,0,W,H);
+          var cw=(W-60)/25+1,ch=(H-40)/25+1;
+          for(var gx=0;gx<100;gx+=4)for(var gy=0;gy<100;gy+=4){var pr=pred(l,gx+2,gy+2);ctx.fillStyle=pr==='A'?'rgba(52,211,153,0.08)':'rgba(244,63,94,0.08)';ctx.fillRect(X(gx),Y(gy+4),cw,ch);}
+          pts.forEach(function(p){ctx.fillStyle=p[2]==='A'?'#34d399':'#f43f5e';ctx.beginPath();ctx.arc(X(p[0]),Y(p[1]),5,0,7);ctx.fill();ctx.strokeStyle='rgba(0,0,0,.4)';ctx.stroke();});}
+        function initDraw(){ctx.clearRect(0,0,W,H);pts.forEach(function(p){ctx.fillStyle=p[2]==='A'?'#34d399':'#f43f5e';ctx.beginPath();ctx.arc(X(p[0]),Y(p[1]),5,0,7);ctx.fill();});}
+        initDraw();
+        wrap.querySelectorAll('.rulebtn').forEach(function(btn){btn.onclick=function(){var l=+btn.dataset.l;wrap.querySelectorAll('.rulebtn').forEach(function(x){x.classList.remove('on');if(!x.style.borderColor.includes('52'))x.style.borderColor='';});btn.classList.add('on');
+          var a=acc(l);draw(l);wrap.querySelector('#nncap').textContent=btn.textContent;var ae=wrap.querySelector('#nnacc');ae.textContent=a+'%';ae.style.color=a>=90?'var(--green)':(a>=70?'var(--xp)':'var(--red)');
+          var msg=wrap.querySelector('#nnmsg');
+          if(l===0){msg.className='binmsg';msg.innerHTML='One neuron draws one straight line — and no straight line can separate an XOR pattern. Stuck near 50%.';}
+          else if(l===1){msg.className='binmsg';msg.innerHTML='A small layer bends the boundary into a corner — better, but it still misclassifies a cluster.';}
+          else{msg.className='binmsg ok';msg.innerHTML='✓ Enough units, composed in depth, carve the boundary into <b>any</b> shape — the classes separate cleanly. That representational power is what scales up into a Transformer.';btn.style.borderColor='var(--green)';
+            if(!fin){fin=true;bktUpdate('ml_neural',true);mentor("You just felt why depth matters: stacking simple weighted units lets a network draw shapes a single line never could. An LLM is this idea, scaled and specialised.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
+        };});
+        mentor("Start with one neuron — see that a single straight line can’t split this pattern.");});
     lensBeat(add,
       "Neural networks trade transparency for power: they learn patterns no one wrote down, but they can’t easily explain <em>why</em>. That single trade-off drives the cost, the data appetite, and the governance burden of everything from deep learning to LLMs.",
       "A client in a regulated domain (credit, health) asking for a deep neural network but also full case-by-case explainability is describing a tension they’ll have to resolve — accuracy vs interpretability.",
@@ -1427,7 +1507,7 @@ ml_neural:{concept:"ml_neural",node:"Neural Networks",act:"Act 8 · Machine Lear
       function(wrap,done){chooser(wrap,'Where next?');});
     return b;}
 },
-genai:{concept:"genai",node:"Generative AI",act:"Act 10 · Applied AI",title:"Generative AI — Beyond Text",
+genai:{concept:"genai",node:"Generative AI",act:"Act 10 · Applied GenAI",title:"Generative AI — Beyond Text",
   intro:"LLMs generate words; the same generative idea produces images, audio and code. Here’s the paradigm — and where it earns real money versus where it’s demo-ware.",
   build:function(){var b=[];var add=function(h,g){b.push({html:h,gate:g});};
     add('<div class="kicker">From predicting to producing</div><h1>One idea, many media</h1><p class="lead">Generative AI flips the usual goal. Instead of <em>classifying</em> what something is, it <em>produces</em> something new — text, an image, audio, code — that fits the patterns it learned.</p><p>The same <strong>foundation model</strong> idea you met with LLMs extends across media: train once at scale, then adapt to many tasks.</p>');
@@ -1435,6 +1515,20 @@ genai:{concept:"genai",node:"Generative AI",act:"Act 10 · Applied AI",title:"Ge
       support:'<div class="kicker">First principles</div><h2>How images differ from text</h2><p>Text models build an answer piece by piece (next <span class="term" data-t="token">token</span>). Image models often work differently: <strong>diffusion</strong> starts with pure noise and repeatedly “denoises” it into a picture that matches your prompt. A <strong>foundation model</strong> is a big model trained once on huge data that many teams then adapt — so one model powers many products. <strong>Multimodal</strong> models handle several media at once (text + image + audio).</p>',
       standard:'<div class="kicker">First principles</div><h2>Paradigms and models</h2><p>Autoregressive generation (text) vs <strong>diffusion</strong> (images/audio) vs GANs. <strong>Foundation models</strong> amortise one massive pretraining across many downstream uses; <strong>multimodal</strong> models unify media. The generative paradigm = produce novel outputs matching a learned distribution.</p>',
       fast:'<div class="kicker">First principles</div><h2>Generative modelling</h2><p>Sampling from a learned data distribution: autoregressive (tokens), diffusion (iterative denoising), adversarial (GANs). Foundation models centralise pretraining cost; multimodality fuses encoders. Value accrues where generation replaces expensive human production — not where a deterministic system would do.</p>'}));
+    add('<div class="card"><div class="kicker">Make the call · route the task</div><h2>Generation, or a deterministic answer?</h2><p class="hint">Four client asks. For each, decide whether generative AI is the right tool, or whether the job needs an exact, deterministic/grounded answer. One best answer each.</p><div id="gnsort"></div><div class="binmsg" id="gnmsg" style="margin-top:10px"></div></div>',
+      function(wrap,done){
+        var opts=[["gen","Generative AI"],["det","Deterministic / grounded"]];
+        var probs=[
+          {q:"“Draft 20 ad headlines for us to pick from and polish.”",a:"gen",why:"High-volume first-pass creative a human reviews — generation’s sweet spot."},
+          {q:"“Show the customer their exact current account balance.”",a:"det",why:"One guaranteed-correct number — pull it from the system, never generate it."},
+          {q:"“Summarise this 40-page contract into plain-English bullets to review.”",a:"gen",why:"Draft-and-review over messy text, with a human check — generation fits."},
+          {q:"“Compute the exact VAT owed on this invoice.”",a:"det",why:"An exact figure with legal consequences — deterministic calculation, not a sampler."}
+        ];
+        var host=wrap.querySelector('#gnsort'),msg=wrap.querySelector('#gnmsg'),solved=0;
+        host.innerHTML=probs.map(function(p,i){return '<div style="background:#0b0f1b;border:1px solid var(--line-soft);border-radius:11px;padding:12px 14px;margin-bottom:9px"><div style="font-size:14px;color:#eef2fa;margin-bottom:9px">'+p.q+'</div><div class="rulebtns" data-i="'+i+'" style="margin:0">'+opts.map(function(o){return '<button class="rulebtn" data-t="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div><div data-w="'+i+'" style="font-size:12.5px;color:var(--green);margin-top:8px;display:none"></div></div>';}).join('');
+        host.querySelectorAll('.rulebtns').forEach(function(row){var i=+row.dataset.i,locked=false;row.querySelectorAll('.rulebtn').forEach(function(btn){btn.onclick=function(){if(locked)return;var w=host.querySelector('[data-w="'+i+'"]');if(btn.dataset.t===probs[i].a){btn.classList.add('on');btn.style.borderColor='var(--green)';locked=true;solved++;w.style.display='block';w.style.color='var(--green)';w.innerHTML='✓ '+probs[i].why;
+          if(solved===probs.length){msg.className='binmsg ok';msg.innerHTML='✓ The line is simple: generation for draft-and-review and volume; deterministic/grounded for exact, high-stakes single answers.';bktUpdate('genai',true);mentor("That routing instinct saves clients from the classic mistake — pointing a creative tool at a job that needs a guaranteed-correct answer.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}else{btn.style.borderColor='var(--red)';w.style.display='block';w.style.color='var(--rose)';w.innerHTML='Reconsider: is this a draft-and-review job, or does it need one exact, guaranteed answer?';setTimeout(function(){btn.style.borderColor='';},700);}};});});
+        mentor("Start with the balance one — an exact number is never a job for a generator.");});
     lensBeat(add,
       "Generation is probabilistic and unbounded — which is exactly why it dazzles in demos and disappoints in production where correctness, brand safety and IP provenance matter.",
       "A client wanting generative AI for high-stakes, exact outputs (legal clauses, financial figures) is reaching for a creative tool to do a deterministic job.",
@@ -1448,7 +1542,7 @@ genai:{concept:"genai",node:"Generative AI",act:"Act 10 · Applied AI",title:"Ge
       function(wrap,done){chooser(wrap,'Where next?');});
     return b;}
 },
-embeddings:{concept:"embeddings",node:"Embeddings",act:"Act 11 · Applied AI",title:"Embeddings — Meaning as Numbers",
+embeddings:{concept:"embeddings",node:"Embeddings",act:"Act 11 · Applied GenAI",title:"Embeddings — Meaning as Numbers",
   intro:"The quiet enabler of search, RAG and recommendation: turning text into numbers that place similar meanings close together. Small idea, huge downstream leverage.",
   build:function(){var b=[];var add=function(h,g){b.push({html:h,gate:g});};
     add('<div class="kicker">Turning meaning into geometry</div><h1>Similar things sit close together</h1><p class="lead">An <strong><span class="term" data-t="embedding">embedding</span></strong> turns a piece of text into a <strong>vector</strong> — a long list of numbers — positioned so that things with similar meaning land near each other in space.</p><p>“Refund policy” and “how do I get my money back” look nothing alike as words, but their vectors sit almost on top of each other. That’s the trick behind meaning-based search.</p>');
@@ -1473,7 +1567,7 @@ embeddings:{concept:"embeddings",node:"Embeddings",act:"Act 11 · Applied AI",ti
         }
         paint('none');
         wrap.querySelector('#emkw').onclick=function(){paint('kw');msg.className='binmsg';msg.innerHTML='Keyword search ranks by <b>shared words</b>. “money back” shares no word with “Refunds &amp; returns” — so the right article sinks while a payments doc floats up. This is why keyword search misses paraphrases.';};
-        wrap.querySelector('#emsem').onclick=function(){paint('sem');msg.className='binmsg ok';msg.innerHTML='✓ Embeddings rank by <b>meaning</b>. “How do I get my money back?” lands right next to “how to get a refund” in vector space — no shared word required. That is semantic search, and the engine under RAG.';bktUpdate('embeddings',true);mentor("That gap — same meaning, different words — is exactly what embeddings close, and why keyword search alone fails on real user language.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};};
+        wrap.querySelector('#emsem').onclick=function(){paint('sem');msg.className='binmsg ok';msg.innerHTML='✓ Embeddings rank by <b>meaning</b>. “How do I get my money back?” lands right next to “how to get a refund” in vector space — no shared word required. That is semantic search, and the engine under RAG.';bktUpdate('embeddings',true,'weak');mentor("That gap — same meaning, different words — is exactly what embeddings close, and why keyword search alone fails on real user language.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};};
         mentor("Try keyword search first — notice the right doc doesn’t come top.");});
     lensBeat(add,
       "Embeddings quietly underpin search, RAG, deduplication and recommendation — one capability that unlocks several products. Their quality and freshness silently cap the quality of everything built on them.",
@@ -1488,7 +1582,7 @@ embeddings:{concept:"embeddings",node:"Embeddings",act:"Act 11 · Applied AI",ti
       function(wrap,done){chooser(wrap,'Where next?');});
     return b;}
 },
-rag:{concept:"rag",node:"RAG",act:"Act 12 · Applied AI",title:"RAG — Grounding the Model",
+rag:{concept:"rag",node:"RAG",act:"Act 12 · Applied GenAI",title:"RAG — Grounding the Model",
   intro:"Retrieval-augmented generation is the workhorse of enterprise AI: give the model your facts at answer time so it stops guessing. This is where the prompt-vs-fine-tune-vs-retrieve decision finally resolves.",
   build:function(){var b=[];var add=function(h,g){b.push({html:h,gate:g});};
     add('<div class="kicker">Facts at answer time</div><h1>Look it up, then answer</h1><p class="lead"><strong>RAG</strong> fixes two LLM weaknesses at once: it doesn’t know your private data, and it <span class="term" data-t="hallucination">hallucinates</span>. The fix is simple — <strong>retrieve</strong> the relevant documents (by meaning, using embeddings) and hand them to the model as context, so it answers <em>from</em> them.</p>');
@@ -1507,7 +1601,7 @@ rag:{concept:"rag",node:"RAG",act:"Act 12 · Applied AI",title:"RAG — Groundin
             +'<div style="background:#0b0f1b;border:1px solid var(--line-soft);border-radius:10px;padding:9px 12px"><b>1 · Retrieve</b> — embed the question, find the nearest chunk in your policy index.</div>'
             +'<div style="background:#0b0f1b;border:1px solid var(--gold-soft);border-radius:10px;padding:9px 12px"><span class="mono" style="font-size:11px;color:var(--ink-faint)">refund_policy.pdf · chunk 3</span><br>“Customers may return items within <b>14 days</b> of delivery for a full refund.”</div>'
             +'<div style="background:#0b0f1b;border:1px solid var(--green);border-radius:10px;padding:11px 13px"><div class="mono" style="font-size:11px;color:var(--ink-faint);margin-bottom:5px">MODEL · grounded on the retrieved chunk</div><div style="color:#eef2fa">“Our refund window is <b>14 days</b> from delivery. <span class="mono" style="font-size:11px;color:var(--gold)">[refund_policy.pdf]</span>”</div></div></div>';
-          msg.className='binmsg ok';msg.innerHTML='✓ Same model — but now it answers <b>from your facts</b> and cites the source. That is RAG: fix the <i>input</i>, not the model.';bktUpdate('rag',true);mentor("Notice we never retrained the model. RAG changed what we put <em>into</em> the prompt — retrieved evidence — and the answer became correct and auditable.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};};
+          msg.className='binmsg ok';msg.innerHTML='✓ Same model — but now it answers <b>from your facts</b> and cites the source. That is RAG: fix the <i>input</i>, not the model.';bktUpdate('rag',true,'weak');mentor("Notice we never retrained the model. RAG changed what we put <em>into</em> the prompt — retrieved evidence — and the answer became correct and auditable.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};};
         mentor("Run the plain answer first — watch it invent a plausible number.");});
     lensBeat(add,
       "RAG separates knowledge (a cheap, updatable index) from reasoning (the frozen model). That decoupling is why it usually beats fine-tuning on cost, freshness and auditability for “answer from our documents” — the single most common enterprise ask.",
@@ -1522,7 +1616,7 @@ rag:{concept:"rag",node:"RAG",act:"Act 12 · Applied AI",title:"RAG — Groundin
       function(wrap,done){chooser(wrap,'Where next?');});
     return b;}
 },
-agents:{concept:"agents",node:"Agentic AI",act:"Act 13 · Applied AI",title:"Agentic AI — Models That Act",
+agents:{concept:"agents",node:"Agentic AI",act:"Act 13 · Applied GenAI",title:"Agentic AI — Models That Act",
   intro:"Answering isn’t acting. Agents let a model call tools, take steps and pursue a goal — enormous value, and enormous new failure modes. The strategist’s job is to place the human wisely.",
   build:function(){var b=[];var add=function(h,g){b.push({html:h,gate:g});};
     add('<div class="kicker">From words to actions</div><h1>Plan, act, observe, repeat</h1><p class="lead">An <strong>agent</strong> wraps an LLM in a loop: it <strong>plans</strong> a step, <strong>acts</strong> by calling a <strong>tool</strong> (an API — the same request/response you met in Act 2), <strong>observes</strong> the result, and repeats until the goal is met.</p>');
@@ -1543,7 +1637,7 @@ agents:{concept:"agents",node:"Agentic AI",act:"Act 13 · Applied AI",title:"Age
         btn.onclick=function(){
           if(i<steps.length){var s=steps[i];html+='<div style="background:#0b0f1b;border:1px solid var(--line-soft);border-radius:10px;padding:9px 12px;margin-bottom:7px"><div style="color:var(--violet)">'+s.r+'</div><div style="color:#eef2fa;margin:3px 0">'+s.a+'</div><div style="color:var(--ink-soft);font-size:13px">'+s.o+'</div></div>';i++;render();btn.textContent=(i<steps.length)?'Next step':'Send the email';}
           else if(!btn.dataset.gate){html+='<div style="background:#0b0f1b;border:1px solid var(--xp);border-radius:10px;padding:11px 13px;margin-bottom:7px"><b>⚠ Human-in-the-loop gate</b> — emailing a customer is <i>irreversible</i>, so the agent pauses for approval before acting.</div>';render();btn.textContent='Approve &amp; send';btn.dataset.gate='1';}
-          else{html+='<div style="background:#0b0f1b;border:1px solid var(--green);border-radius:10px;padding:11px 13px"><span style="color:var(--green)">✓ Approved — email sent with the correct total.</span> The agent chained three tools into a real outcome, with a human on the one step that mattered.</div>';render();btn.style.display='none';bktUpdate('agents',true);mentor("Every step depended on the last — that is why errors compound, and why the irreversible step earned a human gate. Placing that gate well is the strategist’s core agent-design decision.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}
+          else{html+='<div style="background:#0b0f1b;border:1px solid var(--green);border-radius:10px;padding:11px 13px"><span style="color:var(--green)">✓ Approved — email sent with the correct total.</span> The agent chained three tools into a real outcome, with a human on the one step that mattered.</div>';render();btn.style.display='none';bktUpdate('agents',true,'weak');mentor("Every step depended on the last — that is why errors compound, and why the irreversible step earned a human gate. Placing that gate well is the strategist’s core agent-design decision.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}
         };});
     lensBeat(add,
       "The moment a model can <em>act</em>, every mistake gains consequences — and errors compound across steps. Autonomy and reliability pull in opposite directions; more independence means more ways to fail expensively.",
@@ -1554,11 +1648,19 @@ agents:{concept:"agents",node:"Agentic AI",act:"Act 13 · Applied AI",title:"Age
       opts:[{k:"a",t:"They use slightly more electricity."},{k:"b",t:"Mistakes now take actions and compound across steps — autonomy vs reliability."},{k:"c",t:"Nothing changes; acting is the same as answering."}],
       correct:"b",right:"Exactly. Acting gives errors consequences and they compound — so where you place the human is the key design decision.",
       wrong:{a:"Energy isn’t the headline risk — consequential, compounding actions are.",c:"Acting is fundamentally riskier than answering — errors now <em>do</em> things."},wrongDefault:"Mistakes now take real actions and compound — autonomy vs reliability."});
+    questionBeat(add,{concept:"agents",k:"Decision · place the human gate",
+      q:tierPick({support:"In the invoice-total agent, which single step most needs a human sign-off before it runs?",standard:"Which step should require human approval before it executes?",fast:"Where does the human-in-the-loop gate belong?"}),
+      opts:[{k:"a",t:"Searching for the overdue invoices."},{k:"b",t:"Summing the amounts."},{k:"c",t:"<b>Sending the email to the customer.</b>"}],
+      correct:"c",flag:"hitl_placement",
+      right:"Right. Put the human on the irreversible, customer-facing action — reads and calculations are safe to automate; the send is where a mistake has consequences.",
+      rightSay:"That placement decision — automate the reversible, gate the irreversible — is the core of designing a safe agent.",
+      wrong:{a:"Reading data is reversible and low-stakes — automate it.",c:"A calculation is safe to automate; it's the irreversible send that needs the gate."},
+      wrongDefault:"Gate the irreversible, customer-facing step — the send."});
     add('<div class="kicker">Carry it forward</div><h2>Put it all together</h2><p>You’ve travelled from a bare processor to autonomous agents. The finale: assemble the whole stack into one real enterprise solution — and frame it as a business outcome.</p><p class="whisper">Next: <a class="jump" data-k="capstone">Enterprise Capstone</a>.</p>',
       function(wrap,done){chooser(wrap,'Where next?');});
     return b;}
 },
-capstone:{concept:"capstone",node:"Capstone",act:"Act 14 · Applied AI",title:"Enterprise Capstone — Putting It Together",
+capstone:{concept:"capstone",node:"Capstone",act:"Act 14 · Applied GenAI",title:"Enterprise Capstone — Putting It Together",
   intro:"The payoff: fold everything — data, models, RAG, agents, GCP, governance — into one reference solution, and frame the whole thing in the language executives actually buy: outcomes in currency.",
   build:function(){var b=[];var add=function(h,g){b.push({html:h,gate:g});};
     add('<div class="kicker">The whole stack, one solution</div><h1>Qualify → scope → value → de-risk</h1><p class="lead">A real solution threads the whole journey: <strong>data</strong> readiness underneath, a <strong>model</strong> for reasoning, <strong>RAG</strong> for grounded knowledge, an <strong>agent</strong> where action is needed, all on <strong>GCP</strong> — with security, cost and governance as first-class design constraints, not afterthoughts.</p>');
@@ -1592,7 +1694,7 @@ llm_why:{concept:"llm_why",node:"Why LLMs",act:"Act 8 · Large Language Models",
         var host=wrap.querySelector('#tks'),out=wrap.querySelector('#tout'),tried=false;
         host.innerHTML=Object.keys(jobs).map(function(k){return '<button class="btn ghost" data-k="'+k+'">'+jobs[k][0]+'</button>';}).join('');
         host.querySelectorAll('button').forEach(function(bt){bt.onclick=function(){out.style.display='block';out.innerHTML=jobs[bt.dataset.k][1];
-          if(!tried){tried=true;bktUpdate('llm_why',true);mentor('No retraining between tasks — one set of weights, steered only by the instruction. That generality is the entire reason LLMs changed the game (and why every client now wants “AI”).');var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}};});
+          if(!tried){tried=true;bktUpdate('llm_why',true,'weak');mentor('No retraining between tasks — one set of weights, steered only by the instruction. That generality is the entire reason LLMs changed the game (and why every client now wants “AI”).');var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}};});
         mentor('Try a few — same model, wildly different jobs, no retraining.');});
     lensBeat(add,
       "The leap from narrow ML to a general LLM is why every client suddenly wants “AI” — one model touches dozens of use cases. But generality cuts both ways: a model that can do anything is also unpredictable and hard to guarantee, which is a governance and QA problem buyers rarely anticipate.",
@@ -1623,7 +1725,7 @@ llm_tokens:{concept:"llm_tokens",node:"Tokens",act:"Act 8 · Large Language Mode
         var tks=["Token","izing","▁text","▁is","▁how","▁an","▁LLM","▁reads","."];
         btn.onclick=function(){btn.disabled=true;host.innerHTML=tks.map(function(x,i){return '<span class="tokchip'+(i%2?' alt':'')+'">'+x+'</span>';}).join('');
           msg.className='binmsg ok';msg.innerHTML='✓ <b>9 tokens</b> for 7 words — “Tokenizing” became “Token”+“izing,” and the ▁ marks a leading space. That count is exactly what you’re billed on and what fills the context limit.';
-          bktUpdate('llm_tokens',true);mentor('Small thing, big consequence: 7 words → 9 tokens. Code and non-English text can be 2–3× worse. Estimate cost in tokens, never in “number of queries.”');
+          bktUpdate('llm_tokens',true,'weak');mentor('Small thing, big consequence: 7 words → 9 tokens. Code and non-English text can be 2–3× worse. Estimate cost in tokens, never in “number of queries.”');
           var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};};
         mentor('Hit Tokenize and count — notice it’s more tokens than words.');});
     lensBeat(add,
@@ -1656,7 +1758,7 @@ llm_predict:{concept:"llm_predict",node:"Next-Token",act:"Act 8 · Large Languag
         var steps=[[["marked",0.44],["closed",0.27],["urgent",0.16],["ignored",0.10],["haunted",0.03]],[["as",0.55],["and",0.2],["by",0.16],["yesterday",0.09]],[["resolved",0.5],["urgent",0.26],["spam",0.16],["poetry",0.08]]];
         var ctx=wrap.querySelector('#ctx'),cands=wrap.querySelector('#cands'),s=0;
         function render(){ctx.innerHTML=text+' <span style="color:var(--teal)">▮</span>';
-          if(s>=steps.length){cands.innerHTML='';bktUpdate('llm_predict',true);mentor('At no point did it look anything up — it just kept choosing the most plausible next token. Fluent, confident — and with nothing anchoring it to <em>your</em> facts. Remember that.');var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">I see the loop — continue ↓</button>';cands.appendChild(c);c.querySelector('button').onclick=function(){done();};return;}
+          if(s>=steps.length){cands.innerHTML='';bktUpdate('llm_predict',true,'weak');mentor('At no point did it look anything up — it just kept choosing the most plausible next token. Fluent, confident — and with nothing anchoring it to <em>your</em> facts. Remember that.');var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">I see the loop — continue ↓</button>';cands.appendChild(c);c.querySelector('button').onclick=function(){done();};return;}
           var opts=steps[s];cands.innerHTML=opts.map(function(o,i){return '<div class="probrow" data-i="'+i+'"><span class="w">'+o[0]+'</span><span class="pb"><i style="width:'+Math.round(o[1]*100)+'%"></i></span><span class="pc">'+Math.round(o[1]*100)+'%</span></div>';}).join('');
           cands.querySelectorAll('.probrow').forEach(function(r){r.onclick=function(){text+=' '+opts[+r.dataset.i][0];s++;render();};});}
         render();mentor('Pick any token — even a silly low-probability one. You’re doing exactly what the model does: sampling from a probability list.');});
@@ -1692,7 +1794,7 @@ llm_attention:{concept:"llm_attention",node:"Attention",act:"Act 8 · Large Lang
         function draw(k){wrap.querySelector('#attn').innerHTML=words.map(function(w,i){return '<div class="attnrow"><span class="aw">'+w+'</span><span class="ab"><i style="width:'+W[k][i]+'%"></i></span></div>';}).join('');
           wrap.querySelector('#amsg').innerHTML=(k==='it')?'The spotlight is mostly on <b>“dog”</b> — that’s how the model resolves “it” to the dog, not the cat. Meaning comes from these connections.':'For a filler word the attention spreads out — no single earlier word dominates.';}
         wrap.querySelectorAll('#atog button').forEach(function(bt){bt.onclick=function(){wrap.querySelectorAll('#atog button').forEach(function(x){x.classList.remove('on');});bt.classList.add('on');draw(bt.dataset.w);
-          if(!seen){seen=true;bktUpdate('llm_attention',true);mentor('That weighting <em>is</em> understanding, mechanically — and it’s why Transformers handle context so well. Note the cost tell: comparing every word to every other means long prompts get expensive fast.');var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}};});
+          if(!seen){seen=true;bktUpdate('llm_attention',true,'weak');mentor('That weighting <em>is</em> understanding, mechanically — and it’s why Transformers handle context so well. Note the cost tell: comparing every word to every other means long prompts get expensive fast.');var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}};});
         draw('it');mentor('Look at how much weight lands on “dog” when resolving “it.”');});
     lensBeat(add,
       "Attention / the Transformer is why LLMs handle context so well — but attention cost grows with context length, so “just give it the whole document” gets slow and expensive fast. Context size and chunking are cost decisions, not free settings.",
@@ -1725,7 +1827,7 @@ llm_training:{concept:"llm_training",node:"How They’re Made",act:"Act 8 · Lar
           rlhf:["Sure — here’s how: 1) Open Settings → Security. 2) Tap “Reset password.” 3) Check your email for the link and set a new one. Let me know if you hit a snag!",'<span class="term" data-t="rlhf">RLHF</span> tuned it to be helpful, clear and safe — the polish you feel in a product like ChatGPT.']};
         var seen=false;
         function draw(k){wrap.querySelector('#sout').textContent=O[k][0];wrap.querySelector('#smsg').innerHTML=O[k][1];
-          if(k==='rlhf'&&!seen){seen=true;bktUpdate('llm_training',true);mentor('Same weights’ worth of language ability — three stages of shaping. This is the ladder behind your options: prompt the finished model, fine-tune it, or (almost never) train your own.');var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
+          if(k==='rlhf'&&!seen){seen=true;bktUpdate('llm_training',true,'weak');mentor('Same weights’ worth of language ability — three stages of shaping. This is the ladder behind your options: prompt the finished model, fine-tune it, or (almost never) train your own.');var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
         wrap.querySelectorAll('#stog button').forEach(function(bt){bt.onclick=function(){wrap.querySelectorAll('#stog button').forEach(function(x){x.classList.remove('on');});bt.classList.add('on');draw(bt.dataset.s);};});
         draw('pre');mentor('Step through 1 → 2 → 3 and watch the same prompt get a completely different answer.');});
     lensBeat(add,
@@ -1761,7 +1863,7 @@ llm_prompt:{concept:"llm_prompt",node:"Prompting",act:"Act 8 · Large Language M
           wrap.querySelectorAll('#pchips .rulebtn').forEach(function(el){el.onclick=function(){on[el.dataset.k]=!on[el.dataset.k];draw();};});
           var msg=wrap.querySelector('#pmsg');
           if(used>cap){msg.innerHTML='<span style="color:var(--red)">Over the '+cap.toLocaleString()+'-token limit ('+used.toLocaleString()+').</span> The model silently drops the earliest text — often your <b>system instructions</b> — so it appears to “forget” how to behave. This is why big documents need <b>retrieval</b>, not pasting.';
-            if(!over){over=true;bktUpdate('llm_prompt',true);mentor('There it is — overflow doesn’t error, it quietly truncates. In production that looks like “the model got worse on long chats.” The fix is retrieval: fetch only the relevant pages.');var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
+            if(!over){over=true;bktUpdate('llm_prompt',true,'weak');mentor('There it is — overflow doesn’t error, it quietly truncates. In production that looks like “the model got worse on long chats.” The fix is retrieval: fetch only the relevant pages.');var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
           else msg.innerHTML='Room to spare. Every element — instructions, history, docs, question — spends from the same token budget.';}
         draw();mentor('Add the 40-page PDF and watch the window overflow — then notice what gets dropped.');});
     lensBeat(add,
@@ -1794,7 +1896,7 @@ llm_halluc:{concept:"llm_halluc",node:"Hallucination",act:"Act 8 · Large Langua
         wrap.querySelector('#grun').onclick=function(){var out=wrap.querySelector('#gout');
           if(!grounded){out.innerHTML='<div class="genbox" style="border-color:var(--red)">“You have <b>30 days</b> to return items for a full refund.”<br><span style="font-size:12.5px;color:var(--ink-faint)">A <span class="term" data-t="hallucination">hallucination</span> — invented from common phrasing, not your policy.</span></div>';}
           else{out.innerHTML='<div class="genbox" style="border-color:var(--teal);color:#bfe6c9;font-size:13.5px;font-family:var(--mono)">📄 Retrieved · handbook §Returns: “Items may be returned within <b>14 days</b> of delivery.”</div><div class="genbox" style="border-color:var(--green)">“You have <b>14 days</b> from delivery to return items for a full refund.”<br><span style="font-size:12.5px;color:var(--ink-faint)">Grounded — same model, but it answered from the retrieved passage (and can cite it).</span></div>';
-            if(!ok){ok=true;bktUpdate('llm_halluc',true);mentor('We didn’t change the model — we changed what it could <em>see</em>. That’s the whole game: grounding turns a confident guess into a cited fact. But note it reduces, not removes, the risk.');var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}};
+            if(!ok){ok=true;bktUpdate('llm_halluc',true,'weak');mentor('We didn’t change the model — we changed what it could <em>see</em>. That’s the whole game: grounding turns a confident guess into a cited fact. But note it reduces, not removes, the risk.');var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}};
         mentor('Ask with grounding OFF first — watch it invent “30 days.” Then switch grounding ON.');});
     lensBeat(add,
       "Hallucination isn’t a bug to be patched — it’s inherent to how LLMs work, so it can be reduced (grounding/RAG, citations, guardrails) but never fully eliminated. Any pitch promising “no hallucinations” is a red flag.",
@@ -1829,7 +1931,7 @@ llm_eval:{concept:"llm_eval",node:"Eval & Economics",act:"Act 8 · Large Languag
           wrap.querySelector('#emsg').innerHTML=(mode==='fr'&&cpm>10000)?'At this scale the <b>model choice dominates everything</b>. Switch to the small model and the same bot is ~10× cheaper — often with acceptable quality. That trade-off is what you architect.':'Notice: cost is driven by tokens × volume × model tier — not by “number of features.”';}
         wrap.querySelector('#tk').oninput=function(){touched=true;upd();fin();};wrap.querySelector('#vol').oninput=function(){touched=true;upd();fin();};
         wrap.querySelectorAll('#mtog2 button').forEach(function(bt){bt.onclick=function(){wrap.querySelectorAll('#mtog2 button').forEach(function(x){x.classList.remove('on');});bt.classList.add('on');mode=bt.dataset.m;touched=true;upd();fin();};});
-        var done_=false;function fin(){if(touched&&!done_){done_=true;bktUpdate('llm_eval',true);mentor('Feel the leverage: model tier can swing the monthly bill 10×. Quality vs cost vs latency is the core trade-off you’ll shape in every LLM proposal.');var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
+        var done_=false;function fin(){if(touched&&!done_){done_=true;bktUpdate('llm_eval',true,'weak');mentor('Feel the leverage: model tier can swing the monthly bill 10×. Quality vs cost vs latency is the core trade-off you’ll shape in every LLM proposal.');var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
         upd();mentor('Push volume up, then flip to the small model — watch the monthly cost collapse.');});
     lensBeat(add,
       "LLM output is open-ended, so there’s no single accuracy number — evaluation needs task-specific rubrics, and cost/latency are first-class metrics. Skipping real evaluation is why so many pilots never reach production.",
@@ -1843,6 +1945,14 @@ llm_eval:{concept:"llm_eval",node:"Eval & Economics",act:"Act 8 · Large Languag
       rightSay:"One more thing enterprises will grill you on before they buy: what could go wrong once it’s live.",
       wrong:{a:"Bigger rarely fixes reliability or cost — it often makes cost worse. Evaluation and economics are the blockers.",c:"Prompting helps quality but doesn’t answer “is it reliably good, and what does it cost?” — the real gates."},
       wrongToast:"<b>Misconception flagged:</b> “the demo proves it’s ready.”"});
+    questionBeat(add,{concept:"llm_eval",k:"Decision · quality under budget",
+      q:tierPick({support:"A support assistant must hit the quality bar, but the top-tier model blows the monthly budget at your volume. Best first move?",standard:"Top-tier model meets quality but busts the budget at volume. First move?",fast:"Quality met at frontier tier, but unit cost busts budget at scale. First lever?"}),
+      opts:[{k:"a",t:"Ship the top-tier model anyway and absorb the cost."},{k:"b",t:"<b>Drop to a smaller model + retrieval and prompt work</b> to hit quality under budget."},{k:"c",t:"Cut the number of users."}],
+      correct:"b",flag:"cost_quality",
+      right:"Right. Model tier can swing cost ~10×; hit quality with a smaller model plus retrieval, caching and prompt discipline before paying for the frontier.",
+      rightSay:"That's the quality-cost-latency trade made deliberately — the architecture decision that ships the project.",
+      wrong:{a:"Absorbing frontier cost at scale is what kills these projects — engineer the trade-off first.",c:"Cutting users ducks the design problem; tier + retrieval usually meets budget and quality."},
+      wrongDefault:"Use a smaller model + retrieval/prompt work to meet quality under budget."});
     add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Evaluate open-ended output with a rubric + test set; cost is tokens × volume × model tier.</strong> Quality, cost and latency are an explicit trade-off — decide it deliberately.</p><p class="whisper">Ship an LLM to real users and a new category of problems appears — ones your security and legal teams will ask about first. Next: <a class="jump" data-k="llm_risk">Risk, Safety &amp; Governance</a>.</p>',
       function(wrap,done){chooser(wrap,'You can prove and price it. Where next?');});
     return b;}
@@ -1866,7 +1976,7 @@ llm_risk:{concept:"llm_risk",node:"Risk & Governance",act:"Act 8 · Large Langua
           if(risk<=25)msg.innerHTML='✓ With guardrails in place, residual risk is manageable — <b>and this is exactly the story enterprise security will ask you to tell.</b> Note: never zero.';
           else if(any)msg.innerHTML='Risk is dropping — keep layering. Defence-in-depth, not a single fix.';
           else msg.innerHTML='A bare assistant carries high exposure: injection, data leakage, harmful output. Add a guardrail.';
-          if(any&&!applied){applied=true;bktUpdate('llm_risk',true);mentor('This is what separates a serious solution from a demo: you don’t bolt safety on later — it’s designed and priced in. Raising it first is how you pass security review and win enterprise trust.');var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
+          if(any&&!applied){applied=true;bktUpdate('llm_risk',true,'weak');mentor('This is what separates a serious solution from a demo: you don’t bolt safety on later — it’s designed and priced in. Raising it first is how you pass security review and win enterprise trust.');var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Continue ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
         draw();mentor('Turn on a guardrail or two — watch residual risk fall (but never to zero).');});
     lensBeat(add,
       "An LLM in production opens attack surface and liability a spreadsheet never did: prompt injection, data leakage, IP/privacy exposure, harmful output. These aren’t edge cases — they’re what enterprise security and legal will grill you on.",
