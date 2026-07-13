@@ -595,6 +595,54 @@ textarea,.opt{background:#fff}
 .v33n{font-size:11px;color:var(--ink-soft);margin-top:4px}
 @media(max-width:640px){.v33race{flex-direction:column}}
 </style>
+<style id="alos-v34">
+/* v3.4 Wave 1 — all selectors v34-prefixed (collision rule, HANDOVER §4) */
+.v34goal{font-size:12.5px;color:var(--ink-soft);margin:2px 0 10px}
+.v34goal b{color:var(--ink)}
+/* virt: slice the box */
+.v34box{border:1.5px solid var(--line);border-radius:12px;padding:10px;background:var(--panel2)}
+.v34stack{display:flex;flex-direction:column;gap:4px;min-height:96px}
+.v34lay{border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600}
+.v34hw{background:#0F172A;color:#fff}
+.v34hv{background:linear-gradient(90deg,#2563EB,#8B5CF6);color:#fff}
+.v34vm{background:#EFF6FF;border:1px solid #93C5FD;color:#1E40AF}
+.v34bm{background:#F1F5F9;border:1px dashed var(--line);color:var(--ink-soft)}
+.v34bar{height:8px;background:var(--line-soft);border-radius:99px;overflow:hidden;margin-top:8px}
+.v34bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2563EB,#8B5CF6);transition:width .3s}
+.v34meta{font-size:11px;color:var(--ink-soft);margin-top:4px;min-height:15px}
+/* containers: the ladder */
+.v34lad{display:flex;gap:8px}
+.v34col{flex:1;cursor:pointer;border:1.5px solid var(--line);border-radius:10px;padding:8px;background:#fff;transition:border-color .15s,box-shadow .15s}
+.v34col.on{border-color:var(--gold);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.v34col.seen .v34ch::after{content:" ✓";color:var(--teal)}
+.v34ch{font-size:12px;font-weight:800;color:var(--ink);margin-bottom:6px}
+.v34r{font-size:11px;border-radius:6px;padding:5px 7px;margin-top:4px;background:#EFF6FF;border:1px solid #BFDBFE;color:#1E40AF;font-weight:600}
+.v34r.theirs{background:#F1F5F9;border-color:var(--line);color:var(--ink-faint);font-weight:500}
+.v34r.theirs::after{content:" · theirs";font-size:9.5px;letter-spacing:.04em;text-transform:uppercase}
+.v34cap{margin-top:10px;font-size:13px;color:var(--ink);min-height:20px}
+/* k8s: reconciliation loop */
+.v34k8s{display:flex;gap:12px;align-items:stretch}
+.v34code{font-family:var(--mono);font-size:12px;line-height:1.7;background:#0F172A;color:#E2E8F0;border-radius:10px;padding:12px 14px;white-space:pre;flex:0 0 auto}
+.v34code em{color:#93C5FD;font-style:normal}
+.v34cluster{flex:1;border:1.5px dashed var(--line);border-radius:12px;padding:10px;background:var(--panel2)}
+.v34pods{display:flex;gap:8px;flex-wrap:wrap;min-height:44px}
+.v34pod{padding:8px 12px;border-radius:10px;font-size:12px;font-weight:700;background:#ECFDF5;border:1px solid #6EE7B7;color:#065F46}
+.v34pod.dead{background:#FEF2F2;border-color:#FCA5A5;color:#991B1B}
+.v34loop{font-size:12px;color:var(--ink-soft);margin-top:8px;min-height:17px;font-family:var(--mono)}
+/* gcp: the block map */
+.v34proj{border:2px dashed var(--gold-soft);border-radius:14px;padding:12px;background:#fff}
+.v34pt{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.v34iam{cursor:pointer;border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;color:var(--ink);background:var(--panel2);transition:border-color .15s}
+.v34blocks{display:flex;gap:8px;margin-top:8px}
+.v34blk{flex:1;cursor:pointer;border:1.5px solid var(--line);border-radius:10px;padding:10px;background:var(--panel2);transition:border-color .15s}
+.v34blk:hover,.v34iam:hover{border-color:var(--gold-soft)}
+.v34blk.seen,.v34iam.seen{border-color:var(--teal)}
+.v34blk.seen .v34bt::after,.v34iam.seen::after{content:" ✓";color:var(--teal)}
+.v34bt{font-size:12.5px;font-weight:800;color:var(--ink)}
+.v34sub{font-size:10.5px;color:var(--ink-soft);margin-top:4px;line-height:1.55}
+.v34det{margin-top:10px;font-size:13px;color:var(--ink);min-height:20px}
+@media(max-width:640px){.v34lad,.v34blocks,.v34k8s{flex-direction:column}.v34code{flex:none}}
+</style>
 </head>
 <body>
 <div class="app">
@@ -5268,6 +5316,165 @@ if(window.GLOSS)Object.assign(window.GLOSS,{
 document.addEventListener('click',function(e){var b=e.target&&e.target.closest&&e.target.closest('.bf-simple');if(!b)return;
  var k=b.dataset.k,n=(typeof AADI_NOTES!=='undefined'&&AADI_NOTES[k]&&AADI_NOTES[k].eli5)||null;
  if(typeof mentor==='function')mentor('<b>Simply:</b> '+(n||'The one-line version: '+((typeof OUTCOMES!=='undefined'&&OUTCOMES[k])||'this concept in plain words — ask me below.')));});
+
+
+/* ===== v3.4 · Wave 1 visual interactives — Visual Audit items 2,5,6,7 (P9/P12) ===== */
+(function(){
+ if(!window.EPISODES)return;
+ function v34credit(c){if(typeof bktUpdate==='function')bktUpdate(c,true,'sim');}
+ function v34cont(w){if(typeof inlineContinue==='function')inlineContinue(w);}
+ function v34splice(ep,needle,beat,fb){
+  if(!EPISODES[ep])return;
+  var _b=EPISODES[ep].build;
+  EPISODES[ep].build=function(){
+   var b=_b(),i=-1;
+   for(var j=0;j<b.length;j++){if((b[j].html||'').indexOf(needle)>-1){i=j;break;}}
+   if(i<0)i=Math.min(fb,b.length);
+   b.splice(i,0,beat);
+   return b;};
+ }
+
+ /* --- 1 · virt: slice the box (audit item 2, load-bearing) --- */
+ v34splice('virt','Physical box, or virtualize?',{
+  html:'<div class="kicker">Prove the claim \u00b7 slice the box</div><h2>One box, the work of ten</h2>'
+   +'<p>The lesson opened with a promise: a box running one app at 15% load can do the work of ten. Don\u2019t take it on faith \u2014 make it happen.</p>'
+   +'<div class="card"><div class="v34goal"><b>Your goal:</b> take this machine from one bare-metal app to ten isolated apps.</div>'
+   +'<div class="v34box"><div class="v34stack"><div class="v34lay v34hw">Hardware \u00b7 16 GB</div><div class="v34lay v34bm">Bare metal \u00b7 one app \u00b7 2.4 GB \u2014 the other 13.6 GB idles</div></div>'
+   +'<div class="v34bar"><i></i></div><div class="v34meta"></div></div>'
+   +'<div class="btnrow" style="margin-top:12px"><button class="btn v34b">Slice it into VMs</button></div>'
+   +'<div class="binmsg v34out"></div></div>',
+  gate:function(wrap,done){
+   var st=wrap.querySelector('.v34stack'),bar=wrap.querySelector('.v34bar i'),
+       meta=wrap.querySelector('.v34meta'),btn=wrap.querySelector('.v34b'),out=wrap.querySelector('.v34out');
+   var sliced=false,vms=0;
+   function used(){return sliced?0.5+vms*1.5:2.4;}
+   function upd(){var u=used();bar.style.width=Math.min(100,u/16*100)+'%';
+    meta.textContent=sliced?(vms+' isolated app'+(vms===1?'':'s')+' \u00b7 '+u.toFixed(1)+' GB \u00b7 '+Math.round(u/16*100)+'% utilised')
+     :'1 app \u00b7 2.4 GB \u00b7 15% utilised';}
+   function vmChip(n){var d=document.createElement('div');d.className='v34lay v34vm';d.textContent='VM '+n+' \u00b7 guest OS + app \u00b7 1.5 GB';st.appendChild(d);}
+   btn.onclick=function(){
+    if(!sliced){sliced=true;vms=1;
+     st.innerHTML='<div class="v34lay v34hw">Hardware \u00b7 16 GB</div><div class="v34lay v34hv">Hypervisor \u00b7 0.5 GB \u2014 the isolation layer</div>';
+     vmChip(1);btn.textContent='+ Add another VM';}
+    else if(vms<10){vms++;vmChip(vms);}
+    upd();
+    if(vms===10&&!wrap.__v34w){wrap.__v34w=1;
+     out.className='binmsg ok v34out';
+     out.innerHTML='<b>\u2713 Ten isolated apps on the box that ran one \u2014 15% \u2192 '+Math.round(used()/16*100)+'% utilised.</b><br>'
+      +'Same hardware, ten tenants, each behind its own wall \u2014 the hypervisor keeps every VM believing it\u2019s alone. '
+      +'Notice the price you paid ten times over: a <b>guest OS copy</b> inside every VM. Hold that weight \u2014 the next lesson deletes it.';
+     btn.disabled=true;btn.textContent='Full \u2014 15.5 of 16 GB';
+     v34credit('virt');}
+   };
+   upd();v34cont(wrap);
+  }},2);
+
+ /* --- 2 · containers: the ladder of "stop managing" (audit item 5) --- */
+ v34splice('containers','VM, container, or serverless?',{
+  html:'<div class="kicker">The axis, drawn \u00b7 what you stop managing</div><h2>Four rungs, one trade</h2>'
+   +'<p>You just felt the density win. Here is the whole axis it sits on \u2014 each rung to the right hands one more layer to the platform.</p>'
+   +'<div class="card"><div class="v34goal"><b>Your goal:</b> click all four rungs and watch what stops being yours.</div>'
+   +'<div class="v34lad"></div><div class="v34cap">Click a rung to read the trade.</div>'
+   +'<div class="binmsg v34out"></div></div>',
+  gate:function(wrap,done){
+   var ROWS=['Your app','Runtime & dependencies','OS & kernel','Hardware'];
+   var COLS=[
+    {n:'Bare metal',yours:[1,1,1,1],cap:'<b>Bare metal:</b> everything is yours \u2014 total control, total toil. The legitimate exception (latency, licensing), never the default.'},
+    {n:'VM',yours:[1,1,1,0],cap:'<b>VM:</b> the provider owns the hardware; you still patch and boot a full OS per machine \u2014 the 3.5 GB you kept paying above.'},
+    {n:'Container',yours:[1,1,0,0],cap:'<b>Container:</b> the platform runs the OS; you ship runtime + app as one image that starts in seconds, anywhere.'},
+    {n:'Serverless',yours:[1,0,0,0],cap:'<b>Serverless:</b> only the code is yours. No machines to manage at all \u2014 and the least control of the four.'}];
+   var lad=wrap.querySelector('.v34lad'),cap=wrap.querySelector('.v34cap'),out=wrap.querySelector('.v34out'),seen=0;
+   COLS.forEach(function(c){
+    var col=document.createElement('div');col.className='v34col';
+    col.innerHTML='<div class="v34ch">'+c.n+'</div>'+ROWS.map(function(r,ri){
+     return '<div class="v34r'+(c.yours[ri]?'':' theirs')+'">'+r+'</div>';}).join('');
+    col.onclick=function(){
+     var on=lad.querySelector('.v34col.on');if(on)on.classList.remove('on');
+     col.classList.add('on');cap.innerHTML=c.cap;
+     if(!col.classList.contains('seen')){col.classList.add('seen');seen++;
+      if(seen===COLS.length&&!wrap.__v34w){wrap.__v34w=1;
+       out.className='binmsg ok v34out';
+       out.innerHTML='<b>\u2713 One axis, four rungs.</b> Every step right trades control for speed and density \u2014 hand a layer over, stop managing it, accept the platform\u2019s rules for it. That single trade decides the checkpoint below, and half the architecture calls in this course.';
+       v34credit('containers');}}
+    };
+    lad.appendChild(col);});
+   v34cont(wrap);
+  }},4);
+
+ /* --- 3 · k8s: the reconciliation loop, playable (audit item 6) --- */
+ v34splice('k8s','Human ops, or orchestrator?',{
+  html:'<div class="kicker">Run the loop \u00b7 try to beat it</div><h2>Kill container #217. See who restarts it.</h2>'
+   +'<p>You declared the <em>what</em>. Now attack the system and watch the loop defend it.</p>'
+   +'<div class="card"><div class="v34goal"><b>Your goal:</b> break the system faster than it heals. Kill three containers and count the humans woken up.</div>'
+   +'<div class="v34k8s">'
+   +'<div class="v34code">kind: Deployment\nspec:\n  <em>replicas: 3</em>   # the what\n\n# nobody wrote the how</div>'
+   +'<div class="v34cluster"><div class="v34pods"></div><div class="v34loop">loop: observing\u2026 3/3 running \u00b7 no drift</div></div>'
+   +'</div>'
+   +'<div class="btnrow" style="margin-top:12px"><button class="btn v34kill">\ud83d\udca5 Kill a container</button></div>'
+   +'<div class="v34meta v34score">kills: 0 \u00b7 humans woken at 3am: 0</div>'
+   +'<div class="binmsg v34out"></div></div>',
+  gate:function(wrap,done){
+   var pods=wrap.querySelector('.v34pods'),loop=wrap.querySelector('.v34loop'),
+       btn=wrap.querySelector('.v34kill'),score=wrap.querySelector('.v34score'),out=wrap.querySelector('.v34out');
+   var seq=0,kills=0,healing=false;
+   function pod(){seq++;var d=document.createElement('div');d.className='v34pod';d.textContent='pod-'+(216+seq)+' \u00b7 running';pods.appendChild(d);return d;}
+   pod();pod();pod();
+   btn.onclick=function(){
+    if(healing)return;
+    var alive=pods.querySelectorAll('.v34pod:not(.dead)');if(!alive.length)return;
+    var v=alive[Math.floor(Math.random()*alive.length)];
+    v.classList.add('dead');v.textContent=v.textContent.replace(' \u00b7 running',' \u00b7 crashed');
+    kills++;healing=true;
+    loop.textContent='loop: observed 2/3 running \u2014 drift \u2192 acting';
+    score.textContent='kills: '+kills+' \u00b7 humans woken at 3am: 0';
+    setTimeout(function(){
+     v.remove();pod();
+     loop.textContent='loop: 3/3 running \u00b7 desired state restored \u2014 no human involved';
+     healing=false;
+     if(kills>=3&&!wrap.__v34w){wrap.__v34w=1;
+      out.className='binmsg ok v34out';
+      out.innerHTML='<b>\u2713 You killed three. The loop replaced three. Humans woken: zero.</b><br>'
+       +'You never told the system <i>how</i> to recover \u2014 you declared <b>replicas: 3</b>, and a tireless loop closes the gap between what you asked for and what exists, every few seconds, forever. That loop \u2014 not the containers \u2014 is what Kubernetes actually sells.';
+      v34credit('k8s');}
+    },900);
+   };
+   v34cont(wrap);
+  }},2);
+
+ /* --- 4 · gcp: the block map (audit item 7) --- */
+ v34splice('gcp','Which Google Cloud block?',{
+  html:'<div class="kicker">The map, drawn \u00b7 click every block</div><h2>One boundary, one gate, three shelves</h2>'
+   +'<p>Those bold nouns arrange into a single picture. Everything you rent lives inside it.</p>'
+   +'<div class="card"><div class="v34goal"><b>Your goal:</b> open all four blocks \u2014 each maps to a primitive you already know.</div>'
+   +'<div class="v34proj"><div class="v34pt">Project \u00b7 the billing + resource boundary</div>'
+   +'<div class="v34iam" data-b="iam">IAM \u00b7 who can do what \u2014 every call passes this gate</div>'
+   +'<div class="v34blocks">'
+   +'<div class="v34blk" data-b="compute"><div class="v34bt">Compute</div><div class="v34sub">Compute Engine \u00b7 GKE \u00b7 Cloud Run \u00b7 Cloud Functions</div></div>'
+   +'<div class="v34blk" data-b="storage"><div class="v34bt">Storage</div><div class="v34sub">Cloud Storage \u00b7 Cloud SQL \u00b7 BigQuery</div></div>'
+   +'<div class="v34blk" data-b="ai"><div class="v34bt">AI services</div><div class="v34sub">Vertex AI \u00b7 Gemini API</div></div>'
+   +'</div></div>'
+   +'<div class="v34det">Click a block to place it on the map you already have.</div>'
+   +'<div class="binmsg v34out"></div></div>',
+  gate:function(wrap,done){
+   var DET={
+    iam:'<b>IAM \u2014 identity is the gate.</b> Every API call is checked: <i>who</i> is asking, <i>what</i> are they allowed to do, on <i>which</i> resource. No identity, no entry \u2014 you\u2019ll formalise this in Security.',
+    compute:'<b>Compute \u2014 the ladder you just climbed, for rent.</b> Compute Engine = the VM. GKE = your container fleet, orchestrated. Cloud Run = one container, run per request. Cloud Functions = serverless \u2014 code on an event.',
+    storage:'<b>Storage \u2014 pick by the shape of the data.</b> Cloud Storage = objects (files at any scale). Cloud SQL = the transactional ledger. BigQuery = the warehouse that scans billions of rows \u2014 both get whole lessons soon.',
+    ai:'<b>AI services \u2014 intelligence as a building block.</b> Vertex AI = the workbench to train, tune and deploy models. Gemini API = a frontier model rented by the token \u2014 no ML team required.'};
+   var det=wrap.querySelector('.v34det'),out=wrap.querySelector('.v34out'),seen=0;
+   var blocks=wrap.querySelectorAll('[data-b]');
+   for(var i=0;i<blocks.length;i++)(function(el){
+    el.onclick=function(){
+     det.innerHTML=DET[el.dataset.b];
+     if(!el.classList.contains('seen')){el.classList.add('seen');seen++;
+      if(seen===4&&!wrap.__v34w){wrap.__v34w=1;
+       out.className='binmsg ok v34out';
+       out.innerHTML='<b>\u2713 That\u2019s the whole map.</b> One boundary (the project), one gate (IAM), three shelves \u2014 and every shelf is a primitive you already hold: the compute ladder, the shapes of data, intelligence by the token. Naming the right block is exactly what the next question asks.';
+       v34credit('gcp');}}
+    };})(blocks[i]);
+   v34cont(wrap);
+  }},2);
+})();
 
 </script>
 </body>
