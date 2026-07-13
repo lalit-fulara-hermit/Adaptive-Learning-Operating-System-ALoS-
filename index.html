@@ -197,7 +197,7 @@
   }
   #gtip{position:fixed; z-index:300; pointer-events:none; max-width:250px; background:#F1F5F9; border:1px solid var(--gold-soft); border-radius:10px; padding:9px 12px; font-size:12.5px; color:var(--ink-soft); line-height:1.5; box-shadow:0 14px 34px -14px #000; display:none}
   #gtip.show{display:block} #gtip b{color:var(--gold)}
-  .term{border-bottom:1px dotted var(--gold-soft); cursor:help}
+  .term{border-bottom:1px dotted rgba(37,99,235,.38); cursor:help}
   .tokchip{display:inline-block; background:#12203a; border:1px solid var(--line); border-radius:6px; padding:3px 7px; margin:2px; font-family:var(--mono); font-size:12.5px; color:#1E3A5F}
   .tokchip.alt{background:#0e1830}
   .probrow{display:flex; align-items:center; gap:10px; margin:7px 0; cursor:pointer}
@@ -512,6 +512,47 @@ textarea,.opt{background:#fff}
 .stat{background:#F8FAFC}
 .dot{box-shadow:0 0 8px rgba(37,99,235,.55)}
 </style>
+
+<style id="alos-v33">
+/* v3.3 — rail compaction (P6), time chip (P7), checkpoint + stack visual (P11/P12), simply chip (P10) */
+.ob-time{color:var(--violet);font-weight:700;margin-right:10px}
+.tutorrail .topcard{padding:10px 12px 6px}
+.lv-av{width:26px!important;height:26px!important;font-size:12px!important}
+.xp-txt{display:none!important}
+.xpbar{height:4px!important;margin-top:4px!important}
+.journeybox{padding:8px 10px!important;margin-bottom:0!important}
+.journeybox .jb-h{margin-bottom:4px!important;font-size:9.5px!important}
+.journeybox .jb-t,.journeybox .jb-now{margin-bottom:4px!important;font-size:11px!important}
+.journeybox .jb-next{padding:6px 9px!important;font-size:11.5px!important}
+.tutorrail .mentor{padding:8px 12px!important}
+#saystack{flex:1 1 auto!important;min-height:160px}
+.understanding{padding:4px 12px 8px!important}
+.understanding .lab{font-size:9.5px!important}
+.understanding .orb{height:88px!important}
+.understanding .orb canvas{width:88px!important;height:88px!important}
+.understanding .cap{font-size:10.5px!important}
+.bf-simple{background:none;border:1px solid var(--line);color:var(--ink-soft);border-radius:999px;padding:5px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans);margin:0 0 12px}
+.bf-simple:hover{border-color:var(--gold-soft);color:var(--gold)}
+.cstk-wrap{display:flex;gap:14px;margin:14px 0}
+.cstk-wrap>div{flex:1;min-width:0}
+.cstk{display:flex;flex-direction:column-reverse;gap:4px}
+.cstk .lay{border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:12px;text-align:center;background:#F8FAFC;opacity:0;animation:cstkIn .5s ease forwards}
+.cstk .lay.hw{background:#E2E8F0;font-weight:600}
+.cstk .lay.os{background:rgba(37,99,235,.10)}
+.cstk .lay.app{background:rgba(139,92,246,.12)}
+.cstk .lay.thin{padding:5px 8px;font-size:11px}
+.cstk-cap{font-size:11px;color:var(--ink-faint);text-align:center;margin-top:6px}
+@keyframes cstkIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.ckrow{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;transition:border-color .2s}
+.ckrow .ckq{font-size:13.5px;margin-bottom:8px}
+.ckrow .ckbtns{display:flex;gap:6px;flex-wrap:wrap}
+.ckrow.ok{border-color:var(--green)}.ckrow.no{border-color:var(--red)}
+.ckexp{font-size:12px;color:var(--ink-soft);margin-top:7px;display:none;line-height:1.5}
+.ckrow.done .ckexp{display:block}
+.ckrow.done .rulebtn{pointer-events:none;opacity:.6}
+.ckrow.done .rulebtn.on{opacity:1}
+@media(max-width:640px){.cstk-wrap{flex-direction:column}}
+</style>
 </head>
 <body>
 <div class="app">
@@ -529,7 +570,7 @@ textarea,.opt{background:#fff}
       <span class="ep-title" id="eptitle">Computing — The Machine</span>
       <span class="prog"><i id="progbar"></i></span>
       <button class="iconbtn" id="codexBtn" title="The Strategy Codex — every strategic lens in order: the business story of the whole stack">&#9636; Strategy Codex</button>
-      <button class="iconbtn" id="lensRoleBtn" title="Switch strategic lens: Presales / CFO Office">◑ Presales</button>
+      <button class="iconbtn" id="lensRoleBtn" title="Switch strategic lens: Solution Architecture / CFO Office">◑ Solution Architecture</button>
       <button class="menubtn" id="menuBtn" aria-label="Menu" title="Menu">&#9776;</button>
     </div></div>
     <div class="outcomebar" id="epoutcome"></div>
@@ -613,7 +654,7 @@ var PHASES=[
  {t:"Large Language Models · deep dive",ids:["llm_why","llm_tokens","llm_soundright","llm_attention","llm_training","llm_prompt","llm_approach","llm_custom","llm_eval","llm_risk","llm_deploy","ai_pnl"]},
  {t:"Applied GenAI · deep dive",ids:["genai","multimodal","embeddings","rag","funccall","mcp","aisec","agents","agentops","adoption","capstone"]}
 ];
-var UNLOCK=0.75, PLAYABLE=["computing","networks","servers","virt","containers","k8s","cloud","gcp","storage","data","dataplat","security","sre","finops","ml_why","ml_landscape","ml_data","ml_learning","ml_overfit","ml_zoo","ml_neural","ml_eval","ml_responsible","ml_ops","ml_buildbuy","ml_biz","llm_why","llm_tokens","llm_soundright","llm_attention","llm_training","llm_prompt","llm_approach","llm_custom","llm_eval","llm_risk","llm_deploy","ai_pnl","genai","multimodal","embeddings","rag","funccall","mcp","aisec","agents","agentops","adoption","capstone"];
+var LOAD_BEARING={networks:1,virt:1,containers:1,storage:1,data:1};var UNLOCK=0.75, PLAYABLE=["computing","networks","servers","virt","containers","k8s","cloud","gcp","storage","data","dataplat","security","sre","finops","ml_why","ml_landscape","ml_data","ml_learning","ml_overfit","ml_zoo","ml_neural","ml_eval","ml_responsible","ml_ops","ml_buildbuy","ml_biz","llm_why","llm_tokens","llm_soundright","llm_attention","llm_training","llm_prompt","llm_approach","llm_custom","llm_eval","llm_risk","llm_deploy","ai_pnl","genai","multimodal","embeddings","rag","funccall","mcp","aisec","agents","agentops","adoption","capstone"];
 var misconceptions={}, ACTIVE="llm_why";
 var OUTCOMES={
 llm_tco:"build a defensible business case — value net of run cost — and pick the first lever when it's underwater.",
@@ -675,7 +716,7 @@ function bktUpdate(id,correct,weight){id=ALIAS[id]||id;var c=concepts[id];if(!c)
     else if(LEARNER._miss>=3 && LEARNER.tier==="standard"){setTier("support");mentor("No rush — I’ve switched us to <b>Support</b> pace: more analogies and worked examples from here.");}}
   else {LEARNER._miss=0;}
   return c.p;}
-function isUnlocked(id){return concepts[id].prereq.every(function(p){return concepts[p].p>=UNLOCK;});}
+function isUnlocked(id){return concepts[id].prereq.every(function(p){return concepts[p].p>=(LOAD_BEARING[p]?0.85:UNLOCK);});}
 
 var svg=document.getElementById('graph');var NS="http://www.w3.org/2000/svg";
 function el(t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);return e;}
@@ -724,11 +765,11 @@ function autoGlossary(scope){
   try{
     var G=window.GLOSS;
     scope.querySelectorAll('.term').forEach(function(el){var k=(el.getAttribute('data-t')||'').toLowerCase();var tx=(el.textContent||'').toLowerCase().trim();if(k)GLOSS_USED[k]=1;if(tx)GLOSS_USED[tx]=1;});
-    var keys=[];for(var kk in G){if(!GLOSS_USED[kk])keys.push(kk);}
+    var keys=[];for(var kk in G){keys.push(kk);}
     if(!keys.length)return;
     function esc(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
     var skipTags={BUTTON:1,CODE:1,H1:1,H2:1,INPUT:1,TEXTAREA:1,STYLE:1,SCRIPT:1};
-    var skipCls=['term','rulebtn','rulebtns','opt','lskick','kicker','ls-h','ls-b','lens','binmsg','continue','tierflag','mn','ms','whisper','jump','feedback','who'];
+    var skipCls=['term','rulebtn','rulebtns','opt','lskick','kicker','binmsg','continue','tierflag','mn','ms','jump','who'];
     function ok(node){var p=node.parentNode;while(p&&p!==scope){if(skipTags[p.nodeName])return false;var cl=p.classList;if(cl){for(var i=0;i<skipCls.length;i++)if(cl.contains(skipCls[i]))return false;}p=p.parentNode;}return true;}
     var walker=document.createTreeWalker(scope,NodeFilter.SHOW_TEXT,null,false);
     var textNodes=[],nd;while(nd=walker.nextNode()){if(nd.nodeValue&&nd.nodeValue.trim()&&ok(nd))textNodes.push(nd);}
@@ -736,7 +777,7 @@ function autoGlossary(scope){
       var guard=0;
       while(node&&guard++<30){
         var bestKey=null,bestIdx=1e9,bestLen=0,bestHit=null;
-        for(var i=0;i<keys.length;i++){var key=keys[i];if(GLOSS_USED[key])continue;
+        for(var i=0;i<keys.length;i++){var key=keys[i];if(window.GLOSS_SCOPE&&GLOSS_SCOPE[key]&&!(GLOSS_SCOPE[key].split(',').some(function(pf){return typeof ACTIVE==='string'&&ACTIVE.indexOf(pf)===0;})))continue;
           var re=new RegExp('\\b'+esc(key)+'(?:s)?\\b','i');var m=re.exec(node.nodeValue);
           if(m&&(m.index<bestIdx||(m.index===bestIdx&&key.length>bestLen))){bestKey=key;bestIdx=m.index;bestLen=key.length;bestHit=m[0];}
         }
@@ -771,7 +812,7 @@ function videoBeat(add,cfg){add('<div class="card"><div style="font-size:11px;le
 
 function setTier(tn){LEARNER.tier=tn;var nm={support:"Support",standard:"Standard",fast:"Fast"}[tn];document.getElementById('tierName').textContent=nm;var _mt=document.getElementById('mTier');if(_mt)_mt.innerHTML='Pace: <b>'+nm+'</b>';if(typeof STATE!=="undefined"){STATE.tier=tn;if(typeof saveState==="function")saveState();}renderBKT();}
 
-function loadEpisode(key){key=ALIAS[key]||key;var e=EPISODES[key];if(!e)return;ACTIVE=e.concept;beats=e.build();beatIdx=0;if(typeof glossReset==='function')glossReset();col.innerHTML="";document.getElementById('saystack').innerHTML="";document.getElementById('acttag').textContent=e.act;document.getElementById('eptitle').textContent=e.title;var _ob=document.getElementById('epoutcome');if(_ob)_ob.innerHTML=(typeof OUTCOMES!=='undefined'&&OUTCOMES[key])?('<span class="ob-k">Outcome</span> By the end, you can '+OUTCOMES[key]):'';document.getElementById('book').scrollTop=0;renderGraph();renderOrb();mentor(e.intro);offerDepth(key);}
+function loadEpisode(key){key=ALIAS[key]||key;var e=EPISODES[key];if(!e)return;ACTIVE=e.concept;beats=e.build();beatIdx=0;if(typeof glossReset==='function')glossReset();col.innerHTML="";document.getElementById('saystack').innerHTML="";document.getElementById('acttag').textContent=e.act;document.getElementById('eptitle').textContent=e.title;var _ob=document.getElementById('epoutcome');if(_ob){var _w=0,_g=0;beats.forEach(function(b){_w+=((b.html||'').replace(/<[^>]*>/g,' ').split(/\s+/).length);if(b.gate)_g++;});var _mins=Math.max(3,Math.min(30,Math.round(_w/170+_g*1.2)));_ob.innerHTML='<span class="ob-time">≈'+_mins+' min</span>'+((typeof OUTCOMES!=='undefined'&&OUTCOMES[key])?('<span class="ob-k">Outcome</span> By the end, you can '+OUTCOMES[key]):'');}document.getElementById('book').scrollTop=0;renderGraph();renderOrb();mentor(e.intro);offerDepth(key);}
 function offerDepth(key){var c=ACTIVE;var recFast=concepts[c].p>0.5||LEARNER.tier==="fast"||(concepts[c].prereq.length>0&&concepts[c].prereq.every(function(p){return concepts[p].p>=0.9;}));
   var recTxt=recFast?"You’ve got the groundwork — jump straight to the hands-on core, or take the full story.":"Take the full story so it builds properly, or fast-forward to the hands-on part.";
   var prim=recFast?{t:"⚡ Fast-track to the hands-on",i:2}:{t:"Start from the story",i:0};var sec=recFast?{t:"Full story",i:0}:{t:"⚡ Fast-track",i:2};
@@ -868,8 +909,8 @@ funccall:{so:"Structured output and function calling are the line between a chat
 ml_ops:{so:"A model is the only asset that degrades after you ship it, silently — turning a one-off build into a recurring operating commitment (monitoring, retraining compute, pipelines, on-call) that usually exceeds the build cost.",tell:"A budget for build the model with no line for monitoring or retraining is pricing the car and forgetting the fuel and servicing — ask what happens in month four.",move:"Fund the lifecycle as run-rate, not the model as capex: the monitoring, retraining and data pipeline is the recurring bill that keeps the asset from impairing."},
 llm_approach:{so:"Reaching for fine-tuning is usually the most expensive lever for a problem a cheaper one solves — the wrong lever inflates cost and locks in staleness, so lever choice is a capital-efficiency decision.",tell:"A client opening with we need to fine-tune, before anyone has tried a good prompt or retrieval, is describing the priciest solution to an unstated problem.",move:"Enforce cheapest-sufficient — prompt, then RAG, then fine-tune — and move down only when the cheaper lever provably cannot do the job."}
 };
-function lensBeat(add,so,tell,move){var _id=(typeof ACTIVE!=="undefined"?ACTIVE:"");var kick="Strategist’s Lens · second-order &amp; business";var moveH="Your presales / solution-architecture move";if(so===undefined&&PRESALES_LENS[_id]){var _p=PRESALES_LENS[_id];so=_p.so;tell=_p.tell;move=_p.move;}if(LENS_ROLE==="cfo"&&CFO_LENS[_id]){var _c=CFO_LENS[_id];so=_c.so;tell=_c.tell;move=_c.move;kick="CFO Lens · second-order &amp; financial";moveH="Your CFO-office move";}var th=(LENS_THREAD[_id])?('<div class="ls-row thread"><div class="ls-h">The through-line</div><div class="ls-b">'+LENS_THREAD[_id]+'</div></div>'):"";add('<div class="card lens"><div class="lskick">'+kick+'</div><div class="ls-row"><div class="ls-h">Second-order effect</div><div class="ls-b">'+so+'</div></div><div class="ls-row"><div class="ls-h">The tell — what to listen for</div><div class="ls-b">'+tell+'</div></div><div class="ls-row"><div class="ls-h">'+moveH+'</div><div class="ls-b">'+move+'</div></div>'+th+'</div>');}
-function setLensRole(r){LENS_ROLE=r;if(typeof STATE!=="undefined"){STATE.lensRole=r;if(typeof saveState==="function")saveState();}var _b=document.getElementById("lensRoleBtn");if(_b)_b.innerHTML=(r==="cfo"?"◑ CFO":"◑ Presales");if(typeof ACTIVE!=="undefined"&&typeof loadEpisode==="function"&&typeof EPISODES!=="undefined"&&EPISODES[ACTIVE])loadEpisode(ACTIVE);}
+function lensBeat(add,so,tell,move){var _id=(typeof ACTIVE!=="undefined"?ACTIVE:"");var kick="Strategist’s Lens · second-order &amp; business";var moveH="Your solution-architecture move";if(so===undefined&&PRESALES_LENS[_id]){var _p=PRESALES_LENS[_id];so=_p.so;tell=_p.tell;move=_p.move;}if(LENS_ROLE==="cfo"&&CFO_LENS[_id]){var _c=CFO_LENS[_id];so=_c.so;tell=_c.tell;move=_c.move;kick="CFO Lens · second-order &amp; financial";moveH="Your CFO-office move";}var th=(LENS_THREAD[_id])?('<div class="ls-row thread"><div class="ls-h">The through-line</div><div class="ls-b">'+LENS_THREAD[_id]+'</div></div>'):"";add('<div class="card lens"><div class="lskick">'+kick+'</div><div class="ls-row"><div class="ls-h">Second-order effect</div><div class="ls-b">'+so+'</div></div><div class="ls-row"><div class="ls-h">The tell — what to listen for</div><div class="ls-b">'+tell+'</div></div><div class="ls-row"><div class="ls-h">'+moveH+'</div><div class="ls-b">'+move+'</div></div>'+th+'</div>');}
+function setLensRole(r){LENS_ROLE=r;if(typeof STATE!=="undefined"){STATE.lensRole=r;if(typeof saveState==="function")saveState();}var _b=document.getElementById("lensRoleBtn");if(_b)_b.innerHTML=(r==="cfo"?"◑ CFO":"◑ Solution Architecture");if(typeof ACTIVE!=="undefined"&&typeof loadEpisode==="function"&&typeof EPISODES!=="undefined"&&EPISODES[ACTIVE])loadEpisode(ACTIVE);}
 
 var PRACTICE={
 llm_tco:[
@@ -1119,7 +1160,7 @@ llm_risk:[
 llm_biz:[
  {q:"To qualify an LLM idea, check first…",o:[["a","data/source, value, and risk"],["b","the logo"],["c","the server brand"]],c:"a",why:"Qualification touches data readiness, value and risk."},
  {q:"Framing value to a CFO means…",o:[["a","outcomes in currency (hours saved, revenue)"],["b","accuracy percentages"],["c","model names"]],c:"a",why:"Money, not metrics, gets funded."},
- {q:"A strong presales move is to…",o:[["a","reframe ‘AI everywhere’ into a prioritised shortlist"],["b","enable every use case at once"],["c","avoid scoping"]],c:"a",why:"Sequence by value × feasibility × risk."},
+ {q:"A strong solution architecture move is to…",o:[["a","reframe ‘AI everywhere’ into a prioritised shortlist"],["b","enable every use case at once"],["c","avoid scoping"]],c:"a",why:"Sequence by value × feasibility × risk."},
  {q:"The cheapest sufficient path for grounded answers is often…",o:[["a","prompting/RAG before fine-tuning"],["b","train from scratch"],["c","buy more GPUs"]],c:"a",why:"Reserve fine-tuning for where cheaper options fail."},
  {q:"De-risking an LLM proposal includes…",o:[["a","governance, guardrails, human-in-the-loop"],["b","hiding the risks"],["c","ignoring PII"]],c:"a",why:"Name and mitigate risks to make it deployable."}
 ],
@@ -1500,12 +1541,12 @@ llm_approach:{concept:"llm_approach",node:"Prompt · RAG · Fine-tune",act:"Act 
     return b;}
 },
 ml_biz:{concept:"ml_biz",node:"Business Outcomes",act:"Act 7 · Machine Learning",title:"From ML to Business Outcomes",
-  intro:"You’ve learned how ML works from the inside. In strategy, presales and solution architecture, that only pays off when you turn it into a business outcome — live, in the room. Let’s put it all together.",
+  intro:"You’ve learned how ML works from the inside. In strategy, solution architecture, that only pays off when you turn it into a business outcome — live, in the room. Let’s put it all together.",
   build:function(){var b=[];var add=function(h,g){b.push({html:h,gate:g});};
     add('<div class="kicker">The client meeting</div><h1>“We want to use AI to reduce churn”</h1><p class="lead">A prospect drops the classic line. The junior in the room starts talking models and neural nets. You do something far more valuable — you <em>shape the outcome</em>.</p><p>Your job isn’t to build. It’s to <strong>qualify feasibility</strong>, map the ask to the right kind of ML, surface the risks before they bite, and frame the value in the client’s currency. Everything in this module feeds this one skill.</p>');
     add('<span class="tierflag">'+({support:"Support pace",standard:"Standard pace",fast:"Fast pace"}[LEARNER.tier]||"Standard pace")+'</span>'+tierPick({
       support:'<div class="kicker">First principles</div><h2>The strategist’s chain</h2><p>Great AI solutioning runs a simple chain — <em>backwards</em> from money, then forwards to check it. Start at the <strong>business outcome</strong> the client actually cares about (revenue, cost, risk, time). Ask: what <strong>decision</strong> would move it? What <strong>prediction</strong> would inform that decision? What <strong>kind of ML</strong> is that (classification, regression, clustering)? What <strong>data</strong> does it need — and do they have it? What could <strong>go wrong</strong> (bad data, bias, drift, governance)? And finally, how do we measure <strong>value in dollars</strong>?</p><p>Run that chain and a vague “use AI” becomes a scoped, qualified, defensible opportunity. That is the job.</p>',
-      standard:'<div class="kicker">First principles</div><h2>Work outcome-backwards</h2><p>The chain: business KPI → decision lever → required prediction → ML paradigm → data &amp; feasibility → risk register (data, bias, governance, drift) → value metric in currency. Presales is running this chain live. Qualify feasibility <em>before</em> scoping; price the data and the lifecycle, not just the model; translate every metric into P&amp;L.</p>',
+      standard:'<div class="kicker">First principles</div><h2>Work outcome-backwards</h2><p>The chain: business KPI → decision lever → required prediction → ML paradigm → data &amp; feasibility → risk register (data, bias, governance, drift) → value metric in currency. Solution Architecture is running this chain live. Qualify feasibility <em>before</em> scoping; price the data and the lifecycle, not just the model; translate every metric into P&amp;L.</p>',
       fast:'<div class="kicker">First principles</div><h2>The value chain</h2><p>KPI → intervention → predictive target → paradigm/model class → data/feasibility gate → risk register → cost-weighted value. Sell the data and the lifecycle (monitoring/retraining), not a one-off model. Model choice is a governance decision as much as a technical one. Your differentiator is disqualifying bad-fit asks fast and quantifying good ones in the client’s currency.</p>'}));
     add('<div class="card"><h3>Shape the solution</h3><div class="hint">The client says: “We want to use AI to reduce churn.” You’re not building — you’re shaping the deal. Make the three calls a strategist makes.</div><div id="shape"></div><div class="binmsg" id="shmsg"></div></div>',
       function(wrap,done){
@@ -1522,7 +1563,7 @@ ml_biz:{concept:"ml_biz",node:"Business Outcomes",act:"Act 7 · Machine Learning
     add('<div class="q"><div class="qk">Teach it back · make it yours</div><div class="qtext">In one line: how would you qualify whether a client’s AI ask is worth pursuing?</div><textarea id="tbz" placeholder="I’d qualify it by checking..."></textarea><div class="feedback" id="tbzf"></div><div class="continue" style="margin-top:14px"><button class="btn" id="tbzb" disabled>Show Aadi</button></div></div>',
       function(wrap,done){var ta=wrap.querySelector('#tbz'),btn=wrap.querySelector('#tbzb'),fb=wrap.querySelector('#tbzf');ta.addEventListener('input',function(){btn.disabled=ta.value.trim().length<12;});
         btn.onclick=function(){var x=ta.value.toLowerCase();var d=/(data|label|history|readiness|quality)/.test(x),v=/(value|roi|outcome|revenue|cost|business|money|dollar|impact)/.test(x),ff=/(feasib|fit|rule|realistic|risk|possible)/.test(x);var s=(d?1:0)+(v?1:0)+(ff?1:0);bktUpdate('ml_biz',s>=2,'weak');fb.className='feedback ok show';
-          if(s>=2)fb.innerHTML='<div class="who"><span class="dot"></span>Aadi</div>Strong — you’re qualifying on what actually decides success: <b>data readiness</b>, <b>business value</b>, and <b>feasibility</b>. That’s the presales instinct in one sentence.';
+          if(s>=2)fb.innerHTML='<div class="who"><span class="dot"></span>Aadi</div>Strong — you’re qualifying on what actually decides success: <b>data readiness</b>, <b>business value</b>, and <b>feasibility</b>. That’s the solution architecture instinct in one sentence.';
           else fb.innerHTML='<div class="who"><span class="dot"></span>Aadi</div>Good start. The three levers to always check: is the <b>data</b> there (labels, quality)? is there real <b>business value</b> in dollars? and is it actually <b>feasible</b> (not better solved by simple rules)? Weave those three in.';
           btn.disabled=true;ta.disabled=true;var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn">Continue ↓</button>';wrap.querySelector('.q').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};};});
         questionBeat(add,{concept:"ml_biz",k:"Decision · qualify the ask",
@@ -1537,7 +1578,7 @@ ml_biz:{concept:"ml_biz",node:"Business Outcomes",act:"Act 7 · Machine Learning
       correct:"b",
       right:"Right — executives fund outcomes in currency, not accuracy or model names. Translate every metric into money.",
       wrongDefault:"Frame value in the client's currency — money retained or saved — not accuracy percentages."});
-add('<div class="kicker">You’re ready</div><h2>From first principles to business outcomes</h2><p>You can now reason from a business goal to the right ML approach and back — <strong>qualify feasibility, size the effort and risk, and defend the value in the client’s currency.</strong> That is the core of Data &amp; AI strategy, presales and solution architecture, and you built it on real first principles, not buzzwords.</p><p class="whisper">And the same thinking scales to the rest of the AI stack — LLMs, RAG, agents. For each, ask the identical questions: what problem, what data, what risk, what value. You now have the lens to evaluate any AI opportunity that lands on your desk.</p>',
+add('<div class="kicker">You’re ready</div><h2>From first principles to business outcomes</h2><p>You can now reason from a business goal to the right ML approach and back — <strong>qualify feasibility, size the effort and risk, and defend the value in the client’s currency.</strong> That is the core of Data &amp; AI strategy, solution architecture, and you built it on real first principles, not buzzwords.</p><p class="whisper">And the same thinking scales to the rest of the AI stack — LLMs, RAG, agents. For each, ask the identical questions: what problem, what data, what risk, what value. You now have the lens to evaluate any AI opportunity that lands on your desk.</p>',
       function(wrap,done){chooser(wrap,'You’ve completed the Machine Learning Act. Revisit any lesson:');});
     lensBeat(add);
     return b;}
@@ -2420,7 +2461,7 @@ capstone:{concept:"capstone",node:"Capstone",act:"Act 14 · Applied GenAI",title
     add('<span class="tierflag">'+({support:"Support pace",standard:"Standard pace",fast:"Fast pace"}[LEARNER.tier]||"Standard pace")+'</span>'+tierPick({
       support:'<div class="kicker">First principles</div><h2>The arc that wins deals</h2><p>Great solutioning is an arc: <strong>Qualify</strong> (is the data there? is there real value?), <strong>Scope</strong> (the cheapest sufficient design — often prompt/RAG before fine-tuning), <strong>Value</strong> (translate it into money: hours saved, revenue retained, cost avoided), and <strong>De-risk</strong> (governance, guardrails, a human where it matters). Notice: the technology you’ve learned is the <em>easy</em> half — framing the outcome is what gets funded.</p>',
       standard:'<div class="kicker">First principles</div><h2>Solution arc</h2><p>Qualify (data + value) → Scope (cheapest sufficient architecture) → Value (outcome in currency) → De-risk (security, governance, human-in-the-loop). The reference architecture spans data → model → RAG → agent on GCP; the winning move is expressing it as a funded business case, not a tech diagram.</p>',
-      fast:'<div class="kicker">First principles</div><h2>From architecture to business case</h2><p>Compose the stack (data/model/RAG/agent/GCP) under cost, security and governance constraints, then reduce it to an ROI statement. Differentiation in presales/SA is not the diagram — it’s qualification discipline and value framing in currency.</p>'}));
+      fast:'<div class="kicker">First principles</div><h2>From architecture to business case</h2><p>Compose the stack (data/model/RAG/agent/GCP) under cost, security and governance constraints, then reduce it to an ROI statement. Differentiation in solution architecture is not the diagram — it’s qualification discipline and value framing in currency.</p>'}));
         add('<div class="card"><div class="kicker">Capstone · run the whole deal</div><h2>One opportunity, end to end</h2><p class="hint">A national retailer wants an AI assistant that answers store staff’s policy questions from their internal wiki. You’re in the room. Make the right call at each stage — a wrong call shows the consequence and lets you retry.</p><div id="dealprog" style="font-size:12px;color:var(--gold);letter-spacing:.04em;margin-bottom:8px"></div><div id="dealstage"></div><div class="binmsg" id="dealmsg" style="margin-top:10px"></div></div>',
       function(wrap,done){
         var stages=[
@@ -2459,14 +2500,14 @@ capstone:{concept:"capstone",node:"Capstone",act:"Act 14 · Applied GenAI",title
             else{btn.classList.add('wrong');msg.className='binmsg';msg.innerHTML='✗ '+o.m+' <span style="color:var(--ink-faint)">Try again.</span>';}
           };});
         }
-        function winDeal(){prog.textContent='DEAL · all six stages cleared';stageEl.innerHTML='<div style="background:#F1F5F9;border:1px solid var(--green);border-radius:11px;padding:13px 15px;color:#0F172A">🏆 <b>Deal qualified, shaped, architected, de-risked, valued and defended</b> — the whole arc, run live. That end-to-end judgement, technical <em>and</em> commercial, is the job.</div>';msg.className='binmsg ok';msg.innerHTML='';if(!fin){fin=true;bktUpdate('capstone',true);mentor("You didn’t just learn the pieces — you ran a deal end to end: qualify → shape → architect → de-risk → value → defend. That’s what a presales / solution architect gets paid for.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Finish ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
+        function winDeal(){prog.textContent='DEAL · all six stages cleared';stageEl.innerHTML='<div style="background:#F1F5F9;border:1px solid var(--green);border-radius:11px;padding:13px 15px;color:#0F172A">🏆 <b>Deal qualified, shaped, architected, de-risked, valued and defended</b> — the whole arc, run live. That end-to-end judgement, technical <em>and</em> commercial, is the job.</div>';msg.className='binmsg ok';msg.innerHTML='';if(!fin){fin=true;bktUpdate('capstone',true);mentor("You didn’t just learn the pieces — you ran a deal end to end: qualify → shape → architect → de-risk → value → defend. That’s what a solution architect gets paid for.");var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Finish ↓</button>';wrap.querySelector('.card').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};}}
         render();
         mentor("Start at Qualify — the strategist’s instinct is to check feasibility before designing anything.");});
 lensBeat(add);
     add('<div class="q"><div class="qk">Teach it back · make it yours</div><div class="qtext">In one line: how would you qualify whether a client’s AI idea is worth pursuing — and how would you frame its value?</div><textarea id="tbz" placeholder="I’d qualify it by checking… and frame the value as…"></textarea><div class="feedback" id="tbzf"></div><div class="continue" style="margin-top:14px"><button class="btn" id="tbzb" disabled>Show Aadi</button></div></div>',
       function(wrap,done){var ta=wrap.querySelector('#tbz'),fb=wrap.querySelector('#tbzf'),btn=wrap.querySelector('#tbzb');
         ta.addEventListener('input',function(){btn.disabled=ta.value.trim().length<12;});
-        btn.onclick=function(){var x=ta.value.toLowerCase();var d=/(data|source|permission|label|clean|ready|access)/.test(x),v=/(value|roi|hours|saved|cost|revenue|business|money|outcome|currency)/.test(x),r=/(risk|halluc|govern|pii|inject|safe|accuracy|human)/.test(x);var s=(d?1:0)+(v?1:0)+(r?1:0);bktUpdate('capstone',s>=2,'weak');fb.className='feedback ok show';fb.innerHTML='<div class="who"><span class="dot"></span>Aadi</div>'+(s>=2?'That’s the instinct that wins Data &amp; AI deals: you tied it to <b>data readiness</b>, <b>value in currency</b>, and <b>risk</b> — the exact arc a buyer needs.':'Good start. The strongest qualification touches three things: is the <b>data</b> there, what’s the <b>value in money</b>, and how do you handle <b>risk</b>. Fold in the ones you missed and it’s airtight.');mentor('You’ve gone from a bare processor to shaping and valuing a full enterprise AI solution. That end-to-end fluency — technical <em>and</em> commercial — is exactly what a strategy, presales and solution role runs on.');var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Finish ↓</button>';wrap.querySelector('.q').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};};});
+        btn.onclick=function(){var x=ta.value.toLowerCase();var d=/(data|source|permission|label|clean|ready|access)/.test(x),v=/(value|roi|hours|saved|cost|revenue|business|money|outcome|currency)/.test(x),r=/(risk|halluc|govern|pii|inject|safe|accuracy|human)/.test(x);var s=(d?1:0)+(v?1:0)+(r?1:0);bktUpdate('capstone',s>=2,'weak');fb.className='feedback ok show';fb.innerHTML='<div class="who"><span class="dot"></span>Aadi</div>'+(s>=2?'That’s the instinct that wins Data &amp; AI deals: you tied it to <b>data readiness</b>, <b>value in currency</b>, and <b>risk</b> — the exact arc a buyer needs.':'Good start. The strongest qualification touches three things: is the <b>data</b> there, what’s the <b>value in money</b>, and how do you handle <b>risk</b>. Fold in the ones you missed and it’s airtight.');mentor('You’ve gone from a bare processor to shaping and valuing a full enterprise AI solution. That end-to-end fluency — technical <em>and</em> commercial — is exactly what a strategy, solution-architecture role runs on.');var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn ghost">Finish ↓</button>';wrap.querySelector('.q').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};};});
         questionBeat(add,{concept:"capstone",k:"Decision · the solution arc",
       q:"What is the right order to run a client's AI idea through?",
       opts:[{k:"a",t:"Build → demo → price."},{k:"b",t:"<b>Qualify (data + value) → scope the cheapest sufficient design → value in currency → de-risk.</b>"},{k:"c",t:"Pick the trendiest model, then find a use for it."}],
@@ -2819,7 +2860,7 @@ add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><str
     return b;}
 },
 llm_biz:{concept:"llm_biz",node:"Business Outcomes",act:"Act 8 · Large Language Models",title:"From LLMs to Business Outcomes",
-  intro:"You understand how LLMs work from the inside. In strategy, presales and solution architecture, that pays off only when you can shape a real solution — live, in the room. Let’s put it all together.",
+  intro:"You understand how LLMs work from the inside. In strategy, solution architecture, that pays off only when you can shape a real solution — live, in the room. Let’s put it all together.",
   build:function(){var b=[];var add=function(h,g){b.push({html:h,gate:g});};
     add('<div class="kicker">The client meeting</div><h1>“We want an AI assistant for our team”</h1><p class="lead">A prospect wants an assistant that answers staff questions from their internal wiki. The junior starts talking models and fine-tuning. You do the valuable thing — you shape the solution: choose the right approach, qualify feasibility, and frame the value.</p><p>Every idea in this module feeds this one skill.</p>');
     add('<span class="tierflag">'+({support:"Support pace",standard:"Standard pace",fast:"Fast pace"}[LEARNER.tier]||"Standard pace")+'</span>'+tierPick({
@@ -2841,7 +2882,7 @@ llm_biz:{concept:"llm_biz",node:"Business Outcomes",act:"Act 8 · Large Language
     add('<div class="q"><div class="qk">Teach it back · make it yours</div><div class="qtext">In one line: how would you qualify whether a client’s LLM idea is worth pursuing?</div><textarea id="tbz" placeholder="I’d qualify it by checking..."></textarea><div class="feedback" id="tbzf"></div><div class="continue" style="margin-top:14px"><button class="btn" id="tbzb" disabled>Show Aadi</button></div></div>',
       function(wrap,done){var ta=wrap.querySelector('#tbz'),btn=wrap.querySelector('#tbzb'),fb=wrap.querySelector('#tbzf');ta.addEventListener('input',function(){btn.disabled=ta.value.trim().length<12;});
         btn.onclick=function(){var x=ta.value.toLowerCase();var d=/(data|wiki|source|permission|label|clean|ready)/.test(x),v=/(value|roi|hours|saved|cost|revenue|business|money|outcome)/.test(x),r=/(risk|halluc|govern|pii|inject|safe|accuracy)/.test(x);var s=(d?1:0)+(v?1:0)+(r?1:0);bktUpdate('llm_biz',s>=2,'weak');fb.className='feedback ok show';
-          if(s>=2)fb.innerHTML='<div class="who"><span class="dot"></span>Aadi</div>Strong — you’re qualifying on the three levers that decide LLM projects: <b>data/grounding readiness</b>, <b>business value</b>, and <b>risk/governance</b>. That’s the presales instinct.';
+          if(s>=2)fb.innerHTML='<div class="who"><span class="dot"></span>Aadi</div>Strong — you’re qualifying on the three levers that decide LLM projects: <b>data/grounding readiness</b>, <b>business value</b>, and <b>risk/governance</b>. That’s the solution architecture instinct.';
           else fb.innerHTML='<div class="who"><span class="dot"></span>Aadi</div>Good start. The three levers to always check: is the <b>data</b> ready to ground it (and permissioned)? is there real <b>business value</b> in the client’s currency? and can you handle the <b>risk</b> (hallucination, PII, governance)? Weave those three in.';
           btn.disabled=true;ta.disabled=true;var c=document.createElement('div');c.className='continue';c.innerHTML='<button class="btn">Continue ↓</button>';wrap.querySelector('.q').appendChild(c);c.querySelector('button').onclick=function(){c.remove();done();};};});
         questionBeat(add,{concept:"llm_biz",k:"Decision · scope the approach",
@@ -3488,7 +3529,7 @@ function updateLearner(){var lv=levelOf(STATE.xp),nm=STATE.name||"Explorer";docu
 
 function buildOverlays(){
   var sp=document.createElement('div');sp.className='overlay';sp.id='splash';
-  sp.innerHTML='<div class="splash-card"><div class="brand" style="justify-content:center"><b>ALOS</b><span>Adaptive Learning OS</span></div><h1 class="splash-h">Learn cloud &amp; AI the way it actually evolved.</h1><p class="splash-p">One continuous, adaptive book that takes you from a bare processor to autonomous AI agents — 49 concepts across 14 Acts, built for strategy &amp; solution roles. Machine Learning and Large Language Models are full deep dives; the rest are previews you can see the depth of on the map. It adapts to what you already know, and you can hover underlined terms for their meaning.</p><input id="nameInput" class="nameInput" placeholder="Your name (optional)" autocomplete="off"/><div class="diag">How much of cloud &amp; AI do you already know?</div><div class="diagrow" id="diagrow"><button data-t="support">New to it</button><button data-t="standard" class="on">Some idea</button><button data-t="fast">Comfortable</button></div><div class="diag">Which lens do you want? (switch anytime)</div><div class="diagrow" id="lensrow"><button data-r="presales" class="on">Presales / Solution Architect</button><button data-r="cfo">CFO Office</button></div><div class="btnrow" style="justify-content:center"><button class="btn" id="startBtn">Start the Act →</button><button class="btn ghost" id="helpFromSplash">How it works</button></div></div>';
+  sp.innerHTML='<div class="splash-card"><div class="brand" style="justify-content:center"><b>ALOS</b><span>Adaptive Learning OS</span></div><h1 class="splash-h">Learn cloud &amp; AI the way it actually evolved.</h1><p class="splash-p">One continuous, adaptive book that takes you from a bare processor to autonomous AI agents — 49 concepts across 14 Acts, built for strategy &amp; solution roles. Machine Learning and Large Language Models are full deep dives; the rest are previews you can see the depth of on the map. It adapts to what you already know, and you can hover underlined terms for their meaning.</p><input id="nameInput" class="nameInput" placeholder="Your name (optional)" autocomplete="off"/><div class="diag">How much of cloud &amp; AI do you already know?</div><div class="diagrow" id="diagrow"><button data-t="support">New to it</button><button data-t="standard" class="on">Some idea</button><button data-t="fast">Comfortable</button></div><div class="diag">Which lens do you want? (switch anytime)</div><div class="diagrow" id="lensrow"><button data-r="presales" class="on">Solution Architecture / Solution Architect</button><button data-r="cfo">CFO Office</button></div><div class="btnrow" style="justify-content:center"><button class="btn" id="startBtn">Start the Act →</button><button class="btn ghost" id="helpFromSplash">How it works</button></div></div>';
   document.body.appendChild(sp);
   var hm=document.createElement('div');hm.className='overlay hidden';hm.id='helpModal';
   hm.innerHTML='<div class="modal hiw fullpage"><button class="modal-x" id="helpClose">✕</button><h2>How ALOS works</h2><p class="hiw-sub">Every concept runs one quiet loop that adapts to you.</p><div class="hiw-loop"><div class="hiw-track"></div><div class="hiw-pulse"></div><div class="hiw-node n1"><div class="hd">📖</div><div class="hl">Read a beat</div></div><div class="hiw-node n2"><div class="hd">✔</div><div class="hl">Answer</div></div><div class="hiw-node n3"><div class="hd">◉</div><div class="hl">Mastery grows</div></div><div class="hiw-node n4"><div class="hd">🎚</div><div class="hl">Aadi adapts</div></div></div><div class="hiw-meters"><div class="hiw-m"><div class="hiw-mlab">Your mastery of this concept</div><div class="hiw-bar"><i></i></div></div><div class="hiw-m"><div class="hiw-mlab">Aadi tunes your pace</div><div class="hiw-pace"><span data-t="support">Support</span><span data-t="standard">Standard</span><span data-t="fast">Fast</span></div></div></div><div class="hiw-lines"><p><b>Read, then do.</b> Each concept is a short story with a hands-on interactive.</p><p><b>It adapts.</b> Your answers feed a real mastery model, and your pace shifts to match — automatically when you struggle.</p><p><b>The map is your journey.</b> 49 concepts across 14 Acts light up as you master them; hover any node to see its depth.</p><p><b>Everything saves.</b> Progress, XP and streak persist on this device; underlined terms define on hover.</p></div><div class="btnrow" style="margin-top:8px"><button class="btn" id="helpDone">Got it — start learning</button></div></div>';
@@ -3497,7 +3538,7 @@ function buildOverlays(){
   var chosenRole="presales";
   sp.querySelectorAll('#diagrow button').forEach(function(bt){bt.onclick=function(){sp.querySelectorAll('#diagrow button').forEach(function(x){x.classList.remove('on');});bt.classList.add('on');chosen=bt.dataset.t;};});
   sp.querySelectorAll('#lensrow button').forEach(function(bt){bt.onclick=function(){sp.querySelectorAll('#lensrow button').forEach(function(x){x.classList.remove('on');});bt.classList.add('on');chosenRole=bt.dataset.r;};});
-  sp.querySelector('#startBtn').onclick=function(){if(window.__enterFocusMode)window.__enterFocusMode();STATE.name=(sp.querySelector('#nameInput').value||'').trim();LENS_ROLE=chosenRole;STATE.lensRole=chosenRole;var _lb2=document.getElementById('lensRoleBtn');if(_lb2)_lb2.innerHTML=(chosenRole==='cfo'?'◑ CFO':'◑ Presales');setTier(chosen);saveState();updateLearner();if(typeof loadEpisode==="function")loadEpisode(ACTIVE);sp.classList.add('hidden');setTimeout(function(){toast('Welcome'+(STATE.name?', '+STATE.name:'')+'. Pace set to <b>'+({support:'Support',standard:'Standard',fast:'Fast'}[chosen])+'</b> — I’ll fine-tune as we go.');},480);};
+  sp.querySelector('#startBtn').onclick=function(){if(window.__enterFocusMode)window.__enterFocusMode();STATE.name=(sp.querySelector('#nameInput').value||'').trim();LENS_ROLE=chosenRole;STATE.lensRole=chosenRole;var _lb2=document.getElementById('lensRoleBtn');if(_lb2)_lb2.innerHTML=(chosenRole==='cfo'?'◑ CFO':'◑ Solution Architecture');setTier(chosen);saveState();updateLearner();if(typeof loadEpisode==="function")loadEpisode(ACTIVE);sp.classList.add('hidden');setTimeout(function(){toast('Welcome'+(STATE.name?', '+STATE.name:'')+'. Pace set to <b>'+({support:'Support',standard:'Standard',fast:'Fast'}[chosen])+'</b> — I’ll fine-tune as we go.');},480);};
   sp.querySelector('#helpFromSplash').onclick=function(){hm.classList.remove('hidden');};
   hm.querySelector('#helpClose').onclick=function(){hm.classList.add('hidden');};
   hm.querySelector('#helpDone').onclick=function(){hm.classList.add('hidden');};
@@ -3509,7 +3550,7 @@ function initApp(){
   buildOverlays();
   renderGraph();renderOrb();loadEpisode('computing');
   document.getElementById('tierBadge').onclick=function(){var order=['support','standard','fast'];var i=(order.indexOf(LEARNER.tier)+1)%3;setTier(order[i]);toast('Pace set to <b>'+({support:'Support',standard:'Standard',fast:'Fast'}[order[i]])+'</b> — applies as you continue.');};
-  var _lrb=document.getElementById('lensRoleBtn');if(_lrb){_lrb.innerHTML=(LENS_ROLE==='cfo'?'◑ CFO':'◑ Presales');_lrb.onclick=function(){setLensRole(LENS_ROLE==='cfo'?'presales':'cfo');toast('Lens: <b>'+(LENS_ROLE==='cfo'?'CFO Office':'Presales / Solution Architect')+'</b>');};}
+  var _lrb=document.getElementById('lensRoleBtn');if(_lrb){_lrb.innerHTML=(LENS_ROLE==='cfo'?'◑ CFO':'◑ Solution Architecture');_lrb.onclick=function(){setLensRole(LENS_ROLE==='cfo'?'solution architecture':'cfo');toast('Lens: <b>'+(LENS_ROLE==='cfo'?'CFO Office':'Solution Architecture / Solution Architect')+'</b>');};}
   if(STATE.name)document.getElementById('splash').classList.add('hidden');
 }
 
@@ -3676,7 +3717,7 @@ AADI.providers.authored={ask:function(q,ctx,cb){
     cb('You’ve mastered <b>'+done+' of '+tot+'</b> concepts (≥75%). This one — <b>'+ctx.label+'</b> — sits at <b>'+Math.round(ctx.p*100)+'%</b>.'+(nxt?' Next on the spine: <a class="jump" data-k="'+nxt+'">'+concepts[nxt].label+'</a>.':' You’re at the end of the spine.'));return;}
   if(/why (does|do|is|would|should)|matter|business|roi|second.?order|so what|cfo|value/.test(s)){
     var L=lensOf(ctx.id);
-    if(L){cb('<b>Why '+ctx.label+' matters — '+(LENS_ROLE==='cfo'?'CFO lens':'presales lens')+':</b><br>'+L.so+'<br><br><b>The tell:</b> '+L.tell+'<br><br><b>Your move:</b> '+L.move);return;}}
+    if(L){cb('<b>Why '+ctx.label+' matters — '+(LENS_ROLE==='cfo'?'CFO lens':'solution architecture lens')+':</b><br>'+L.so+'<br><br><b>The tell:</b> '+L.tell+'<br><br><b>Your move:</b> '+L.move);return;}}
   if(/simpl|explain (it|this|that|again)|again|confus|lost|don.?t (get|understand)|slower|eli5|plain/.test(s)){
     var e5=notes.eli5||((EPISODES[ctx.id]&&EPISODES[ctx.id].intro)||'');
     cb((e5?e5+'<br><br>':'')+'If it still feels fast, tap the pace badge above and pick <b>Support</b> — every lesson re-renders gentler.');return;}
@@ -3707,7 +3748,7 @@ function codexHTML(){
   var h='<div class="codex-card"><button class="cx-close" id="cxClose">✕ Close</button>'
    +'<div class="cx-kick">The Strategy Codex</div><div class="cx-h">The business story of the whole stack</div>'
    +'<div class="cx-lead">Every lesson carries a strategic lens. Read in order, they are one continuous argument — how computing becomes cloud, cloud becomes intelligence, intelligence becomes autonomy, and where the money and the risk move at each step. The <i>through-line</i> hands each insight to the next lesson.</div>'
-   +'<div class="cx-roles"><button class="cx-role'+(role==='presales'?' on':'')+'" data-r="presales">◑ Presales / Solution Architecture</button><button class="cx-role'+(role==='cfo'?' on':'')+'" data-r="cfo">◑ CFO Office</button></div>';
+   +'<div class="cx-roles"><button class="cx-role'+(role==='solution architecture'?' on':'')+'" data-r="presales">◑ Solution Architecture / Solution Architecture</button><button class="cx-role'+(role==='cfo'?' on':'')+'" data-r="cfo">◑ CFO Office</button></div>';
   var n=0;
   PHASES.forEach(function(ph){
     h+='<div class="cx-phase">'+ph.t+'</div>';
@@ -3938,9 +3979,9 @@ function briefHTML(id,role){
   var B=BRIEFS[id];if(!B)return null;
   var r=B.roles[role]||B.roles.presales;
   var kick=(role==='cfo')?'CFO-Office Brief · second-order &amp; financial':'Strategist’s Brief · second-order &amp; business';
-  var moveH=(role==='cfo')?'Your CFO-office move':'Your presales / solution-architecture move';
+  var moveH=(role==='cfo')?'Your CFO-office move':'Your solution-architecture move';
   var h='<div class="card lens brief"><div class="lskick">'+kick+'</div>';
-  h+='<div class="bf-gov">'+r.gov+'</div>';
+  h+='<div class="bf-gov">'+r.gov+'</div><button class="bf-simple" data-k="'+id+'">✦ Explain this simply</button>';
   (B.arg||[]).forEach(function(p){h+='<p class="bf-arg">'+p+'</p>';});
   if(B.viz){h+='<div class="bf-viz">'+B.viz()+(B.vizCap?'<div class="bf-cap">'+B.vizCap+'</div>':'')+(B.dataViz?(B.stamp?B.stamp():VIZ.stamp()):'')+'</div>';}
   h+='<div class="ls-row"><div class="ls-h">The tell — what to listen for</div><div class="ls-b">'+r.tell+'</div></div>';
@@ -3951,7 +3992,7 @@ function briefHTML(id,role){
 function lensBeat(add,so,tell,move){
   var _id=(typeof ACTIVE!=="undefined"?ACTIVE:"");
   if(typeof BRIEFS==='object'&&BRIEFS&&BRIEFS[_id]){var bh=briefHTML(_id,LENS_ROLE);if(bh){add(bh);return;}}
-  var kick="Strategist’s Lens · second-order &amp; business";var moveH="Your presales / solution-architecture move";
+  var kick="Strategist’s Lens · second-order &amp; business";var moveH="Your solution-architecture move";
   if(so===undefined&&PRESALES_LENS[_id]){var _p=PRESALES_LENS[_id];so=_p.so;tell=_p.tell;move=_p.move;}
   if(LENS_ROLE==="cfo"&&CFO_LENS[_id]){var _c=CFO_LENS[_id];so=_c.so;tell=_c.tell;move=_c.move;kick="CFO Lens · second-order &amp; financial";moveH="Your CFO-office move";}
   var th=(LENS_THREAD[_id])?('<div class="ls-row thread"><div class="ls-h">The through-line</div><div class="ls-b">'+LENS_THREAD[_id]+'</div></div>'):"";
@@ -3962,7 +4003,7 @@ function codexHTML(){
   var h='<div class="codex-card"><button class="cx-close" id="cxClose">✕ Close</button>'
    +'<div class="cx-kick">The Strategy Codex</div><div class="cx-h">The business story of the whole stack</div>'
    +'<div class="cx-lead">Every lesson carries a strategic brief. Read in order, they are one continuous argument — how computing becomes cloud, cloud becomes intelligence, intelligence becomes autonomy, and where the money and the risk move at each step. The <i>through-line</i> hands each insight to the next lesson.</div>'
-   +'<div class="cx-roles"><button class="cx-role'+(role==='presales'?' on':'')+'" data-r="presales">◑ Presales / Solution Architecture</button><button class="cx-role'+(role==='cfo'?' on':'')+'" data-r="cfo">◑ CFO Office</button></div>';
+   +'<div class="cx-roles"><button class="cx-role'+(role==='solution architecture'?' on':'')+'" data-r="presales">◑ Solution Architecture / Solution Architecture</button><button class="cx-role'+(role==='cfo'?' on':'')+'" data-r="cfo">◑ CFO Office</button></div>';
   var n=0;
   PHASES.forEach(function(ph){
     h+='<div class="cx-phase">'+ph.t+'</div>';
@@ -4002,7 +4043,7 @@ virt:{
  viz:function(){return VIZ.bars([{label:"One app per box",v:13,hint:"· typical estate"},{label:"Virtualized (VMs)",v:55,hint:"· consolidated",hi:true},{label:"Cloud multi-tenant",v:80,hint:"· provider scale",hi:true}],{fmt:function(v){return v+"% utilisation";}});},
  vizCap:"Utilisation is the villain of Act I. Virtualization recovers it; the cloud industrialises the recovery and sells it back by the hour.",
  roles:{
-  presales:{gov:"Virtualization is a utilisation story wearing a technology costume — quantify the idle capital and the deal argues itself.",tell:PRESALES_LENS.virt.tell,move:PRESALES_LENS.virt.move,thought:"Your client’s GPU fleet for AI now idles the way their servers did in 2005. Which vendor becomes the ‘hypervisor’ of that waste — and should your client wait for it or build around it?"},
+  presales:{gov:"Virtualization comes down to one number: how much of the hardware you already paid for is doing real work. Measure the idle share, price it, and the case makes itself.",tell:PRESALES_LENS.virt.tell,move:PRESALES_LENS.virt.move,thought:"Your client’s GPU fleet for AI now idles the way their servers did in 2005. Which vendor becomes the ‘hypervisor’ of that waste — and should your client wait for it or build around it?"},
   cfo:{gov:"Every point of utilisation you recover is capex you never spend — consolidation is the rare cost programme with no capability downside.",tell:CFO_LENS.virt.tell,move:CFO_LENS.virt.move,thought:"If 85% of a hardware dollar bought nothing in 2005, audit today’s balance sheet: where is the modern 15%-utilised asset — GPUs, licences, data platforms, people’s calendars?"}}},
 k8s:{
  arg:["Before orchestration, operations headcount scaled with machine count — every new service meant more pagers. Kubernetes breaks that line: humans declare the destination (‘five replicas, always’), and a reconciliation loop does the driving around the clock. Failures still happen; <b>recovery stops being a human act</b>.",
@@ -4206,15 +4247,15 @@ servers:{
  viz:function(){return VIZ.curves([{label:"capacity paid for",pts:[[0,0.8],[1,0.8]],hi:true},{label:"actual load",pts:[[0,0.1],[0.15,0.14],[0.3,0.25],[0.45,0.12],[0.6,0.3],[0.75,0.15],[1,0.12]]}],{xlab:"a typical day →",ylab:"one server",note:"the area between the lines is money spent on silence"});},
  vizCap:"One app per box: the flat line is what you bought, the wiggle is what you used. The gap funds the next four lessons.",
  roles:{
-  presales:{gov:"Utilisation is the number that unlocks every modernisation deal — measure it first, then let the waste make your argument.",tell:PRESALES_LENS.servers.tell,move:PRESALES_LENS.servers.move,thought:"GPU estates for AI are today’s 15%-utilised servers. Who becomes the consolidation vendor of that wave, and what is the presales play before the tooling matures?"},
+  presales:{gov:"Utilisation is the number that unlocks every modernisation deal — measure it first, then let the waste make your argument.",tell:PRESALES_LENS.servers.tell,move:PRESALES_LENS.servers.move,thought:"GPU estates for AI are today’s 15%-utilised servers. Who becomes the consolidation vendor of that wave, and what is the solution architecture play before the tooling matures?"},
   cfo:{gov:"Ask one question of any infrastructure line: what is its utilisation? Below 30%, you are funding an inefficiency someone should be fixing.",tell:CFO_LENS.servers.tell,move:CFO_LENS.servers.move,thought:"Utilisation discipline transformed hardware economics. Which other fixed assets on your balance sheet — offices, licences, data — have never had their ‘utilisation’ measured?"}}},
 containers:{
- arg:["The VM decoupled workload from hardware; the container decoupled it from the operating system. Shipping just the app and its exact dependencies made workloads <b>portable and fast</b> — seconds to start, identical everywhere, dense enough to pack dozens per host where VMs fit a handful.",
+ arg:["A VM freed the workload from the physical machine; a container frees it from the operating system too. Because containers share the host's OS instead of carrying their own, shipping just the app and its exact dependencies makes workloads <b>portable and fast</b> — seconds to start, identical everywhere, and dozens fit on a host where VMs fit a handful.",
   "Portability is quietly a commercial property: workloads that run anywhere negotiate everywhere. The container image became the unit of software logistics — the shipping container metaphor is exact, right down to what standardised boxes did to global trade."],
  viz:function(){return VIZ.bars([{label:"Physical server",v:1,hint:"apps per box"},{label:"Virtual machines",v:10},{label:"Containers",v:50,hi:true}],{fmt:function(v){return v+"×";},log:true});},
  vizCap:"Density per host (indicative). Each abstraction level packs tighter — utilisation recovered again, one layer up.",
  roles:{
-  presales:{gov:"Containers are workload logistics — sell the portability (dev-to-prod, cloud-to-cloud) as negotiating power, not as packaging.",tell:PRESALES_LENS.containers.tell,move:PRESALES_LENS.containers.move,thought:"Standard shipping containers destroyed some ports and made others. As workloads become truly portable, which vendors are the ports that lose?"},
+  presales:{gov:"Containers make workloads portable — dev to prod, cloud to cloud — and portability is bargaining power with vendors.",tell:PRESALES_LENS.containers.tell,move:PRESALES_LENS.containers.move,thought:"Standard shipping containers destroyed some ports and made others. As workloads become truly portable, which vendors are the ports that lose?"},
   cfo:{gov:"Portable workloads are leverage over every infrastructure supplier — fund the packaging discipline that keeps exit costs low.",tell:CFO_LENS.containers.tell,move:CFO_LENS.containers.move,thought:"Lock-in used to be technical; portability makes it contractual. Are your cloud agreements priced as if you could leave — and could you, actually?"}}},
 gcp:{
  arg:["A hyperscaler is a portfolio of the primitives you have now met — compute, network, storage, data, AI — industrialised and priced per use. The catalogue looks bewildering (hundreds of services); the decomposition is not: everything reduces to those primitives plus a management premium.",
@@ -4435,17 +4476,17 @@ capstone:{
    v3 · ASSESSMENT ENGINE — act gates, evidence ledger, spaced review,
    Act 0 on-ramp, creator dashboard
    =================================================================== */
-STATE.gates=STATE.gates||{};STATE.ev=STATE.ev||{};STATE.rev=STATE.rev||{};
+STATE.gates=STATE.gates||{};STATE.ev=STATE.ev||{};STATE.rev=STATE.rev||{};STATE.evt=STATE.evt||{};
 /* --- evidence hook: wrap bktUpdate --- */
 (function(){var _b=bktUpdate;bktUpdate=function(id,correct,weight){id=ALIAS[id]||id;
   STATE.ev=STATE.ev||{};STATE.rev=STATE.rev||{};
-  if(correct)STATE.ev[id]=(STATE.ev[id]||0)+1;
+  STATE.evt=STATE.evt||{};STATE.evt[id]=(STATE.evt[id]||0)+1;if(correct)STATE.ev[id]=(STATE.ev[id]||0)+1;
   STATE.rev[id]=Date.now();
   return _b(id,correct,weight);};})();
 function outcomeAchieved(id){return concepts[id]&&concepts[id].p>=UNLOCK&&(STATE.ev[id]||0)>=3;}
 function reviewDue(){var due=[],now=Date.now();
   for(var id in concepts){if(concepts[id].p>=UNLOCK&&(now-(STATE.rev[id]||0))>172800000&&typeof practiceRemaining==='function'&&practiceRemaining(id)>0)due.push(id);}
-  return due;}
+  due.sort(function(a,b){return ((LOAD_BEARING[b]?1:0)-(LOAD_BEARING[a]?1:0));});return due;}
 /* --- act gates: authored transfer cases --- */
 var GATES=[
 {id:"G1",phase:0,title:"Gate I · The Legacy Estate",
@@ -4587,7 +4628,7 @@ function openDash(){
   PHASES.forEach(function(ph,i){
     rows+='<tr class="dash-ph"><td colspan="5">'+ph.t+(i<GATES.length?(' — gate: '+(STATE.gates[GATES[i].id]?'✓ passed':'not passed')):'')+'</td></tr>';
     ph.ids.forEach(function(id){n++;var c=concepts[id];var ach=outcomeAchieved(id);
-      rows+='<tr><td>'+(n<10?'0':'')+n+'</td><td>'+c.label+'</td><td>'+Math.round(c.p*100)+'%</td><td>'+(STATE.ev[id]||0)+' correct</td><td>'+(ach?'<b style="color:var(--gold)">achieved</b>':(c.p>0.02?'in progress':'—'))+'</td></tr>';});});
+      rows+='<tr><td>'+(n<10?'0':'')+n+'</td><td>'+c.label+'</td><td>'+Math.round(c.p*100)+'%</td><td>'+(STATE.ev[id]||0)+' / '+Math.max((STATE.evt&&STATE.evt[id])||0,(STATE.ev[id]||0))+' correct</td><td>'+(ach?'<b style="color:var(--gold)">achieved</b>':(c.p>0.02?'in progress':'—'))+'</td></tr>';});});
   ov.innerHTML='<div class="modal fullpage"><button class="modal-x" id="dX">✕</button><div class="cx-kick">Creator dashboard · evidence matrix</div>'
    +'<h2>What this learner can prove</h2><p class="hiw-sub">Outcome = mastery ≥ '+(Math.round(UNLOCK*100))+'% AND ≥3 correct applications. Gates = transfer across concepts. Local only — nothing leaves this device.</p>'
    +'<div class="btnrow" style="margin:10px 0 16px"><button class="btn ghost" id="dExp">⇩ Export evidence JSON</button></div>'
@@ -4621,7 +4662,7 @@ var F1={html:simCard('The Shrinking Switch','Flagship sim · feel Moore’s law'
    {t:"Transistor · 1955",d:"The same switch, solid-state, thumbnail-sized, reliable. Computers stop being building-sized experiments.",n:100,cost:"$1 buys ~10³",bar:18,note:"payroll and ledgers cross the line"},
    {t:"Integrated circuit · 1965",d:"Dozens, then thousands of switches printed onto one sliver of silicon. The recipe becomes photographic — and scalable.",n:10000,cost:"$1 buys ~10⁵",bar:40,note:"every large company computes"},
    {t:"Microprocessor · 1975",d:"A whole computer’s logic on one chip. The machine becomes personal — and disposable.",n:1000000,cost:"$1 buys ~10⁷",bar:65,note:"desks, then pockets"},
-   {t:"Modern SoC · today",d:"Tens of billions of switches, each far smaller than a virus, switching billions of times a second.",n:2e10,cost:"$1 buys ~10⁹⁺",bar:100,note:"reading one sentence is worth a model call — the AI acts begin here"}];
+   {t:"Modern SoC · today",d:"A system-on-a-chip (SoC): tens of billions of switches, each far smaller than a virus, switching billions of times a second.",n:2e10,cost:"$1 buys ~10⁹⁺",bar:100,note:"reading one sentence is worth a model call — the AI acts begin here"}];
   var r=wrap.querySelector('#f1r'),st=wrap.querySelector('#f1stage'),seen={0:1};
   function draw(i){var e=eras[i];
    var dots=Math.min(320,Math.max(1,Math.round(Math.pow(10,i*1.5))));var ds='';
@@ -4883,13 +4924,13 @@ function contBtn(wrap,done){var c=document.createElement('div');c.className='con
 /* servers — extra T2: the utilisation sim */
 if(EPISODES.servers){var obS=EPISODES.servers.build;
  EPISODES.servers.build=function(){var b=obS();
-  b.splice(2,0,{html:'<div class="card"><div class="kicker">Simulate it · consolidation</div><h2>Sixty boxes, one slider</h2><p class="hint">The estate: 60 servers, one lightly-used app each (~12% load), ~€4k per box per year. Consolidate and watch the money move.</p><input type="range" id="svr" min="1" max="8" value="1" style="width:100%"/><div id="svout" style="margin-top:12px"></div></div>',
+  b.splice(2,0,{html:'<div class="card"><div class="kicker">Simulate it · consolidation</div><h2>Sixty boxes, one slider</h2><p class="hint">The estate: 60 servers, one lightly-used app each (~12% load), ~€4k per box per year. Consolidate and watch the money move. <b>Your goal: push utilisation past 70% — then read the money line.</b></p><input type="range" id="svr" min="1" max="8" value="1" style="width:100%"/><div id="svout" style="margin-top:12px"></div></div>',
    gate:function(wrap,done){var r=wrap.querySelector('#svr'),out=wrap.querySelector('#svout'),hi=false;
-    function draw(){var n=+r.value;var util=Math.min(85,12*n);var boxes=Math.ceil(60/n);var save=(60-boxes)*4000;
+    function draw(){var n=+r.value;var util=Math.min(85,12*n);var boxes=Math.ceil(60/n);var save=(60-boxes)*4000;if(util>=70&&!wrap.__cWon){wrap.__cWon=1;if(typeof bktUpdate==='function')bktUpdate('servers',true,'sim');}
      out.innerHTML='<div class="mn-mastery"><div class="lab"><span>apps per host</span><b>'+n+'</b></div></div>'
       +'<div class="mn-mastery"><div class="lab"><span>utilisation</span><b>'+util+'%</b></div><div class="bar"><i style="width:'+util+'%"></i></div></div>'
       +'<div class="mn-mastery" style="margin-top:8px"><div class="lab"><span>boxes needed</span><b>'+boxes+' of 60</b></div><div class="bar"><i style="width:'+(boxes/60*100)+'%"></i></div></div>'
-      +'<div style="font-size:13px;color:var(--gold);margin-top:8px">€'+save.toLocaleString()+'/year reclaimed'+(n===1?' — this is the one-app-per-box estate: 88% of the hardware money buys silence.':n>=5?' — isolation still intact (that’s the next lesson’s trick). This is the argument that funds Act I.':'')+'</div>';
+      +'<div style="font-size:13px;color:var(--gold);margin-top:8px">€'+save.toLocaleString()+'/year reclaimed'+(util>=70?'<br><b style="color:var(--green)">✓ Goal reached — '+boxes+' boxes now do the work of 60, isolation intact. That is the consolidation trade.</b>':'')+(n===1?' — this is the one-app-per-box estate: 88% of the hardware money buys silence.':n>=5?' — isolation still intact (that’s the next lesson’s trick). This is the argument that funds Act I.':'')+'</div>';
      if(n>=5&&!hi){hi=true;bktUpdate('servers',true);mentor("You just made the consolidation case a CFO can hear — utilisation × isolation, in euros.");contBtn(wrap,done);}}
     r.oninput=draw;draw();}});
   return b;};}
@@ -5065,6 +5106,108 @@ if(typeof loadEpisode==='function'&&typeof ACTIVE!=='undefined'&&EPISODES[ACTIVE
   document.addEventListener('keydown',function(e){if(e.key==='Escape')panel.classList.remove('open');});
   badge();
 })();
+
+
+/* ===== v3.3 · containers depth beat + modern-stack checkpoint (P11/P12/P13) ===== */
+(function(){
+ if(!window.EPISODES||!EPISODES.containers)return;
+ var _cb=EPISODES.containers.build;
+ EPISODES.containers.build=function(){
+  var b=_cb();
+  var stack='<div class="cstk-wrap">'
+   +'<div><div class="cstk">'
+   +'<div class="lay hw" style="animation-delay:.05s">Hardware</div>'
+   +'<div class="lay os" style="animation-delay:.2s">Hypervisor</div>'
+   +'<div class="lay thin" style="animation-delay:.35s">Guest OS + App</div>'
+   +'<div class="lay thin" style="animation-delay:.5s">Guest OS + App</div>'
+   +'<div class="lay thin" style="animation-delay:.65s">Guest OS + App</div>'
+   +'</div><div class="cstk-cap">VMs — every box carries a whole OS</div></div>'
+   +'<div><div class="cstk">'
+   +'<div class="lay hw" style="animation-delay:.05s">Hardware</div>'
+   +'<div class="lay os" style="animation-delay:.2s">Host OS · one shared kernel</div>'
+   +'<div class="lay os" style="animation-delay:.35s">Container runtime</div>'
+   +'<div class="lay app" style="animation-delay:.5s">App</div>'
+   +'<div class="lay app" style="animation-delay:.6s">App</div>'
+   +'<div class="lay app" style="animation-delay:.7s">App</div>'
+   +'</div><div class="cstk-cap">Containers — apps share the kernel</div></div></div>';
+  b.splice(2,0,{html:'<div class="kicker">Under the hood</div><h2>Why a container is light — and what you trade</h2>'+stack
+   +'<p>A VM carries a whole operating system, so starting one means booting a computer. A container carries only your app and its dependencies — it borrows the host\u2019s already-running kernel. Nothing to boot is why it starts in seconds; one shared kernel is why dozens fit where a handful of VMs would.</p>'
+   +'<p>The price: containers on one host share that kernel, so the wall between them is thinner than a hypervisor\u2019s. That is the virtualization trade-off returning — the more you share, the more you save, and the more you must trust the isolation layer.</p>'
+   +'<p><strong>Serverless</strong> doesn\u2019t remove the container — it removes the <em>managing</em> of it. Your code still runs in one; the provider creates it, scales it, destroys it, and bills only the seconds it lived.</p>'
+   +'<p class="whisper">Hold onto this density-vs-isolation axis — Kubernetes, cloud pricing and deployment topology all turn on it.</p>'},
+  {html:'<div class="card"><div class="kicker">Checkpoint · the modern stack</div><h3>Place five workloads</h3><div class="hint">Your goal: route each workload to the right home. 4 of 5 earns the checkpoint. This is the judgement the rest of the course stands on.</div><div id="ckhost"></div><div id="cksum" class="binmsg"></div></div>',
+   gate:function(wrap,done){
+    var ROWS=[
+     {q:"A latency-critical trading app that must own the whole machine.",a:"bare",exp:"Zero-overhead needs are the legitimate bare-metal exception."},
+     {q:"A legacy app that needs its own full OS, strongly isolated from neighbours.",a:"vm",exp:"Own OS + hard isolation wall = a virtual machine."},
+     {q:"A microservice you redeploy twenty times a day, identical in dev and prod.",a:"ct",exp:"Ship-anywhere, start-in-seconds is container territory."},
+     {q:"Code that runs a few seconds when a file arrives, then goes quiet.",a:"sv",exp:"Spiky, event-driven, seconds-long: serverless — pay only while it runs."},
+     {q:"A steady, compliance-sensitive database that must not share an OS.",a:"vm",exp:"Compliance isolation wants its own OS — a VM (containers share the kernel)."}];
+    var OPTS=[["bare","Bare metal"],["vm","VM"],["ct","Container"],["sv","Serverless"]];
+    var host=wrap.querySelector('#ckhost'),sum=wrap.querySelector('#cksum'),score=0,doneN=0;
+    ROWS.forEach(function(row,ri){
+     var d=document.createElement('div');d.className='ckrow';
+     d.innerHTML='<div class="ckq">'+(ri+1)+'. '+row.q+'</div><div class="ckbtns">'+OPTS.map(function(o){return '<button class="rulebtn" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div><div class="ckexp"></div>';
+     host.appendChild(d);
+     d.querySelectorAll('.rulebtn').forEach(function(btn){btn.onclick=function(){
+      if(d.classList.contains('done'))return;d.classList.add('done');
+      var right=btn.dataset.v===row.a;if(right)score++;doneN++;
+      d.classList.add(right?'ok':'no');btn.classList.add('on');
+      d.querySelector('.ckexp').innerHTML=(right?'✓ ':'✗ ')+row.exp;
+      if(doneN===ROWS.length){
+        var pass=score>=4;
+        sum.className='binmsg '+(pass?'ok':'');
+        sum.innerHTML=pass?('<b>'+score+'/5 — checkpoint earned.</b> You hold the bare-metal → VM → container → serverless axis. Everything ahead stands on it.')
+          :('<b>'+score+'/5.</b> Worth a second pass — re-read the stack diagram above; the axis is isolation vs density. You can re-take this from Practice.');
+        if(typeof bktUpdate==='function')bktUpdate('containers',pass,pass?undefined:'weak');
+        if(typeof inlineContinue==='function')inlineContinue(wrap);
+      }};});
+    });
+   }});
+  return b;};
+})();
+/* ===== v3.3 · glossary additions + collision scoping + simply-chip handler (P4/P10) ===== */
+window.GLOSS_SCOPE={label:'ml_,llm_,ai_,genai,multimodal,embeddings,rag,funccall,mcp,aisec,agents,agentops,adoption,capstone',
+ trace:'agent,llm_eval,aisec,agentops',escalation:'agent,aisec,sre,adoption',
+ pipeline:'data,dataplat,ml_,rag,agent,capstone,llm_',transaction:'storage,data,dataplat,finops,ml_eval'};
+if(window.GLOSS)Object.assign(window.GLOSS,{
+ soc:"a system-on-a-chip — CPU, memory and helpers manufactured together on one sliver of silicon.",
+ packet:"a small chunk of a message, labelled with its destination address and sent independently across the network.",
+ dns:"the internet\u2019s phone book — turns a name like google.com into a machine address.",
+ "ip address":"a machine\u2019s numeric address on a network — how packets find it.",
+ http:"the request/response protocol of the web — how clients ask servers for things.",
+ llm:"a large language model — AI trained on huge amounts of text to predict the next token, which lets it write, summarise and reason.",
+ pii:"personally identifiable information — data that can identify a person (names, emails, account numbers). Regulated; access must be provable.",
+ sla:"a service-level agreement — the contractual promise of reliability made to a customer (the SLO is the internal target behind it).",
+ iaas:"Infrastructure-as-a-Service — rent raw machines and manage everything above them.",
+ paas:"Platform-as-a-Service — rent a managed platform; bring only your code and data.",
+ saas:"Software-as-a-Service — rent finished software by subscription; the provider runs everything.",
+ vm:"a virtual machine — a full computer that exists in software; many share one physical host.",
+ docker:"the tool that made containers the standard way to package and ship software.",
+ etl:"extract-transform-load — the pipeline pattern that copies data out of systems, cleans it, and delivers it where analysis happens.",
+ elt:"extract-load-transform — modern pipelines that load raw data first and transform inside the warehouse.",
+ oltp:"online transaction processing — databases tuned for many small, fast reads and writes (the checkout, not the report).",
+ rest:"a convention for how systems call each other over the web — simple, URL-based requests.",
+ json:"the plain-text format systems use to exchange structured data.",
+ rlhf:"reinforcement learning from human feedback — the training stage that shapes a model toward helpful, safe answers.",
+ peft:"parameter-efficient fine-tuning — updating a small fraction of a model\u2019s weights to change behaviour cheaply.",
+ lora:"a popular efficient fine-tuning technique — small add-on weights that steer a model without retraining all of it.",
+ vpc:"a virtual private cloud — your own isolated network inside a provider\u2019s cloud, where private endpoints live.",
+ gan:"a generative adversarial network — an earlier image-generation approach where two networks compete.",
+ asr:"automatic speech recognition — turning audio into text; a commodity capability you buy, not build.",
+ xor:"a pattern where the answer flips when either input flips — the classic shape no single straight line can separate.",
+ gke:"Google Kubernetes Engine — Google Cloud\u2019s managed Kubernetes service.",
+ bigquery:"Google Cloud\u2019s serverless data warehouse — built for scan-heavy analytics.",
+ tco:"total cost of ownership — the build cost plus everything it costs to run, forever.",
+ kpi:"key performance indicator — the number a business watches to judge success.",
+ roi:"return on investment — value delivered relative to what it cost.",
+ ocr:"optical character recognition — reading text off images and scans.",
+ crm:"customer relationship management software — where sales and customer data live.",
+ swe:"SWE-bench — a benchmark measuring how well a model completes real software-engineering tasks.",
+ k8s:"shorthand for Kubernetes — the container orchestrator."});
+document.addEventListener('click',function(e){var b=e.target&&e.target.closest&&e.target.closest('.bf-simple');if(!b)return;
+ var k=b.dataset.k,n=(typeof AADI_NOTES!=='undefined'&&AADI_NOTES[k]&&AADI_NOTES[k].eli5)||null;
+ if(typeof mentor==='function')mentor('<b>Simply:</b> '+(n||'The one-line version: '+((typeof OUTCOMES!=='undefined'&&OUTCOMES[k])||'this concept in plain words — ask me below.')));});
 
 </script>
 </body>
