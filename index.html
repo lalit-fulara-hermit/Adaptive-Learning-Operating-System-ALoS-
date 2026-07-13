@@ -583,11 +583,13 @@ textarea,.opt{background:#fff}
 .v33m{flex:1;min-width:0}
 .v33t{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px}
 .v33stack{display:flex;flex-direction:column-reverse;gap:4px}
-.v33lay{border:1px solid var(--line);border-radius:7px;padding:5px 8px;font-size:11.5px;text-align:center;background:#F8FAFC;flex:none}
-.v33lay.hw{background:#E2E8F0;font-weight:600}
-.v33lay.os{background:rgba(37,99,235,.10)}
-.v33lay.vmb{background:rgba(37,99,235,.07)}
-.v33lay.app{background:rgba(139,92,246,.12)}
+.v33lay{border:1px solid var(--line);border-radius:7px;padding:5px 8px;font-size:11.5px;text-align:center;background:#F8FAFC;flex:none;display:block;height:auto}
+.v33lay.v33hw{background:#E2E8F0;font-weight:600}
+.v33lay.v33os{background:rgba(37,99,235,.10)}
+.v33lay.v33vmb{background:rgba(37,99,235,.07)}
+.v33chips{display:flex;flex-wrap:wrap;gap:4px;padding:6px;border:1px dashed rgba(139,92,246,.35);border-radius:7px;min-height:18px}
+.v33chips:empty::after{content:'apps land here';font-size:10px;color:var(--ink-faint)}
+.v33chip{background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.28);border-radius:6px;padding:2px 8px;font-size:10.5px;flex:none}
 .v33bar{height:6px;background:#EDF2F7;border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-top:8px}
 .v33bar i{display:block;height:100%;width:3%;background:linear-gradient(90deg,#2563EB,#8B5CF6);transition:width .3s}
 .v33n{font-size:11px;color:var(--ink-soft);margin-top:4px}
@@ -5155,37 +5157,40 @@ if(typeof loadEpisode==='function'&&typeof ACTIVE!=='undefined'&&EPISODES[ACTIVE
  EPISODES.containers.build=function(){
   var b=_cb();
   b.splice(2,0,
-  {html:'<div class="kicker">Under the hood · interact</div><h2>Why a container is light — and what you trade</h2>'
-   +'<div class="card"><div class="hint"><b>Your goal:</b> two identical 16 GB machines — A runs apps in VMs, B in containers. Add the same app to both until one runs out of memory. Then read why.</div>'
+  {html:'<div class="kicker">Under the hood · run the experiment</div><h2>Why a container is light — and what you trade</h2>'
+   +'<p>Virtualization taught you isolation: every VM carries its own operating system. A container isolates too — <em>without</em> carrying one. What does that buy? Run it and see.</p>'
+   +'<div class="card"><div class="hint"><b>Your goal:</b> keep adding the same app to both 16 GB machines until one is full.</div>'
    +'<div class="v33race">'
-   +'<div class="v33m"><div class="v33t">Machine A · VMs</div><div class="v33stack" id="vmStack"><div class="v33lay hw">Hardware · 16 GB</div><div class="v33lay os">Hypervisor · 0.5 GB</div></div><div class="v33bar"><i id="vmBar"></i></div><div class="v33n" id="vmN"></div></div>'
-   +'<div class="v33m"><div class="v33t">Machine B · containers</div><div class="v33stack" id="ctStack"><div class="v33lay hw">Hardware · 16 GB</div><div class="v33lay os">Host OS · one shared kernel · 1 GB</div></div><div class="v33bar"><i id="ctBar"></i></div><div class="v33n" id="ctN"></div></div>'
+   +'<div class="v33m"><div class="v33t">Machine A · VMs</div><div class="v33stack" id="vmStack"><div class="v33lay v33hw">Hardware · 16 GB</div><div class="v33lay v33os">Hypervisor · 0.5 GB</div></div><div class="v33bar"><i id="vmBar"></i></div><div class="v33n" id="vmN"></div></div>'
+   +'<div class="v33m"><div class="v33t">Machine B · containers</div><div class="v33stack" id="ctStack"><div class="v33lay v33hw">Hardware · 16 GB</div><div class="v33lay v33os">Host OS · one shared kernel · 1 GB</div><div class="v33chips" id="ctApps"></div></div><div class="v33bar"><i id="ctBar"></i></div><div class="v33n" id="ctN"></div></div>'
    +'</div>'
    +'<div class="btnrow" style="margin-top:12px"><button class="btn" id="addApp">+ Add the same app to both</button></div>'
    +'<div class="binmsg" id="raceOut"></div></div>'
+   +'<p><strong>Serverless</strong> is one step further on the same axis: the container is still there — the provider runs it for you, per event, and bills only the seconds it lived.</p>'
    +'<p class="whisper">Hold onto this density-vs-isolation axis — Kubernetes, cloud pricing and deployment topology all turn on it.</p>',
    gate:function(wrap,done){
     var vm=0,ct=0;
-    var vmS=wrap.querySelector('#vmStack'),ctS=wrap.querySelector('#ctStack'),btn=wrap.querySelector('#addApp'),outp=wrap.querySelector('#raceOut');
+    var vmS=wrap.querySelector('#vmStack'),ctA=wrap.querySelector('#ctApps'),btn=wrap.querySelector('#addApp'),outp=wrap.querySelector('#raceOut');
+    function apps(n){return n===1?'1 app':n+' apps';}
     function used(){return {vm:0.5+vm*4, ct:1+ct*0.5};}
     function upd(){var u=used();
      wrap.querySelector('#vmBar').style.width=Math.min(100,u.vm/16*100)+'%';
      wrap.querySelector('#ctBar').style.width=Math.min(100,u.ct/16*100)+'%';
-     wrap.querySelector('#vmN').textContent=vm+' apps · '+u.vm.toFixed(1)+' GB used'+(u.vm+4>16?' — FULL':'');
-     wrap.querySelector('#ctN').textContent=ct+' apps · '+u.ct.toFixed(1)+' GB used';}
+     wrap.querySelector('#vmN').textContent=apps(vm)+' · '+u.vm.toFixed(1)+' GB used'+(u.vm+4>16?' — FULL':'');
+     wrap.querySelector('#ctN').textContent=apps(ct)+' · '+u.ct.toFixed(1)+' GB used';}
     btn.onclick=function(){
      var u=used();
-     if(u.vm+4<=16){vm++;var d=document.createElement('div');d.className='v33lay vmb';d.textContent='Guest OS 3.5 GB + App 0.5 GB';vmS.appendChild(d);}
-     ct++;var c=document.createElement('div');c.className='v33lay app';c.textContent='App · 0.5 GB';ctS.appendChild(c);
+     if(u.vm+4<=16){vm++;var d=document.createElement('div');d.className='v33lay v33vmb';d.textContent='Guest OS 3.5 GB + App 0.5 GB';vmS.appendChild(d);}
+     ct++;var c=document.createElement('span');c.className='v33chip';c.textContent='App';ctA.appendChild(c);
      upd();
      var u2=used();
      if(u2.vm+4>16&&!wrap.__v33won){wrap.__v33won=1;
       outp.className='binmsg ok';
-      outp.innerHTML='<b>✓ Machine A is full at '+vm+' apps — Machine B holds the same apps in '+u2.ct.toFixed(1)+' GB, with room for ~'+Math.floor((16-u2.ct)/0.5)+' more.</b><br>The weight was never your app — it was the <b>guest OS copy</b> each VM carries. Containers share the machine\u2019s one running <b>kernel</b> — the core of the OS that talks to the hardware: nothing to boot (seconds, not minutes) and nothing duplicated (dozens fit where a handful did). The trade: the wall between containers is thinner than a hypervisor\u2019s — the virtualization lesson\u2019s isolation story, revisited. And <b>serverless</b>? The container is still there — the provider just runs it for you, per event, billed by the second.';
-      btn.textContent='+ Keep adding to Machine B';
+      outp.innerHTML='<b>✓ Machine A is full at '+apps(vm)+'. Machine B holds the same in '+u2.ct.toFixed(1)+' GB — room for ~'+Math.floor((16-u2.ct)/0.5)+' more.</b><br>The weight was never your app — it was the <b>guest OS copy</b> inside every VM. Containers share the machine\u2019s one running <b>kernel</b> — the core of the OS that talks to the hardware — so there is nothing to boot and nothing duplicated. The trade: the wall between containers is thinner than a hypervisor\u2019s.';
+      btn.textContent='+ Keep filling Machine B';
       if(typeof bktUpdate==='function')bktUpdate('containers',true,'sim');
      }
-     if(ct>=24){btn.disabled=true;btn.textContent='Machine B: still '+(16-used().ct).toFixed(1)+' GB free';}
+     if(ct>=30){btn.disabled=true;btn.textContent='Machine B still has '+(16-used().ct).toFixed(1)+' GB free';}
     };
     upd();
     if(typeof inlineContinue==='function')inlineContinue(wrap);
@@ -5213,7 +5218,7 @@ if(typeof loadEpisode==='function'&&typeof ACTIVE!=='undefined'&&EPISODES[ACTIVE
         var pass=score>=4;
         sum.className='binmsg '+(pass?'ok':'');
         sum.innerHTML=pass?('<b>'+score+'/5 — checkpoint earned.</b> You hold the bare-metal → VM → container → serverless axis. Everything ahead stands on it.')
-          :('<b>'+score+'/5.</b> Worth a second pass — replay the density race above; the axis is isolation vs density. You can re-take this from Practice.');
+          :('<b>'+score+'/5.</b> Worth a second pass — replay the experiment above; the axis is isolation vs density. You can re-take this from Practice.');
         if(typeof bktUpdate==='function')bktUpdate('containers',pass,pass?undefined:'weak');
         if(typeof inlineContinue==='function')inlineContinue(wrap);
       }};});
