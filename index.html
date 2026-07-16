@@ -643,6 +643,20 @@ textarea,.opt{background:#fff}
 .v34det{margin-top:10px;font-size:13px;color:var(--ink);min-height:20px}
 @media(max-width:640px){.v34lad,.v34blocks,.v34k8s{flex-direction:column}.v34code{flex:none}}
 </style>
+<style id="alos-v341">
+/* v3.4.1 — predict-first UI (P16) */
+.v341opts{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.v341fb{font-size:12.5px;margin:6px 0 2px;min-height:16px;color:var(--ink-soft)}
+.v341fb.ok{color:#065F46}.v341fb.no{color:#991B1B}
+.v341lock{opacity:.45;pointer-events:none}
+.v34r.pick{cursor:pointer;user-select:none}
+.v34r.on{outline:2px solid var(--gold);outline-offset:1px}
+.v34r .mk{float:right;font-weight:800}
+.v341rev{margin-top:6px;width:100%;font-size:11.5px;padding:5px 0;border-radius:8px;border:1.5px solid var(--line);background:var(--panel2);cursor:pointer;font-weight:700;color:var(--ink)}
+.v341rev:hover{border-color:var(--gold-soft)}
+.v34col.good{border-color:var(--teal)}.v34col.bad{border-color:#FCA5A5}
+.jb-gap{background:var(--panel2)!important;color:var(--ink-soft)!important}
+</style>
 </head>
 <body>
 <div class="app">
@@ -826,9 +840,9 @@ function renderGraph(){var host=document.getElementById('maplist');
     host.innerHTML=h;
     host.querySelectorAll('.mrow').forEach(function(n){n.onclick=function(){onNodeClick(n.dataset.k);};});}
   var jb=document.getElementById('journeybox');if(jb){var tot=0,dn=0,k;for(k in concepts){tot++;if(concepts[k].p>=UNLOCK)dn++;}var here=concepts[ACTIVE]?concepts[ACTIVE].label:'';
-    var nextId=null;for(var j=0;j<PLAYABLE.length;j++){if(concepts[PLAYABLE[j]].p<UNLOCK){nextId=PLAYABLE[j];break;}}
-    jb.innerHTML='<div class="jb-h">Your journey</div><div class="jb-bar"><i style="width:'+Math.round(dn/tot*100)+'%"></i></div><div class="jb-t">'+dn+' / '+tot+' concepts mastered</div><div class="jb-now">Now: <b>'+here+'</b></div>'+(nextId&&nextId!==ACTIVE?'<button class="jb-next" data-k="'+nextId+'">Next up: '+concepts[nextId].label+' →</button>':'');
-    var nb=jb.querySelector('.jb-next');if(nb)nb.onclick=function(){loadEpisode(nb.dataset.k);};}
+    var nextId=null,gapId=null,ci=PLAYABLE.indexOf(ACTIVE);for(var j=(ci<0?0:ci+1);j<PLAYABLE.length;j++){if(concepts[PLAYABLE[j]].p<UNLOCK){nextId=PLAYABLE[j];break;}}for(var j2=0;j2<(ci<0?0:ci);j2++){if(concepts[PLAYABLE[j2]].p<UNLOCK){gapId=PLAYABLE[j2];break;}}
+    jb.innerHTML='<div class="jb-h">Your journey</div><div class="jb-bar"><i style="width:'+Math.round(dn/tot*100)+'%"></i></div><div class="jb-t">'+dn+' / '+tot+' concepts mastered</div><div class="jb-now">Now: <b>'+here+'</b></div>'+(nextId&&nextId!==ACTIVE?'<button class="jb-next" data-k="'+nextId+'">Next up: '+concepts[nextId].label+' →</button>':'')+(gapId?'<button class="jb-next jb-gap" data-k="'+gapId+'">↻ Gap: '+concepts[gapId].label+'</button>':'');
+    var nbs=jb.querySelectorAll('.jb-next[data-k]');for(var nbi=0;nbi<nbs.length;nbi++)(function(el){el.onclick=function(){loadEpisode(el.dataset.k);};})(nbs[nbi]);}
 }
 function onNodeClick(id){if(PLAYABLE.indexOf(id)>=0){if(id!==ACTIVE)loadEpisode(id);}}
 
@@ -859,7 +873,7 @@ function autoGlossary(scope){
     if(!keys.length)return;
     function esc(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
     var skipTags={BUTTON:1,CODE:1,H1:1,H2:1,INPUT:1,TEXTAREA:1,STYLE:1,SCRIPT:1};
-    var skipCls=['term','rulebtn','rulebtns','opt','lskick','kicker','binmsg','continue','tierflag','mn','ms','jump','who'];
+    var skipCls=['term','rulebtn','rulebtns','opt','lskick','kicker','continue','tierflag','mn','ms','jump','who'];/*v341: binmsg unskipped*/
     function ok(node){var p=node.parentNode;while(p&&p!==scope){if(skipTags[p.nodeName])return false;var cl=p.classList;if(cl){for(var i=0;i<skipCls.length;i++)if(cl.contains(skipCls[i]))return false;}p=p.parentNode;}return true;}
     var walker=document.createTreeWalker(scope,NodeFilter.SHOW_TEXT,null,false);
     var textNodes=[],nd;while(nd=walker.nextNode()){if(nd.nodeValue&&nd.nodeValue.trim()&&ok(nd))textNodes.push(nd);}
@@ -5318,11 +5332,91 @@ document.addEventListener('click',function(e){var b=e.target&&e.target.closest&&
  if(typeof mentor==='function')mentor('<b>Simply:</b> '+(n||'The one-line version: '+((typeof OUTCOMES!=='undefined'&&OUTCOMES[k])||'this concept in plain words — ask me below.')));});
 
 
-/* ===== v3.4 · Wave 1 visual interactives — Visual Audit items 2,5,6,7 (P9/P12) ===== */
+/* ===== v3.4.1 · glossary fixes (audit 1–3) + P14 + P16 predict-first + P19/P20 dataplat ===== */
 (function(){
  if(!window.EPISODES)return;
- function v34credit(c){if(typeof bktUpdate==='function')bktUpdate(c,true,'sim');}
- function v34cont(w){if(typeof inlineContinue==='function')inlineContinue(w);}
+
+ /* ---- 1 · glossary: ~20 missing entries (audit F3, plain register) ---- */
+ if(window.GLOSS)Object.assign(window.GLOSS,{
+  ai:"artificial intelligence \u2014 software that performs tasks that normally need human judgement, such as reading, classifying or answering questions.",
+  ml:"machine learning \u2014 software that learns patterns from examples instead of following hand-written rules. The main way AI is built today.",
+  sql:"Structured Query Language \u2014 the standard language for asking questions of a relational database. Databases that use it are called \u2018SQL databases\u2019.",
+  gcp:"Google Cloud Platform \u2014 Google\u2019s cloud: computing, storage and AI services rented per use.",
+  sre:"Site Reliability Engineering \u2014 running systems to a measured reliability target instead of \u2018as reliable as possible\u2019.",
+  ip:"Internet Protocol \u2014 the addressing rules of the internet. An IP address is a machine\u2019s numeric address.",
+  pdf:"a fixed-layout document file \u2014 the common carrier of contracts, invoices and scans that AI systems are asked to read.",
+  url:"a web address \u2014 the string that names one resource on the internet.",
+  db:"short for database \u2014 an organised, queryable store of records.",
+  gpu:"graphics processing unit \u2014 a chip that does many small calculations in parallel; the workhorse for training and running models.",
+  endpoint:"the specific address where a service accepts requests \u2014 the socket you call.",
+  schema:"the agreed structure of data \u2014 which fields exist, their types, and what they mean.",
+  runtime:"the software layer a program needs around it while it runs \u2014 language engine, libraries, settings.",
+  orchestrator:"the system that manages many containers as one: placement, restarts, scaling. Kubernetes is the standard one.",
+  firewall:"a network gate that allows or blocks traffic by rule \u2014 the classic \u2018wall\u2019 of perimeter security.",
+  tp:"true positive \u2014 a case the model flagged and got right.",
+  fp:"false positive \u2014 a case the model flagged wrongly (a false alarm).",
+  fn:"false negative \u2014 a case the model missed when it should have flagged it.",
+  tn:"true negative \u2014 a case the model correctly left alone.",
+  auc:"area under the curve \u2014 a 0-to-1 score of how well a model separates positives from negatives across all thresholds.",
+  cogs:"cost of goods sold \u2014 what it costs to serve one unit of the product; in AI products, inference is often the biggest part.",
+  ciso:"chief information security officer \u2014 the executive accountable for security.",
+  ci:"continuous integration \u2014 automatically building and testing every code change."});
+
+ /* ---- 2 · gloss the never-glossed surfaces (audit F2) ---- */
+ function v341g(el){if(el&&typeof autoGlossary==='function')try{autoGlossary(el);}catch(e){}}
+ if(typeof loadEpisode==='function'){var _le=loadEpisode;loadEpisode=function(k){_le(k);v341g(document.getElementById('epoutcome'));};}
+ if(typeof mentor==='function'){var _me=mentor;mentor=function(t){_me(t);var st=document.getElementById('saystack');if(st&&st.lastElementChild)v341g(st.lastElementChild);};}
+ if(typeof openDash==='function'){var _od=openDash;openDash=function(){_od();v341g(document.getElementById('dashOv'));};}
+ if(typeof openGate==='function'){var _og=openGate;openGate=function(gi){_og(gi);v341g(document.getElementById('gateOv'));};}
+ document.addEventListener('click',function(e){
+  var gv=e.target&&e.target.closest&&e.target.closest('#gateOv');
+  if(gv){setTimeout(function(){v341g(gv);},150);return;}
+  var host=e.target&&e.target.closest&&(e.target.closest('.q')||e.target.closest('.card'));
+  if(host&&e.target.closest('.rulebtn,.opt,button'))setTimeout(function(){v341g(host);},150);
+ });
+ v341g(document.getElementById('epoutcome'));
+ (function(){var st=document.getElementById('saystack');if(st)for(var i=0;i<st.children.length;i++)v341g(st.children[i]);})();
+
+ /* ---- 3 · P14: VIZ.curves with label anti-collision · bars with 2-line labels ---- */
+ if(window.VIZ){(function(){
+  var W=640,PAD=46;
+  function esc(x){return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+  function frame(h,inner){return '<svg viewBox="0 0 '+W+' '+h+'" class="bfsvg" xmlns="http://www.w3.org/2000/svg">'+inner+'</svg>';}
+  function txt(x,y,t,cls,anchor){return '<text x="'+x+'" y="'+y+'" class="'+(cls||'bft')+'"'+(anchor?' text-anchor="'+anchor+'"':'')+'>'+esc(t)+'</text>';}
+  VIZ.curves=function(series,opts){
+   var h=280;function X(v){return PAD+v*(W-PAD-30);}function Y(v){return (h-40)-v*(h-70);}
+   var s='<line x1="'+PAD+'" y1="'+(h-40)+'" x2="'+(W-20)+'" y2="'+(h-40)+'" class="bfax"/><line x1="'+PAD+'" y1="18" x2="'+PAD+'" y2="'+(h-40)+'" class="bfax"/>';
+   s+=txt(W-24,h-14,(opts&&opts.xlab)||'','bft lab','end')+txt(PAD-30,14,(opts&&opts.ylab)||'','bft lab');
+   var labs=[];
+   series.forEach(function(sr,k){
+    var d=sr.pts.map(function(p,i){return (i?'L':'M')+X(p[0]).toFixed(1)+','+Y(p[1]).toFixed(1);}).join(' ');
+    s+='<path d="'+d+'" class="bfline'+(sr.hi?' hi':'')+'" style="animation-delay:'+(k*0.25)+'s"/>';
+    var lp=sr.pts[sr.pts.length-1];labs.push({x:X(lp[0])-4,y:Y(lp[1])-8,t:sr.label});});
+   labs.sort(function(a,b){return a.y-b.y;});
+   for(var i=1;i<labs.length;i++)if(labs[i].y-labs[i-1].y<14)labs[i].y=labs[i-1].y+14;
+   labs.forEach(function(L){s+=txt(L.x,L.y,L.t,'bft pt','end');});
+   if(opts&&opts.note)s+=txt(PAD+8,30,opts.note,'bft band');
+   return frame(h,s);};
+  VIZ.bars=function(items,opts){
+   opts=opts||{};var max=Math.max.apply(null,items.map(function(d){return d.v;}));
+   var rowH=34,h=items.length*rowH+40;
+   var s='';items.forEach(function(d,i){
+    var y=24+i*rowH,bw=Math.max(3,(W-PAD-190)*(opts.log?Math.log10(1+9*d.v/max):d.v/max));
+    var valstr=(opts.fmt?opts.fmt(d.v):d.v)+(d.hint?'  '+d.hint:'');
+    var est=valstr.length*6.6,inside=(186+bw+est>W-8);
+    var lab=String(d.label);
+    if(lab.length>26){var cut=lab.lastIndexOf(' ',26);if(cut<8)cut=26;
+     s+=txt(8,y+7,lab.slice(0,cut),'bft lab');s+=txt(8,y+19,lab.slice(lab.charAt(cut)===' '?cut+1:cut),'bft lab');}
+    else s+=txt(8,y+13,lab,'bft lab');
+    s+='<rect x="180" y="'+y+'" width="'+bw+'" height="18" rx="4" class="bfbar'+(d.hi?' hi':'')+'" style="animation-delay:'+(i*0.08)+'s"/>';
+    s+=txt(inside?(174+bw):(186+bw),y+13,valstr,'bft '+(inside?(d.hi?'valdk':'valwt'):'val'),inside?'end':null);});
+   return frame(h,s);};
+ })();}
+
+ /* ---- 4 · P16: predict-first Wave 1 interactives (P9.1: no credit without a falsifiable response) ---- */
+ function v341credit(c,ok){if(typeof bktUpdate==='function')bktUpdate(c,!!ok,'sim');}
+ function v341cont(w){if(typeof inlineContinue==='function')inlineContinue(w);}
+ function v341g2(el){if(el&&typeof autoGlossary==='function')try{autoGlossary(el);}catch(e){}}
  function v34splice(ep,needle,beat,fb){
   if(!EPISODES[ep])return;
   var _b=EPISODES[ep].build;
@@ -5333,20 +5427,35 @@ document.addEventListener('click',function(e){var b=e.target&&e.target.closest&&
    b.splice(i,0,beat);
    return b;};
  }
+ function v341opts(host,opts,onPick){
+  var row=document.createElement('div');row.className='v341opts';
+  opts.forEach(function(o){var bt=document.createElement('button');bt.className='rulebtn';bt.textContent=o.t;
+   bt.onclick=function(){if(row.__done)return;row.__done=1;bt.classList.add('on');
+    for(var i=0;i<row.children.length;i++)row.children[i].disabled=true;
+    onPick(o,bt);};
+   row.appendChild(bt);});
+  host.appendChild(row);return row;
+ }
 
- /* --- 1 · virt: slice the box (audit item 2, load-bearing) --- */
+ /* --- virt: predict the count, then slice the box --- */
  v34splice('virt','Physical box, or virtualize?',{
   html:'<div class="kicker">Prove the claim \u00b7 slice the box</div><h2>One box, the work of ten</h2>'
-   +'<p>The lesson opened with a promise: a box running one app at 15% load can do the work of ten. Don\u2019t take it on faith \u2014 make it happen.</p>'
-   +'<div class="card"><div class="v34goal"><b>Your goal:</b> take this machine from one bare-metal app to ten isolated apps.</div>'
-   +'<div class="v34box"><div class="v34stack"><div class="v34lay v34hw">Hardware \u00b7 16 GB</div><div class="v34lay v34bm">Bare metal \u00b7 one app \u00b7 2.4 GB \u2014 the other 13.6 GB idles</div></div>'
+   +'<p>The lesson opened with a promise: a box running one app at 15% load can do the work of ten. Before you run it \u2014 commit to a number.</p>'
+   +'<div class="card"><div class="v34goal"><b>Your goal:</b> predict, then prove it on the machine below.</div>'
+   +'<p style="margin:4px 0"><b>The maths you know:</b> the box has 16 GB. The hypervisor takes 0.5 GB. Each VM needs 1.5 GB (its own guest OS + the app). How many isolated apps fit?</p>'
+   +'<div class="v341q"></div><div class="v341fb"></div>'
+   +'<div class="v34box v341lock"><div class="v34stack"><div class="v34lay v34hw">Hardware \u00b7 16 GB</div><div class="v34lay v34bm">Bare metal \u00b7 one app \u00b7 2.4 GB \u2014 the other 13.6 GB idles</div></div>'
    +'<div class="v34bar"><i></i></div><div class="v34meta"></div></div>'
-   +'<div class="btnrow" style="margin-top:12px"><button class="btn v34b">Slice it into VMs</button></div>'
+   +'<div class="btnrow" style="margin-top:12px"><button class="btn v34b" disabled>Slice it into VMs</button></div>'
    +'<div class="binmsg v34out"></div></div>',
   gate:function(wrap,done){
    var st=wrap.querySelector('.v34stack'),bar=wrap.querySelector('.v34bar i'),
-       meta=wrap.querySelector('.v34meta'),btn=wrap.querySelector('.v34b'),out=wrap.querySelector('.v34out');
-   var sliced=false,vms=0;
+       meta=wrap.querySelector('.v34meta'),btn=wrap.querySelector('.v34b'),out=wrap.querySelector('.v34out'),
+       fb=wrap.querySelector('.v341fb'),box=wrap.querySelector('.v34box');
+   var sliced=false,vms=0,pred=null;
+   v341opts(wrap.querySelector('.v341q'),[{t:'6',v:6},{t:'8',v:8},{t:'10',v:10},{t:'12',v:12}],function(o){
+    pred=o.v;btn.disabled=false;box.classList.remove('v341lock');
+    fb.className='v341fb';fb.textContent='You committed to '+o.v+'. Now run it \u2014 the machine settles the question.';});
    function used(){return sliced?0.5+vms*1.5:2.4;}
    function upd(){var u=used();bar.style.width=Math.min(100,u/16*100)+'%';
     meta.textContent=sliced?(vms+' isolated app'+(vms===1?'':'s')+' \u00b7 '+u.toFixed(1)+' GB \u00b7 '+Math.round(u/16*100)+'% utilised')
@@ -5359,64 +5468,86 @@ document.addEventListener('click',function(e){var b=e.target&&e.target.closest&&
     else if(vms<10){vms++;vmChip(vms);}
     upd();
     if(vms===10&&!wrap.__v34w){wrap.__v34w=1;
+     var right=(pred===10);
      out.className='binmsg ok v34out';
-     out.innerHTML='<b>\u2713 Ten isolated apps on the box that ran one \u2014 15% \u2192 '+Math.round(used()/16*100)+'% utilised.</b><br>'
-      +'Same hardware, ten tenants, each behind its own wall \u2014 the hypervisor keeps every VM believing it\u2019s alone. '
-      +'Notice the price you paid ten times over: a <b>guest OS copy</b> inside every VM. Hold that weight \u2014 the next lesson deletes it.';
+     out.innerHTML='<b>'+(right?'\u2713 You said 10 \u2014 and 10 it is':'The machine says 10 \u2014 you predicted '+pred)+' \u2014 15% \u2192 '+Math.round(used()/16*100)+'% utilised.</b><br>'
+      +'0.5 GB hypervisor + 10 \u00d7 1.5 GB = 15.5 of 16 GB. Same hardware, ten tenants, each behind its own wall. '
+      +(right?'':'Where the estimate slips is usually the hypervisor\u2019s own share \u2014 small, but it comes off the top. ')
+      +'Notice the price paid ten times: a <b>guest OS copy</b> in every VM. The next lesson deletes it.';
      btn.disabled=true;btn.textContent='Full \u2014 15.5 of 16 GB';
-     v34credit('virt');}
+     v341credit('virt',right);v341g2(out);}
    };
-   upd();v34cont(wrap);
+   upd();v341cont(wrap);
   }},2);
 
- /* --- 2 · containers: the ladder of "stop managing" (audit item 5) --- */
+ /* --- containers: predict what stops being yours, rung by rung --- */
  v34splice('containers','VM, container, or serverless?',{
   html:'<div class="kicker">The axis, drawn \u00b7 what you stop managing</div><h2>Four rungs, one trade</h2>'
-   +'<p>You just felt the density win. Here is the whole axis it sits on \u2014 each rung to the right hands one more layer to the platform.</p>'
-   +'<div class="card"><div class="v34goal"><b>Your goal:</b> click all four rungs and watch what stops being yours.</div>'
-   +'<div class="v34lad"></div><div class="v34cap">Click a rung to read the trade.</div>'
+   +'<p>You felt the density win. Here is the axis it sits on. Bare metal is done for you \u2014 for the other three rungs, <b>mark the layers you think stay yours, then reveal</b>.</p>'
+   +'<div class="card"><div class="v34goal"><b>Your goal:</b> predict at least 2 of 3 rungs exactly right.</div>'
+   +'<div class="v34lad"></div><div class="v34cap">Tap the layers you would still manage, then press Reveal.</div>'
    +'<div class="binmsg v34out"></div></div>',
   gate:function(wrap,done){
    var ROWS=['Your app','Runtime & dependencies','OS & kernel','Hardware'];
    var COLS=[
-    {n:'Bare metal',yours:[1,1,1,1],cap:'<b>Bare metal:</b> everything is yours \u2014 total control, total toil. The legitimate exception (latency, licensing), never the default.'},
-    {n:'VM',yours:[1,1,1,0],cap:'<b>VM:</b> the provider owns the hardware; you still patch and boot a full OS per machine \u2014 the 3.5 GB you kept paying above.'},
-    {n:'Container',yours:[1,1,0,0],cap:'<b>Container:</b> the platform runs the OS; you ship runtime + app as one image that starts in seconds, anywhere.'},
-    {n:'Serverless',yours:[1,0,0,0],cap:'<b>Serverless:</b> only the code is yours. No machines to manage at all \u2014 and the least control of the four.'}];
-   var lad=wrap.querySelector('.v34lad'),cap=wrap.querySelector('.v34cap'),out=wrap.querySelector('.v34out'),seen=0;
+    {n:'Bare metal',yours:[1,1,1,1],given:true,cap:'Everything is yours \u2014 full control, full workload.'},
+    {n:'VM',yours:[1,1,1,0]},
+    {n:'Container',yours:[1,1,0,0]},
+    {n:'Serverless',yours:[1,0,0,0]}];
+   var lad=wrap.querySelector('.v34lad'),cap=wrap.querySelector('.v34cap'),out=wrap.querySelector('.v34out');
+   var revealed=0,score=0;
    COLS.forEach(function(c){
     var col=document.createElement('div');col.className='v34col';
-    col.innerHTML='<div class="v34ch">'+c.n+'</div>'+ROWS.map(function(r,ri){
-     return '<div class="v34r'+(c.yours[ri]?'':' theirs')+'">'+r+'</div>';}).join('');
-    col.onclick=function(){
-     var on=lad.querySelector('.v34col.on');if(on)on.classList.remove('on');
-     col.classList.add('on');cap.innerHTML=c.cap;
-     if(!col.classList.contains('seen')){col.classList.add('seen');seen++;
-      if(seen===COLS.length&&!wrap.__v34w){wrap.__v34w=1;
-       out.className='binmsg ok v34out';
-       out.innerHTML='<b>\u2713 One axis, four rungs.</b> Every step right trades control for speed and density \u2014 hand a layer over, stop managing it, accept the platform\u2019s rules for it. That single trade decides the checkpoint below, and half the architecture calls in this course.';
-       v34credit('containers');}}
-    };
-    lad.appendChild(col);});
-   v34cont(wrap);
+    var h='<div class="v34ch">'+c.n+'</div>';
+    ROWS.forEach(function(r,ri){
+     h+='<div class="v34r'+(c.given?(c.yours[ri]?'':' theirs'):' pick')+'" data-ri="'+ri+'">'+r+'<span class="mk"></span></div>';});
+    if(!c.given)h+='<button class="v341rev">Reveal</button>';
+    col.innerHTML=h;lad.appendChild(col);
+    if(c.given){col.classList.add('good');return;}
+    var picks={0:false,1:false,2:false,3:false};
+    col.querySelectorAll('.v34r.pick').forEach(function(r){
+     r.onclick=function(){if(col.__done)return;var ri=+r.dataset.ri;picks[ri]=!picks[ri];r.classList.toggle('on',picks[ri]);};});
+    col.querySelector('.v341rev').onclick=function(){
+     if(col.__done)return;col.__done=1;this.remove();
+     var allRight=true;
+     col.querySelectorAll('.v34r').forEach(function(r){
+      var ri=+r.dataset.ri,truth=!!c.yours[ri],guess=!!picks[ri];
+      r.classList.remove('on','pick');if(!truth)r.classList.add('theirs');
+      r.querySelector('.mk').textContent=(guess===truth)?'\u2713':'\u2717';
+      if(guess!==truth)allRight=false;});
+     col.classList.add(allRight?'good':'bad');
+     if(allRight)score++;revealed++;
+     cap.textContent=c.n+': '+(allRight?'exactly right.':'compare the \u2717 rows \u2014 that is the layer the platform took.');
+     if(revealed===3&&!wrap.__v34w){wrap.__v34w=1;
+      var pass=score>=2;
+      out.className='binmsg '+(pass?'ok ':'')+'v34out';
+      out.innerHTML=(pass?'<b>\u2713 '+score+'/3 \u2014 you hold the axis.</b> ':'<b>'+score+'/3.</b> Replay the density race above, then look again. ')
+       +'Every step right hands one layer to the platform: you gain speed and density, you give up control. That single trade decides the checkpoint below.';
+      v341credit('containers',pass);v341g2(out);}
+    };});
+   v341cont(wrap);
   }},4);
 
- /* --- 3 · k8s: the reconciliation loop, playable (audit item 6) --- */
+ /* --- k8s: predict the human cost, then attack the loop --- */
  v34splice('k8s','Human ops, or orchestrator?',{
   html:'<div class="kicker">Run the loop \u00b7 try to beat it</div><h2>Kill container #217. See who restarts it.</h2>'
-   +'<p>You declared the <em>what</em>. Now attack the system and watch the loop defend it.</p>'
-   +'<div class="card"><div class="v34goal"><b>Your goal:</b> break the system faster than it heals. Kill three containers and count the humans woken up.</div>'
-   +'<div class="v34k8s">'
+   +'<p>The deployment declares <em>replicas: 3</em>. You are about to kill three containers, one after another. <b>Predict first:</b> how many humans get woken up to fix it?</p>'
+   +'<div class="card"><div class="v341q"></div><div class="v341fb"></div>'
+   +'<div class="v34k8s v341lock">'
    +'<div class="v34code">kind: Deployment\nspec:\n  <em>replicas: 3</em>   # the what\n\n# nobody wrote the how</div>'
    +'<div class="v34cluster"><div class="v34pods"></div><div class="v34loop">loop: observing\u2026 3/3 running \u00b7 no drift</div></div>'
    +'</div>'
-   +'<div class="btnrow" style="margin-top:12px"><button class="btn v34kill">\ud83d\udca5 Kill a container</button></div>'
+   +'<div class="btnrow" style="margin-top:12px"><button class="btn v34kill" disabled>\ud83d\udca5 Kill a container</button></div>'
    +'<div class="v34meta v34score">kills: 0 \u00b7 humans woken at 3am: 0</div>'
    +'<div class="binmsg v34out"></div></div>',
   gate:function(wrap,done){
    var pods=wrap.querySelector('.v34pods'),loop=wrap.querySelector('.v34loop'),
-       btn=wrap.querySelector('.v34kill'),score=wrap.querySelector('.v34score'),out=wrap.querySelector('.v34out');
-   var seq=0,kills=0,healing=false;
+       btn=wrap.querySelector('.v34kill'),score=wrap.querySelector('.v34score'),out=wrap.querySelector('.v34out'),
+       fb=wrap.querySelector('.v341fb'),zone=wrap.querySelector('.v34k8s');
+   var seq=0,kills=0,healing=false,pred=null;
+   v341opts(wrap.querySelector('.v341q'),[{t:'0 humans',v:0},{t:'1 \u2014 someone approves the restarts',v:1},{t:'3 \u2014 one per failure',v:3}],function(o){
+    pred=o.v;btn.disabled=false;zone.classList.remove('v341lock');
+    fb.className='v341fb';fb.textContent='Committed: '+o.v+'. Now attack.';});
    function pod(){seq++;var d=document.createElement('div');d.className='v34pod';d.textContent='pod-'+(216+seq)+' \u00b7 running';pods.appendChild(d);return d;}
    pod();pod();pod();
    btn.onclick=function(){
@@ -5432,20 +5563,21 @@ document.addEventListener('click',function(e){var b=e.target&&e.target.closest&&
      loop.textContent='loop: 3/3 running \u00b7 desired state restored \u2014 no human involved';
      healing=false;
      if(kills>=3&&!wrap.__v34w){wrap.__v34w=1;
+      var right=(pred===0);
       out.className='binmsg ok v34out';
-      out.innerHTML='<b>\u2713 You killed three. The loop replaced three. Humans woken: zero.</b><br>'
-       +'You never told the system <i>how</i> to recover \u2014 you declared <b>replicas: 3</b>, and a tireless loop closes the gap between what you asked for and what exists, every few seconds, forever. That loop \u2014 not the containers \u2014 is what Kubernetes actually sells.';
-      v34credit('k8s');}
+      out.innerHTML='<b>'+(right?'\u2713 You said zero \u2014 zero it is.':'You predicted '+pred+' \u2014 the answer is zero.')+' Three kills, three replacements, no one woken.</b><br>'
+       +'You never told the system <i>how</i> to recover. You declared <b>replicas: 3</b>, and a loop closes the gap between what you asked for and what exists \u2014 every few seconds, forever. That loop, not the containers, is what Kubernetes sells.';
+      v341credit('k8s',right);v341g2(out);}
     },900);
    };
-   v34cont(wrap);
+   v341cont(wrap);
   }},2);
 
- /* --- 4 · gcp: the block map (audit item 7) --- */
+ /* --- gcp: explore the map (uncredited), then place four client needs --- */
  v34splice('gcp','Which Google Cloud block?',{
-  html:'<div class="kicker">The map, drawn \u00b7 click every block</div><h2>One boundary, one gate, three shelves</h2>'
-   +'<p>Those bold nouns arrange into a single picture. Everything you rent lives inside it.</p>'
-   +'<div class="card"><div class="v34goal"><b>Your goal:</b> open all four blocks \u2014 each maps to a primitive you already know.</div>'
+  html:'<div class="kicker">The map, drawn \u00b7 then place the work</div><h2>One boundary, one gate, three shelves</h2>'
+   +'<p>Everything you rent lives inside this picture. Explore it first \u2014 each block maps to a primitive you already know.</p>'
+   +'<div class="card">'
    +'<div class="v34proj"><div class="v34pt">Project \u00b7 the billing + resource boundary</div>'
    +'<div class="v34iam" data-b="iam">IAM \u00b7 who can do what \u2014 every call passes this gate</div>'
    +'<div class="v34blocks">'
@@ -5454,26 +5586,57 @@ document.addEventListener('click',function(e){var b=e.target&&e.target.closest&&
    +'<div class="v34blk" data-b="ai"><div class="v34bt">AI services</div><div class="v34sub">Vertex AI \u00b7 Gemini API</div></div>'
    +'</div></div>'
    +'<div class="v34det">Click a block to place it on the map you already have.</div>'
-   +'<div class="binmsg v34out"></div></div>',
+   +'<div class="v34goal" style="margin-top:14px"><b>Now earn it \u2014 place four client needs on the right block.</b> 3 of 4 passes.</div>'
+   +'<div class="v341place"></div><div class="binmsg v34out"></div></div>',
   gate:function(wrap,done){
    var DET={
-    iam:'<b>IAM \u2014 identity is the gate.</b> Every API call is checked: <i>who</i> is asking, <i>what</i> are they allowed to do, on <i>which</i> resource. No identity, no entry \u2014 you\u2019ll formalise this in Security.',
-    compute:'<b>Compute \u2014 the ladder you just climbed, for rent.</b> Compute Engine = the VM. GKE = your container fleet, orchestrated. Cloud Run = one container, run per request. Cloud Functions = serverless \u2014 code on an event.',
-    storage:'<b>Storage \u2014 pick by the shape of the data.</b> Cloud Storage = objects (files at any scale). Cloud SQL = the transactional ledger. BigQuery = the warehouse that scans billions of rows \u2014 both get whole lessons soon.',
-    ai:'<b>AI services \u2014 intelligence as a building block.</b> Vertex AI = the workbench to train, tune and deploy models. Gemini API = a frontier model rented by the token \u2014 no ML team required.'};
-   var det=wrap.querySelector('.v34det'),out=wrap.querySelector('.v34out'),seen=0;
-   var blocks=wrap.querySelectorAll('[data-b]');
-   for(var i=0;i<blocks.length;i++)(function(el){
-    el.onclick=function(){
-     det.innerHTML=DET[el.dataset.b];
-     if(!el.classList.contains('seen')){el.classList.add('seen');seen++;
-      if(seen===4&&!wrap.__v34w){wrap.__v34w=1;
-       out.className='binmsg ok v34out';
-       out.innerHTML='<b>\u2713 That\u2019s the whole map.</b> One boundary (the project), one gate (IAM), three shelves \u2014 and every shelf is a primitive you already hold: the compute ladder, the shapes of data, intelligence by the token. Naming the right block is exactly what the next question asks.';
-       v34credit('gcp');}}
-    };})(blocks[i]);
-   v34cont(wrap);
+    iam:'<b>IAM \u2014 identity is the gate.</b> Every API call is checked: who is asking, what may they do, on which resource. You\u2019ll formalise this in Security.',
+    compute:'<b>Compute \u2014 the ladder you climbed, for rent.</b> Compute Engine = the VM. GKE = your container fleet, orchestrated. Cloud Run = one container per request. Cloud Functions = serverless.',
+    storage:'<b>Storage \u2014 pick by the shape of the data.</b> Cloud Storage = objects. Cloud SQL = the transactional ledger. BigQuery = the warehouse for big scans. Each gets a lesson soon.',
+    ai:'<b>AI services \u2014 intelligence as a building block.</b> Vertex AI = the workbench to train and deploy models. Gemini API = a frontier model rented by the token.'};
+   var det=wrap.querySelector('.v34det');
+   wrap.querySelectorAll('[data-b]').forEach(function(el){
+    el.onclick=function(){el.classList.add('seen');det.innerHTML=DET[el.dataset.b];v341g2(det);};});
+   var NEEDS=[
+    {q:'\u201cWho may delete the production database?\u201d \u2014 the client needs that controlled and provable.',a:'iam',exp:'Access control is IAM\u2019s whole job \u2014 identity first, resource second.'},
+    {q:'A legacy app needs its own full operating system, rented monthly.',a:'compute',exp:'A full OS of your own = a VM = Compute Engine, on the compute shelf.'},
+    {q:'Keep ten years of signed invoices \u2014 cheap, safe, rarely read.',a:'storage',exp:'Files at rest, any scale, lowest cost: object storage on the storage shelf.'},
+    {q:'Add \u201csummarise this contract\u201d to an internal tool by next month.',a:'ai',exp:'No ML team, one month: rent intelligence \u2014 the Gemini API on the AI shelf.'}];
+   var OPTS=[['iam','IAM'],['compute','Compute'],['storage','Storage'],['ai','AI services']];
+   var host=wrap.querySelector('.v341place'),out=wrap.querySelector('.v34out'),scoreN=0,doneN=0;
+   NEEDS.forEach(function(row,ri){
+    var d=document.createElement('div');d.className='ckrow';
+    d.innerHTML='<div class="ckq">'+(ri+1)+'. '+row.q+'</div><div class="ckbtns">'+OPTS.map(function(o){return '<button class="rulebtn" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div><div class="ckexp"></div>';
+    host.appendChild(d);
+    d.querySelectorAll('.rulebtn').forEach(function(bt){bt.onclick=function(){
+     if(d.classList.contains('done'))return;d.classList.add('done');
+     var right=bt.dataset.v===row.a;if(right)scoreN++;doneN++;
+     d.classList.add(right?'ok':'no');bt.classList.add('on');
+     d.querySelector('.ckexp').innerHTML=(right?'\u2713 ':'\u2717 ')+row.exp;
+     if(doneN===NEEDS.length&&!wrap.__v34w){wrap.__v34w=1;
+      var pass=scoreN>=3;
+      out.className='binmsg '+(pass?'ok ':'')+'v34out';
+      out.innerHTML=pass?('<b>\u2713 '+scoreN+'/4 \u2014 the map is yours.</b> One boundary, one gate, three shelves \u2014 and you just did the advisor\u2019s core move: need \u2192 block.')
+       :('<b>'+scoreN+'/4.</b> Re-walk the map above \u2014 the shelf answers \u201cwhat shape is the work?\u201d, IAM answers \u201cwho may act?\u201d.');
+      v341credit('gcp',pass);v341g2(out);}
+    };});});
+   v341cont(wrap);
   }},2);
+
+ /* ---- 5 · P19/P20: dataplat brief — reference rewrite (register + one metric + how-to-read) ---- */
+ if(window.BRIEFS&&BRIEFS.dataplat){
+  BRIEFS.dataplat.arg=[
+   "Every AI project depends on the data platform under it. Operational systems produce data as a by-product: it sits in separate systems, in different formats, owned by different teams. The platform \u2014 pipelines, a lake, a warehouse, plus quality checks and lineage \u2014 turns that by-product into one reliable input for every dashboard and model.",
+   "Without a shared platform, each AI project rebuilds part of one: its own extracts, its own cleaning, its own definitions. That costs more and produces worse data. Fund the platform once, centrally, and every later model uses it.",
+   "<b>How to read the chart:</b> three stages of one client\u2019s data estate. The bar is the share of their AI use-cases the estate can support today. Watch what the middle stage adds."];
+  BRIEFS.dataplat.viz=function(){return VIZ.bars([
+   {label:"14 source systems",v:10,hint:"of AI use-cases supported"},
+   {label:"+ pipelines + lake",v:45},
+   {label:"+ warehouse + quality checks",v:85,hi:true}],{fmt:function(v){return v+"%";}});};
+  BRIEFS.dataplat.vizCap="Most clients sit at the middle bar for about a year. Budget for that stage \u2014 it is where the value starts.";
+  if(BRIEFS.dataplat.roles&&BRIEFS.dataplat.roles.presales)
+   BRIEFS.dataplat.roles.presales.gov="Platform readiness, not model choice, decides whether an AI roadmap is real. Recommend the platform first \u2014 it removes the most common cause of failed AI projects.";
+ }
 })();
 
 </script>
