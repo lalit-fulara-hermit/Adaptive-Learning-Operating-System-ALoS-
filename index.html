@@ -662,7 +662,7 @@ textarea,.opt{background:#fff}
 <div class="app">
   <aside class="rail">
     <div class="rail-head"><div class="brand"><b>ALOS</b><span>Adaptive Learning OS</span></div>
-      <div class="rail-sub">The whole journey — computing to autonomous agents — as one continuous book. 49 concepts across 14 Acts. Hover any node to see its depth; click to explore.</div></div>
+      <div class="rail-sub">The whole journey — computing to autonomous agents — as one continuous book. 55 concepts across 15 Acts. Hover any node to see its depth; click to explore.</div></div>
     <div class="constellation" id="maplist"></div>
     <div class="rail-foot"><label class="devtoggle"><input type="checkbox" id="devchk" title="Shows the internal knowledge-tracing model: a 0\u20131 estimate of how well you know each concept, which drives your pace, unlocking, and the mastery %."/> Peek under the hood · the mastery model</label><div class="bkt-readout" id="bkt"></div></div>
   </aside>
@@ -842,9 +842,9 @@ function renderGraph(){var host=document.getElementById('maplist');
   var jb=document.getElementById('journeybox');if(jb){var tot=0,dn=0,k;for(k in concepts){tot++;if(concepts[k].p>=UNLOCK)dn++;}var here=concepts[ACTIVE]?concepts[ACTIVE].label:'';
     var nextId=null,gapId=null,ci=PLAYABLE.indexOf(ACTIVE);for(var j=(ci<0?0:ci+1);j<PLAYABLE.length;j++){if(concepts[PLAYABLE[j]].p<UNLOCK){nextId=PLAYABLE[j];break;}}for(var j2=0;j2<(ci<0?0:ci);j2++){if(concepts[PLAYABLE[j2]].p<UNLOCK){gapId=PLAYABLE[j2];break;}}
     jb.innerHTML='<div class="jb-h">Your journey</div><div class="jb-bar"><i style="width:'+Math.round(dn/tot*100)+'%"></i></div><div class="jb-t">'+dn+' / '+tot+' concepts mastered</div><div class="jb-now">Now: <b>'+here+'</b></div>'+(nextId&&nextId!==ACTIVE?'<button class="jb-next" data-k="'+nextId+'">Next up: '+concepts[nextId].label+' →</button>':'')+(gapId?'<button class="jb-next jb-gap" data-k="'+gapId+'">↻ Gap: '+concepts[gapId].label+'</button>':'');
-    var nbs=jb.querySelectorAll('.jb-next[data-k]');for(var nbi=0;nbi<nbs.length;nbi++)(function(el){el.onclick=function(){loadEpisode(el.dataset.k);};})(nbs[nbi]);}
+    var nbs=jb.querySelectorAll('.jb-next[data-k]');for(var nbi=0;nbi<nbs.length;nbi++)(function(el){el.onclick=function(){onNodeClick(el.dataset.k);};})(nbs[nbi]);/*v342: chips route through the same lock check*/}
 }
-function onNodeClick(id){if(PLAYABLE.indexOf(id)>=0){if(id!==ACTIVE)loadEpisode(id);}}
+function onNodeClick(id){if(PLAYABLE.indexOf(id)<0)return;if(!isUnlocked(id)){toast('\ud83d\udd12 '+concepts[id].label+' is locked \u2014 finish its prerequisites (or the phase gate) first.');return;}if(id!==ACTIVE)loadEpisode(id);}/*v342: P15 second-order \u2014 locking enforced at click, not just paint*/
 
 var orb=document.getElementById('orb'),octx=(orb&&orb.getContext)?orb.getContext('2d'):null,orbT=0;
 function renderOrb(){if(!octx){return;}var p=(concepts[ACTIVE]?concepts[ACTIVE].p:0),cx=150,cy=150,R=120;octx.clearRect(0,0,300,300);var n=Math.round(30+p*150);
@@ -3633,10 +3633,10 @@ function updateLearner(){var lv=levelOf(STATE.xp),nm=STATE.name||"Explorer";docu
 
 function buildOverlays(){
   var sp=document.createElement('div');sp.className='overlay';sp.id='splash';
-  sp.innerHTML='<div class="splash-card"><div class="brand" style="justify-content:center"><b>ALOS</b><span>Adaptive Learning OS</span></div><h1 class="splash-h">Learn cloud &amp; AI the way it actually evolved.</h1><p class="splash-p">One continuous, adaptive book that takes you from a bare processor to autonomous AI agents — 49 concepts across 14 Acts, built for strategy &amp; solution roles. Machine Learning and Large Language Models are full deep dives; the rest are previews you can see the depth of on the map. It adapts to what you already know, and you can hover underlined terms for their meaning.</p><input id="nameInput" class="nameInput" placeholder="Your name (optional)" autocomplete="off"/><div class="diag">How much of cloud &amp; AI do you already know?</div><div class="diagrow" id="diagrow"><button data-t="support">New to it</button><button data-t="standard" class="on">Some idea</button><button data-t="fast">Comfortable</button></div><div class="diag">Which lens do you want? (switch anytime)</div><div class="diagrow" id="lensrow"><button data-r="presales" class="on">Solution Architecture / Solution Architect</button><button data-r="cfo">CFO Office</button></div><div class="btnrow" style="justify-content:center"><button class="btn" id="startBtn">Start the Act →</button><button class="btn ghost" id="helpFromSplash">How it works</button></div></div>';
+  sp.innerHTML='<div class="splash-card"><div class="brand" style="justify-content:center"><b>ALOS</b><span>Adaptive Learning OS</span></div><h1 class="splash-h">Learn cloud &amp; AI the way it actually evolved.</h1><p class="splash-p">One continuous, adaptive book that takes you from a bare processor to autonomous AI agents — 55 concepts across 15 Acts, built for strategy &amp; solution roles. Machine Learning and Large Language Models are full deep dives; the rest are previews you can see the depth of on the map. It adapts to what you already know, and you can hover underlined terms for their meaning.</p><input id="nameInput" class="nameInput" placeholder="Your name (optional)" autocomplete="off"/><div class="diag">How much of cloud &amp; AI do you already know?</div><div class="diagrow" id="diagrow"><button data-t="support">New to it</button><button data-t="standard" class="on">Some idea</button><button data-t="fast">Comfortable</button></div><div class="diag">Which lens do you want? (switch anytime)</div><div class="diagrow" id="lensrow"><button data-r="presales" class="on">Solution Architecture / Solution Architect</button><button data-r="cfo">CFO Office</button></div><div class="btnrow" style="justify-content:center"><button class="btn" id="startBtn">Start the Act →</button><button class="btn ghost" id="helpFromSplash">How it works</button></div></div>';
   document.body.appendChild(sp);
   var hm=document.createElement('div');hm.className='overlay hidden';hm.id='helpModal';
-  hm.innerHTML='<div class="modal hiw fullpage"><button class="modal-x" id="helpClose">✕</button><h2>How ALOS works</h2><p class="hiw-sub">Every concept runs one quiet loop that adapts to you.</p><div class="hiw-loop"><div class="hiw-track"></div><div class="hiw-pulse"></div><div class="hiw-node n1"><div class="hd">📖</div><div class="hl">Read a beat</div></div><div class="hiw-node n2"><div class="hd">✔</div><div class="hl">Answer</div></div><div class="hiw-node n3"><div class="hd">◉</div><div class="hl">Mastery grows</div></div><div class="hiw-node n4"><div class="hd">🎚</div><div class="hl">Aadi adapts</div></div></div><div class="hiw-meters"><div class="hiw-m"><div class="hiw-mlab">Your mastery of this concept</div><div class="hiw-bar"><i></i></div></div><div class="hiw-m"><div class="hiw-mlab">Aadi tunes your pace</div><div class="hiw-pace"><span data-t="support">Support</span><span data-t="standard">Standard</span><span data-t="fast">Fast</span></div></div></div><div class="hiw-lines"><p><b>Read, then do.</b> Each concept is a short story with a hands-on interactive.</p><p><b>It adapts.</b> Your answers feed a real mastery model, and your pace shifts to match — automatically when you struggle.</p><p><b>The map is your journey.</b> 49 concepts across 14 Acts light up as you master them; hover any node to see its depth.</p><p><b>Everything saves.</b> Progress, XP and streak persist on this device; underlined terms define on hover.</p></div><div class="btnrow" style="margin-top:8px"><button class="btn" id="helpDone">Got it — start learning</button></div></div>';
+  hm.innerHTML='<div class="modal hiw fullpage"><button class="modal-x" id="helpClose">✕</button><h2>How ALOS works</h2><p class="hiw-sub">Every concept runs one quiet loop that adapts to you.</p><div class="hiw-loop"><div class="hiw-track"></div><div class="hiw-pulse"></div><div class="hiw-node n1"><div class="hd">📖</div><div class="hl">Read a beat</div></div><div class="hiw-node n2"><div class="hd">✔</div><div class="hl">Answer</div></div><div class="hiw-node n3"><div class="hd">◉</div><div class="hl">Mastery grows</div></div><div class="hiw-node n4"><div class="hd">🎚</div><div class="hl">Aadi adapts</div></div></div><div class="hiw-meters"><div class="hiw-m"><div class="hiw-mlab">Your mastery of this concept</div><div class="hiw-bar"><i></i></div></div><div class="hiw-m"><div class="hiw-mlab">Aadi tunes your pace</div><div class="hiw-pace"><span data-t="support">Support</span><span data-t="standard">Standard</span><span data-t="fast">Fast</span></div></div></div><div class="hiw-lines"><p><b>Read, then do.</b> Each concept is a short story with a hands-on interactive.</p><p><b>It adapts.</b> Your answers feed a real mastery model, and your pace shifts to match — automatically when you struggle.</p><p><b>The map is your journey.</b> 55 concepts across 15 Acts light up as you master them; hover any node to see its depth.</p><p><b>Everything saves.</b> Progress, XP and streak persist on this device; underlined terms define on hover.</p></div><div class="btnrow" style="margin-top:8px"><button class="btn" id="helpDone">Got it — start learning</button></div></div>';
   document.body.appendChild(hm);
   var chosen="standard";
   var chosenRole="presales";
@@ -5637,6 +5637,334 @@ document.addEventListener('click',function(e){var b=e.target&&e.target.closest&&
   if(BRIEFS.dataplat.roles&&BRIEFS.dataplat.roles.presales)
    BRIEFS.dataplat.roles.presales.gov="Platform readiness, not model choice, decides whether an AI roadmap is real. Recommend the platform first \u2014 it removes the most common cause of failed AI projects.";
  }
+})();
+
+/* ===== v3.5.0 · Act A — Governing Data (curriculum proposal §5, wave 1) =====
+ * Six lessons between Data Platforms and Security & IAM. Source: SIDF + Center tenders.
+ * Authoring standard: P9.1 (falsifiable response before credit), P17 (LO contract on briefs),
+ * P18 (assessment at LOS verb level), P19 register, P20 sequencing.
+ * security.prereq deliberately stays ["dataplat"]: v3.4 saves mid-Act-3 must not re-lock. */
+(function(){
+if(!window.EPISODES)return;
+
+/* ---- 1 · concepts, order, phases ---- */
+Object.assign(concepts,{
+  gov_catalog:{label:"Catalogue & Lineage",p:0.0,depth:"deep",prereq:["dataplat"]},
+  gov_quality:{label:"Data Quality",p:0.0,depth:"deep",prereq:["gov_catalog"]},
+  gov_mdm:{label:"Master Data",p:0.0,depth:"deep",prereq:["gov_quality"]},
+  gov_access:{label:"Classification & Access",p:0.0,depth:"deep",prereq:["gov_mdm"]},
+  gov_records:{label:"Records & Retention",p:0.0,depth:"deep",prereq:["gov_access"]},
+  gov_privacy:{label:"Privacy in the Pipeline",p:0.0,depth:"deep",prereq:["gov_records"]}
+});
+PHASES[1].t="Cloud & Data · then Governing It";
+PHASES[1].ids.push('gov_catalog','gov_quality','gov_mdm','gov_access','gov_records','gov_privacy');
+PLAYABLE.splice(PLAYABLE.indexOf('dataplat')+1,0,'gov_catalog','gov_quality','gov_mdm','gov_access','gov_records','gov_privacy');
+
+/* ---- 2 · glossary (plain register, per §6 rule) ---- */
+if(window.GLOSS)Object.assign(window.GLOSS,{
+  "data catalogue":"a searchable inventory of what data an organisation holds — which tables and files exist, what they mean, and who owns them.",
+  lineage:"the recorded path a piece of data took: which source system it came from and every transformation applied on the way to a report or model.",
+  "master data":"the core nouns of a business — customers, products, suppliers — that many systems refer to and each tends to copy differently.",
+  "golden record":"the single agreed version of a customer, product or supplier, produced by matching and merging the copies that live in separate systems.",
+  survivorship:"the rules that decide, when duplicate records merge, which field value survives into the golden record — for example, billing wins on address.",
+  "data steward":"a named business role accountable for one data domain — the person who arbitrates when merge rules or quality rules disagree.",
+  rbac:"role-based access control — permissions granted by job role. Simple at small scale; roles multiply as data categories multiply.",
+  abac:"attribute-based access control — permissions computed from attributes at request time: the user’s clearance, the data’s label, the context.",
+  "retention schedule":"the rule set stating how long each class of record must be kept and when it must be destroyed. It obliges deletion as much as keeping.",
+  "legal hold":"an instruction that suspends normal deletion for material relevant to litigation or investigation. It overrides the retention schedule.",
+  anonymisation:"removing personal identifiers so a person can never be re-identified. Irreversible — and genuinely hard to achieve.",
+  pseudonymisation:"replacing identifiers with codes while a key exists somewhere to map them back. Reversible — so the data is still personal data.",
+  "purpose limitation":"the privacy principle that data collected for one purpose may not be quietly reused for another without a new basis."
+});
+
+/* ---- 3 · outcomes ---- */
+Object.assign(OUTCOMES,{
+  gov_catalog:"trace a reported figure back to its source system — and say why an organisation that cannot do this cannot defend its own reporting.",
+  gov_quality:"write a quality requirement as a measurable rule with a threshold, an owner and a remediation path — and spot what a single score hides.",
+  gov_mdm:"explain why one customer exists five times across four systems, and how match, merge and survivorship rules — plus a human steward — produce one golden record.",
+  gov_access:"design access rules driven by data labels rather than job titles, and say why a new classification tier changes the architecture rather than sitting on top of it.",
+  gov_records:"distinguish storing a document from managing a record, and state what a retention schedule and a legal hold each oblige you to do.",
+  gov_privacy:"trace a consent flag from capture to enforcement inside a query — and say why pseudonymised data is still personal data."
+});
+
+/* ---- 4 · episodes ---- */
+Object.assign(EPISODES,{
+
+gov_catalog:{concept:"gov_catalog",node:"Catalogue & Lineage",act:"Act A · Governing Data",title:"Where Did This Number Come From?",
+  intro:"Two dashboards, one board meeting, two different revenue figures. Nobody in the room can say which is right — or why they differ. This lesson is about the capability that answers that question in minutes instead of weeks.",
+  build:function(){var b=[];var add=function(h,g){b.push({html:h,gate:g});};
+    add('<div class="kicker">The question that stops a boardroom</div><h1>Two numbers, one truth, no map</h1><p class="lead">A development fund reports its loan exposure to a regulator. The regulator asks a simple question: <strong>where did this figure come from?</strong> The honest answer is a three-week archaeology project across four systems and a chain of spreadsheets. That answer fails the audit — not because the number is wrong, but because nobody can show it is right.</p><p>Organisations that cannot trace their numbers cannot defend their reporting. That is why buyers now test for this capability by name before any AI conversation starts.</p>');
+    add('<span class="tierflag">'+({support:"Support pace",standard:"Standard pace",fast:"Fast pace"}[LEARNER.tier]||"Standard pace")+'</span>'+tierPick({
+      support:'<div class="kicker">First principles</div><h2>An inventory, and a trail</h2><p>Two tools solve this. The <span class="term" data-t="data catalogue">data catalogue</span> is the inventory: a searchable list of every dataset — what it means, where it lives, who owns it. <span class="term" data-t="lineage">Lineage</span> is the trail: for any figure, the recorded path from source system through every transformation to the report. A catalogue kept by hand goes stale the week after it is written. An automated catalogue scans systems and stays current. And there are two kinds of trail: <em>technical</em> lineage (table to table, job to job) and <em>business</em> lineage (which definition of “revenue” this figure uses). Auditors ask for the second; tools mostly give you the first.</p>',
+      standard:'<div class="kicker">First principles</div><h2>Catalogue = inventory · Lineage = graph</h2><p>The <span class="term" data-t="data catalogue">catalogue</span> answers “what do we hold, what does it mean, who owns it” — and only an automated one stays true. <span class="term" data-t="lineage">Lineage</span> is a graph: nodes are datasets, edges are transformations; tracing a reported figure is walking that graph backwards. Distinguish technical lineage (physical: table → job → table) from business lineage (semantic: which definition produced this KPI). Regulators and buyers test the business kind; most tooling ships the technical kind. The gap between the two is where audits fail.</p>',
+      fast:'<div class="kicker">First principles</div><h2>Metadata as a first-class system</h2><p>Catalogue: automated metadata harvesting with ownership and semantics; manual inventories decay to fiction. Lineage: a DAG over datasets and transformations; figure-to-source tracing is reverse reachability on that DAG. Technical vs business lineage differ in node granularity — physical tables vs governed definitions. Procurement increasingly names certified catalogue tooling as a hard requirement; an uncertified tool can disqualify a bid regardless of engineering quality.</p>'}));
+    questionBeat(add,{concept:"gov_catalog",k:"Apply · the wrong churn number",flag:"w_rebuild_first",
+      q:"The churn rate on the executive dashboard looks wrong. You own the fix. What is your first move?",
+      opts:[{k:"a",t:"Rebuild the churn calculation from scratch so you know it is right."},{k:"b",t:"<b>Walk its lineage: which sources and which transformations produced this figure.</b>"},{k:"c",t:"Ask the analyst who built the dashboard what they remember."}],
+      correct:"b",
+      right:"Right — trace before you rebuild. The trail shows whether the defect is in a source, a transformation, or the definition itself, and every later question gets the same treatment.",
+      rightSay:"Tracing first is the habit. Rebuilding first gives you a second number you also cannot defend.",
+      wrong:{a:"A rebuild gives you a second number with no more authority than the first — now the room has three. Trace the existing figure first; fix where the trail breaks.",c:"Memory is not lineage. The analyst may be gone next quarter, and the audit fails either way. The trail must be recorded, not recalled."},
+      wrongDefault:"Trace the figure through its recorded lineage first — rebuilding or asking around produces answers you still cannot defend."});
+    questionBeat(add,{concept:"gov_catalog",k:"Explain · why the audit fails",flag:"w_accuracy_enough",
+      q:"A regulator challenges a bank’s reported capital figure. The figure happens to be correct. Without lineage, what actually happens?",
+      opts:[{k:"a",t:"Nothing — the figure is correct, so the challenge closes."},{k:"b",t:"<b>The bank cannot demonstrate how the figure was produced, so the finding stands despite the number being right.</b>"},{k:"c",t:"The regulator recalculates it themselves from the raw systems."}],
+      correct:"b",
+      right:"Right — the obligation is to show your working, not just the answer. A correct number you cannot reproduce is, to an auditor, indistinguishable from a lucky one.",
+      wrong:{a:"Being right is not enough — the finding is about capability, not the number. “Correct but unexplainable” fails the same control.",c:"Regulators do not rebuild your reporting for you. They record that you could not, and price that into how much they trust everything else you file."},
+      wrongDefault:"The obligation is provenance, not just accuracy — a correct figure that cannot be traced still fails the control."});
+    lensBeat(add);
+    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>If you cannot trace it, you cannot defend it.</strong> The catalogue says what you hold and who owns it; lineage says how any figure was made. Automated beats manual because manual goes stale; business lineage beats technical because that is what auditors and buyers actually test. Every governance capability in this Act stands on these two.</p><p class="whisper">Next: knowing where data came from says nothing about whether it is any good. <a class="jump" data-k="gov_quality">Data Quality</a>.</p>',
+      function(wrap,done){chooser(wrap,'You can trace a number now. Where next?');});
+    return b;}
+},
+
+gov_quality:{concept:"gov_quality",node:"Data Quality",act:"Act A · Governing Data",title:"Quality Is a Contract, Not a Score",
+  intro:"The pipeline ran green all quarter. The numbers were wrong anyway. Quality that is not written as a measurable rule with an owner is a hope, not a control.",
+  build:function(){var b=[];var add=function(h,g){b.push({html:h,gate:g});};
+    add('<div class="kicker">Green pipelines, wrong numbers</div><h1>“High quality” is not a requirement</h1><p class="lead">Every tender says the data must be “accurate and reliable”. That sentence commits nobody to anything. A quality requirement only exists when it is <strong>measurable</strong> (a rule that can pass or fail), has a <strong>threshold</strong> (how much failure is tolerable), an <strong>owner</strong> (a person who acts), and a <strong>remediation path</strong> (what happens on breach).</p><p>Anything less is decoration. The buyer who wrote “no master data capability” in a gap analysis was really writing: nobody here owns the answer.</p>');
+    add('<span class="tierflag">'+({support:"Support pace",standard:"Standard pace",fast:"Fast pace"}[LEARNER.tier]||"Standard pace")+'</span>'+tierPick({
+      support:'<div class="kicker">First principles</div><h2>Six ways data goes bad</h2><p>Quality has dimensions, and they fail independently. <strong>Completeness</strong> — are values present? <strong>Accuracy</strong> — do they match reality? <strong>Consistency</strong> — do two systems agree? <strong>Timeliness</strong> — is it fresh enough for the decision? <strong>Validity</strong> — does it obey its format and rules? <strong>Uniqueness</strong> — is each real thing recorded once? A single combined score averages these — and an average is exactly where a failing dimension hides. A table can score 91% overall while timeliness sits at 58% and quietly ruins every daily decision built on it.</p>',
+      standard:'<div class="kicker">First principles</div><h2>Dimensions fail independently — scores average them</h2><p>Six dimensions: completeness, accuracy, consistency, timeliness, validity, uniqueness. Each needs its own rule and threshold because each fails for different reasons and is fixed by different people. A composite score is a communication device, not a control: it hides which dimension is failing and therefore who must act. The unit of quality management is the <em>rule</em> — “≥ 98% of customer records carry a verified ID; on breach, stewardship blocks the weekly load” — not the score.</p>',
+      fast:'<div class="kicker">First principles</div><h2>Rules with owners, not dashboards with averages</h2><p>Model each dimension as independent checks with explicit thresholds and a named <span class="term" data-t="data steward">steward</span> per domain; route breaches to a remediation path with teeth (block the load, quarantine the partition, page the owner). Composite indices are for executives; controls operate at rule level. The test of a quality regime is not the dashboard — it is what mechanically happens on breach, and whether anyone is obliged to act.</p>'}));
+    questionBeat(add,{concept:"gov_quality",k:"Express · which one is a requirement",flag:"w_aspiration",
+      q:"Three statements from three project documents. Which one is an enforceable quality requirement?",
+      opts:[{k:"a",t:"“Customer records must be of high quality across the platform.”"},{k:"b",t:"“The data team should correct bad records whenever they are found.”"},{k:"c",t:"<b>“≥ 98% of customer records carry a verified ID; below that, stewardship blocks the weekly load.”</b>"}],
+      correct:"c",
+      right:"Right — rule, threshold, owner, remediation. It can fail, and failing forces someone’s hand. That is what makes it a control.",
+      rightSay:"You can now read any tender’s quality section and sort real controls from decoration in one pass.",
+      wrong:{a:"“High quality” cannot pass or fail — no rule, no threshold, nobody obliged. It is the sentence every failed programme also had.",b:"“Should, whenever found” has an actor but no rule, no threshold and no trigger. Good intentions are not a remediation path."},
+      wrongDefault:"An enforceable requirement needs all four parts: measurable rule, threshold, owner, remediation path."});
+    questionBeat(add,{concept:"gov_quality",k:"Diagnose · the 91% table that fails",flag:"w_trust_composite",
+      q:"A table scores 91% on the quality dashboard, yet deliveries based on it keep failing. What is the most likely explanation?",
+      opts:[{k:"a",t:"The 9% of bad records happen to be the important ones."},{k:"b",t:"<b>The composite averages six dimensions — one of them is failing badly and the average hides it.</b>"},{k:"c",t:"The dashboard is miscalculating; 91% should be treated as trustworthy."}],
+      correct:"b",
+      right:"Right — averages hide the failing dimension. Timeliness at 58% disappears inside a 91% composite, and timeliness is exactly what daily deliveries die on.",
+      wrong:{a:"Possible, but it is the rarer failure — and a per-dimension view would surface it too. Check the dimensions before inventing a conspiracy of important records.",c:"The score is probably computed exactly as designed. The design is the problem: a single number cannot tell you which dimension is failing or who must act."},
+      wrongDefault:"Break the composite into its dimensions — one of them is failing and the average is hiding it."});
+    lensBeat(add);
+    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Quality is a contract: rule + threshold + owner + remediation.</strong> Six dimensions fail independently, so each needs its own rule; a composite score is reporting, not control. When a buyer’s gap analysis says “no quality capability”, this contract structure is what they are buying.</p><p class="whisper">Next: the hardest quality problem of all — the same customer, five times. <a class="jump" data-k="gov_mdm">Master Data</a>.</p>',
+      function(wrap,done){chooser(wrap,'You can write a quality rule now. Where next?');});
+    return b;}
+},
+
+gov_mdm:{concept:"gov_mdm",node:"Master Data",act:"Act A · Governing Data",title:"One Customer, Five Records, One Truth",
+  intro:"A fund asks a simple question: what is our total exposure to this industrial group? Four systems return four different answers — because the group exists in each of them under a different name. This is the most under-taught problem in enterprise data, and it decides tenders.",
+  build:function(){var b=[];var add=function(h,g){b.push({html:h,gate:g});};
+    add('<div class="kicker">The question four systems cannot answer</div><h1>Which of the five is the real customer?</h1><p class="lead"><span class="term" data-t="master data">Master data</span> is the set of nouns every system refers to — customers, products, suppliers. Each system created its own record for its own purpose: the CRM to sell, billing to invoice, the loan book to lend, support to log tickets. No shared key, four spellings, five records. Every report that joins on “customer” silently picks one and is wrong about the rest.</p><p>A model can write the pipeline that moves these records. It cannot decide which of the five is the real one. That decision is what this lesson teaches.</p>');
+    add('<span class="tierflag">'+({support:"Support pace",standard:"Standard pace",fast:"Fast pace"}[LEARNER.tier]||"Standard pace")+'</span>'+tierPick({
+      support:'<div class="kicker">First principles</div><h2>Match, merge, survive, arbitrate</h2><p>Producing the <span class="term" data-t="golden record">golden record</span> takes three mechanisms and one human. <strong>Matching</strong> finds records that are the same real thing: <em>deterministic</em> matching joins on an exact key (tax number); <em>probabilistic</em> matching scores similarity (name + address + phone) when no key exists. <strong>Merging</strong> combines the matched records. <strong><span class="term" data-t="survivorship">Survivorship</span></strong> decides which field wins: billing wins on address, the CRM wins on contact name, most-recent wins on phone. And when the rules disagree — they will — a <span class="term" data-t="data steward">data steward</span> arbitrates. Stewardship is a role with authority, not a tool you install.</p>',
+      standard:'<div class="kicker">First principles</div><h2>Deterministic where you can, probabilistic where you must</h2><p>Deterministic matching is cheap and exact but needs a shared key that usually does not exist across systems. Probabilistic matching scores candidate pairs and forces two thresholds: above = auto-merge, below = distinct, and a middle band that must go to human review. <span class="term" data-t="survivorship">Survivorship</span> is precedence <em>per field</em>, by source reliability — not one global “most recent wins”. The design question buyers actually probe: who arbitrates the middle band and rule conflicts? If the answer is a vendor product, the capability does not exist.</p>',
+      fast:'<div class="kicker">First principles</div><h2>The decision layer above the pipeline</h2><p>MDM = entity resolution (deterministic keys, else probabilistic scoring with dual thresholds and a review queue) + field-level survivorship precedence + stewardship with arbitration authority. Failure modes worth naming: over-merge (two real companies fused — the expensive one), under-merge (exposure understated), and precedence by recency alone (latest edit is not most reliable source). Score design and threshold placement are business decisions wearing statistical clothes — treat them as such in scoping.</p>'}));
+    questionBeat(add,{concept:"gov_mdm",k:"Explain · why five records exist",flag:"w_blame_users",
+      q:"Why does the same industrial group exist five times across the four systems?",
+      opts:[{k:"a",t:"Data entry staff kept making typing mistakes over the years."},{k:"b",t:"<b>Each system created its own record for its own purpose, and no shared key ever connected them.</b>"},{k:"c",t:"Storage is cheap, so systems keep copies deliberately for resilience."}],
+      correct:"b",
+      right:"Right — duplication is structural, not sloppy. Each system was doing its job; nothing made them agree. That is why the fix is a capability, not a cleanup weekend.",
+      rightSay:"When you explain duplication as structure rather than carelessness, the client stops blaming staff and starts funding the fix.",
+      wrong:{a:"Typos add noise, but clean typing would still produce five records — each system mints its own ID for its own purpose. The cause is structural, so a “be careful” memo fixes nothing.",c:"These are not resilience copies — they are independent, disagreeing versions with no mechanism to reconcile. Resilience copies are identical by design; these differ by design."},
+      wrongDefault:"The duplication is structural: independent systems, independent purposes, no shared key. Cleanup without a matching capability just resets the clock."});
+    questionBeat(add,{concept:"gov_mdm",k:"Apply · which address survives",flag:"w_recency_always",
+      q:"The CRM address was updated last month by a sales rep. The billing address was verified by a successful payment last week. The merge must pick one address for the golden record. Which rule is right?",
+      opts:[{k:"a",t:"Most recent update wins — last month loses to last week either way."},{k:"b",t:"<b>Field-level precedence: billing wins on address, because a completed payment verified it.</b>"},{k:"c",t:"Keep both addresses in the golden record and let each consumer choose."}],
+      correct:"b",
+      right:"Right — survivorship is per-field precedence by source reliability. A payment that cleared is evidence; a CRM edit is an assertion.",
+      wrong:{a:"Recency is a tiebreaker, not a rule. The most recent edit is often the least verified — a rep updating a field from memory beats nothing. Precedence by source reliability comes first.",c:"Keeping both is the disease with better presentation. Every consumer choosing their own version is exactly the five-records problem you were hired to end."},
+      wrongDefault:"Survivorship works per field, by source reliability — verified sources outrank recent edits, and keeping both defeats the purpose."});
+    questionBeat(add,{concept:"gov_mdm",k:"Identify · when the rules disagree",flag:"w_tool_decides",
+      q:"Two survivorship rules conflict on a high-value merge, and the match score sits in the uncertain middle band. Who decides?",
+      opts:[{k:"a",t:"The MDM tool — that is what it was bought for."},{k:"b",t:"The integration engineers who own the pipeline."},{k:"c",t:"<b>The data steward for that domain — a named business role with arbitration authority.</b>"}],
+      correct:"c",
+      right:"Right — the middle band and rule conflicts are business judgements. The steward owns them because the consequences (a fused customer, an understated exposure) are business consequences.",
+      wrong:{a:"The tool executes rules; it cannot arbitrate between them. A buyer who hears “the tool decides” writes down: no stewardship capability. That sentence has lost real bids.",b:"Engineers can implement any decision but have no authority to make this one — whether two companies are the same legal entity is not a pipeline question."},
+      wrongDefault:"Ambiguous merges are business judgements — a named steward with authority decides, not the tool and not the pipeline team."});
+    lensBeat(add);
+    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Five records is structure, not sloppiness — and the golden record is a decision process, not a table.</strong> Match (deterministic where a key exists, probabilistic where it does not), merge, apply field-level survivorship, and give a named steward the middle band. The pipeline is the easy part; the decisions are the product.</p><p class="whisper">Next: now that one true record exists — who is allowed to see it? <a class="jump" data-k="gov_access">Classification & Access</a>.</p>',
+      function(wrap,done){chooser(wrap,'You can defend a golden record now. Where next?');});
+    return b;}
+},
+
+gov_access:{concept:"gov_access",node:"Classification & Access",act:"Act A · Governing Data",title:"Labels Decide, Not Job Titles",
+  intro:"A government client adopts a four-tier classification scheme and asks you to “apply it to the platform”. If you bolt it onto role-based access, the roles multiply until nobody can review them. This lesson is why classification changes the access architecture itself.",
+  build:function(){var b=[];var add=function(h,g){b.push({html:h,gate:g});};
+    add('<div class="kicker">The innocent-looking requirement</div><h1>Four tiers, two hundred roles, one explosion</h1><p class="lead">The scheme looks simple: public, internal, confidential, secret. The organisation already runs <span class="term" data-t="rbac">RBAC</span> — access by job role — with about two hundred roles. Apply four tiers on top and every role that touches data needs a variant per tier it may see. Two hundred roles head toward eight hundred, review becomes fiction, and the scheme fails not by leaking but by drowning.</p><p>The requirement was never “add labels”. It was “change how access is decided”.</p>');
+    add('<span class="tierflag">'+({support:"Support pace",standard:"Standard pace",fast:"Fast pace"}[LEARNER.tier]||"Standard pace")+'</span>'+tierPick({
+      support:'<div class="kicker">First principles</div><h2>From “who are you” to “what is it”</h2><p><span class="term" data-t="rbac">RBAC</span> asks one question: what is your role? That works while roles are few and data categories fewer. <span class="term" data-t="abac">ABAC</span> asks three at the moment of access: what is the user’s clearance, what is the data’s label, what is the context? The rule becomes one line — <em>allow if clearance ≥ label</em> — instead of hundreds of role variants. The price: every dataset must actually carry a label, and the label must <strong>travel</strong>. A report built from confidential rows is confidential; a training set built from it is too. If labels do not propagate through transformations, the scheme is paint.</p>',
+      standard:'<div class="kicker">First principles</div><h2>Role explosion is the failure mode; attributes are the exit</h2><p>RBAC cost grows with roles × data categories — a new tier multiplies rather than adds, which is why bolting classification onto RBAC produces the explosion. <span class="term" data-t="abac">ABAC</span> evaluates a policy at request time over user attributes (clearance), data attributes (label), and context — policy count stays flat as tiers grow. The two real engineering problems: labelling the estate (initial classification is a project, not a setting), and <strong>label propagation</strong> — every join, extract and derived table inherits the strictest input label unless a rule says otherwise.</p>',
+      fast:'<div class="kicker">First principles</div><h2>Policy at query time, labels as data</h2><p>Treat labels as first-class metadata columns and access as a policy decision point evaluated per query: allow iff clearance ≥ max(label of inputs), with context conditions. Propagation is the hard invariant — derived artefacts inherit max input sensitivity by default; downgrades are explicit, audited decisions. Federate identity from the client’s provider rather than owning users. Forward pointer: this exact architecture is what permission-aware AI retrieval sits on later — retrieval inherits whatever access model you build here.</p>'}));
+    questionBeat(add,{concept:"gov_access",k:"Explain · why RBAC breaks",flag:"w_add_roles",
+      q:"Why does introducing the four-tier scheme break the existing role-based model, rather than slotting into it?",
+      opts:[{k:"a",t:"Role-based access is an outdated technology that vendors no longer support."},{k:"b",t:"<b>Every role that touches data now needs a variant per tier — roles multiply until review is impossible.</b>"},{k:"c",t:"It does not break it — you simply add four new roles, one per tier."}],
+      correct:"b",
+      right:"Right — the cost is multiplicative. Roles × tiers, not roles + tiers. The scheme fails by administrative collapse long before it fails by breach.",
+      wrong:{a:"RBAC is neither outdated nor unsupported — it is fine at small scale. The failure is mathematical, not technological: tiers multiply role variants.",c:"Four flat roles cannot express “this analyst may see confidential finance data but only internal HR data”. Real access is role × domain × tier — that cross-product is the explosion."},
+      wrongDefault:"Tiers multiply role variants — roles × tiers, not plus. That multiplication is why classification changes the architecture."});
+    questionBeat(add,{concept:"gov_access",k:"Design · the rule that scales",flag:"w_rbac_reflex",
+      q:"Which access rule correctly implements the classification scheme and stays reviewable as the organisation grows?",
+      opts:[{k:"a",t:"Create a “Finance-Confidential” role, and equivalents for each department–tier pair."},{k:"b",t:"<b>Allow access if the user’s clearance ≥ the data’s label, evaluated when the query runs.</b>"},{k:"c",t:"Let each application enforce the tiers in its own screens and reports."}],
+      correct:"b",
+      right:"Right — one policy, evaluated at request time, over labels that live with the data. Tier count can grow; the policy does not.",
+      wrong:{a:"That is the explosion with a friendly name — every department–tier pair is a new role, and you will be back here at review time with eight hundred of them.",c:"Application-layer enforcement means every new app re-implements security and any direct query bypasses all of it. The label must be enforced where the data is, not where the screen is."},
+      wrongDefault:"The scalable rule is attribute-based: clearance versus label, decided at query time, enforced at the data layer."});
+    questionBeat(add,{concept:"gov_access",k:"Apply · the join that leaks",flag:"w_labels_static",
+      q:"An analyst joins a confidential customer table with a public product table and saves the result as a new dataset. What label must the result carry?",
+      opts:[{k:"a",t:"Public — the sensitive columns were not selected into the output."},{k:"b",t:"Internal — a reasonable middle ground between the two inputs."},{k:"c",t:"<b>Confidential — derived data inherits the strictest input label unless an explicit, audited downgrade says otherwise.</b>"}],
+      correct:"c",
+      right:"Right — labels propagate. Derivation inherits the maximum input sensitivity by default; any downgrade is a deliberate, logged decision by someone with authority.",
+      wrong:{a:"Column selection is not sanitisation — the rows were filtered by confidential data, and that alone can disclose (who is in the result is information). Default must be inherit-strictest.",b:"Averaging sensitivity has no basis — a label is an obligation, not a number. Middle grounds are how confidential data ends up in a public dashboard."},
+      wrongDefault:"Derived data inherits the strictest input label by default — downgrades are explicit decisions, never side effects of a join."});
+    lensBeat(add);
+    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Classification changes the decision, not just the paperwork.</strong> Role-based access collapses under roles × tiers; attribute-based access keeps one policy — clearance versus label at query time — and moves the work to labelling the estate and propagating labels through every derivation. Whatever you build here becomes the permission model of every AI system layered on top.</p><p class="whisper">Next: some data you must keep for ten years, some you must destroy on schedule. <a class="jump" data-k="gov_records">Records & Retention</a>.</p>',
+      function(wrap,done){chooser(wrap,'You can design label-driven access now. Where next?');});
+    return b;}
+},
+
+gov_records:{concept:"gov_records",node:"Records & Retention",act:"Act A · Governing Data",title:"The Obligation to Keep — and to Destroy",
+  intro:"Both tenders require records management. Neither calls it an AI problem. That is exactly why it gets missed — and why it surfaces at acceptance time, attached to a payment milestone.",
+  build:function(){var b=[];var add=function(h,g){b.push({html:h,gate:g});};
+    add('<div class="kicker">Two duties pointing in opposite directions</div><h1>Storing is not managing</h1><p class="lead">A document sits in storage: anyone with access can edit it, copy it, delete it, or keep it forever. A <strong>record</strong> is different — it is evidence of a decision or transaction. It must be fixed (no silent edits), classified, and bound to a <span class="term" data-t="retention schedule">retention schedule</span>: kept for a mandated period, then <em>destroyed</em>, defensibly, on time.</p><p>“We keep everything forever” is not compliance. Past its retention date, a record is no longer an asset — it is discoverable liability that keeping was a choice.</p>');
+    add('<span class="tierflag">'+({support:"Support pace",standard:"Standard pace",fast:"Fast pace"}[LEARNER.tier]||"Standard pace")+'</span>'+tierPick({
+      support:'<div class="kicker">First principles</div><h2>Schedule, disposal, hold</h2><p>Three mechanisms carry the whole discipline. The <span class="term" data-t="retention schedule">retention schedule</span> maps each record class to a keep-period — loan files ten years, HR files seven, meeting notes two — and to a destruction rule after. <strong>Defensible disposal</strong> means destruction is scheduled, approved, logged and provable: you can show a regulator <em>why</em> that file no longer exists and that its deletion was policy, not panic. A <span class="term" data-t="legal hold">legal hold</span> is the override: when litigation or investigation is on foot, deletion stops for covered material — even material the schedule says to destroy this week.</p>',
+      standard:'<div class="kicker">First principles</div><h2>Retention is bidirectional</h2><p>The schedule obliges keeping <em>and</em> deletion; most organisations honour only the first, which turns the archive into un-priced legal exposure. Disposal must be defensible — approved, logged, reproducible — because “it was deleted per schedule” is a complete answer and “someone tidied the drive” is an admission. <span class="term" data-t="legal hold">Legal hold</span> strictly overrides the schedule, and its scope is set by lawyers, not by whoever administers storage. Deleting held material is among the most expensive mistakes an organisation can make in litigation.</p>',
+      fast:'<div class="kicker">First principles</div><h2>Records as a lifecycle state machine</h2><p>Declare → classify → retain (immutable, scheduled) → dispose (approved, logged) — with legal hold as a state that suspends disposal transitions for covered material. Two integration notes that decide acceptance: document-AI pipelines that ingest records inherit records obligations on every derived copy; and as-built documentation, SOPs and configuration records are themselves records that gate final acceptance in both tenders. Unglamorous, priced by almost nobody, and attached to the last payment milestone.</p>'}));
+    questionBeat(add,{concept:"gov_records",k:"Distinguish · the SharePoint defence",flag:"w_keep_everything",
+      q:"“We are covered — everything is in SharePoint and we never delete anything.” What is wrong with this position?",
+      opts:[{k:"a",t:"Nothing serious — keeping everything is the safest possible policy."},{k:"b",t:"<b>Retention also obliges deletion: past its date a record is discoverable liability, and unmanaged storage cannot prove integrity anyway.</b>"},{k:"c",t:"SharePoint is the wrong product — a dedicated records tool would make the same approach fine."}],
+      correct:"b",
+      right:"Right — keep-everything fails in both directions: it breaches destruction duties, and editable storage cannot demonstrate a record is unaltered evidence.",
+      wrong:{a:"Keeping everything feels safe and is the opposite — every expired record is material a future dispute can discover, and none of it has managed integrity. The schedule obliges deletion too.",c:"The product is not the point. A dedicated tool running a keep-everything policy has the same two failures — no defensible disposal, no bounded liability. Fix the policy, then tool it."},
+      wrongDefault:"Retention is an obligation to delete as much as to keep — and storage without fixity and schedules is not records management, whatever the product."});
+    questionBeat(add,{concept:"gov_records",k:"Apply · the hold arrives",flag:"w_schedule_first",
+      q:"A litigation notice lands. The retention schedule says this quarter’s expired loan files are due for destruction this month. What happens?",
+      opts:[{k:"a",t:"Destroy on schedule — following written policy is always defensible."},{k:"b",t:"<b>Legal hold overrides the schedule: deletion is suspended for covered material until the hold lifts.</b>"},{k:"c",t:"Suspend all deletion of everything, indefinitely, to be safe."}],
+      correct:"b",
+      right:"Right — the hold outranks the schedule for material in its scope, and its scope is defined by counsel. Everything outside the scope continues on schedule.",
+      wrong:{a:"Once notice exists, scheduled destruction of covered material stops being policy and becomes spoliation — courts treat it as destroying evidence, and “the schedule said so” does not survive that.",c:"Freezing everything indefinitely quietly recreates keep-everything, with all its liability — and signals you cannot scope a hold. Suspend what the hold covers; the rest of the schedule runs."},
+      wrongDefault:"A legal hold suspends deletion for covered material only — it overrides the schedule there, and the schedule keeps running everywhere else."});
+    lensBeat(add);
+    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>A record is evidence with a lifecycle: fixed, classified, kept to schedule, destroyed defensibly — with legal hold as the override.</strong> Extracting from a document and being obliged to keep or destroy it are different disciplines that clients buy in the same breath. Price both.</p><p class="whisper">Last in the Act: the data that belongs to a person, and the promise that has to travel with it. <a class="jump" data-k="gov_privacy">Privacy in the Pipeline</a>.</p>',
+      function(wrap,done){chooser(wrap,'You can tell storage from records management now. Where next?');});
+    return b;}
+},
+
+gov_privacy:{concept:"gov_privacy",node:"Privacy in the Pipeline",act:"Act A · Governing Data",title:"The Consent Flag Must Travel",
+  intro:"At signup, a customer unticked “use my data for marketing”. The flag was stored, the policy was published — and eighteen months later a churn model trained on that customer anyway, because no pipeline ever read the flag. Privacy failed in the plumbing, not the policy.",
+  build:function(){var b=[];var add=function(h,g){b.push({html:h,gate:g});};
+    add('<div class="kicker">Where privacy actually lives</div><h1>A policy document enforces nothing</h1><p class="lead">Privacy obligations are specific: data collected for a purpose may be used for that purpose (<span class="term" data-t="purpose limitation">purpose limitation</span>); a person may ask what you hold about them, and ask you to erase it. Every one of these is a <strong>data lifecycle</strong> problem. The consent captured at signup is a value that must travel with the record into every extract, join and training set — and be enforced <em>inside the query</em>, not remembered in a PDF.</p><p>An erasure request is the sharpest test: “delete this person everywhere” requires knowing where everywhere is. That is lineage — the Act’s first lesson, arriving from the other direction.</p>');
+    add('<span class="tierflag">'+({support:"Support pace",standard:"Standard pace",fast:"Fast pace"}[LEARNER.tier]||"Standard pace")+'</span>'+tierPick({
+      support:'<div class="kicker">First principles</div><h2>Consent as data · copies as scope</h2><p>Treat consent and purpose as columns that travel with the record, checked wherever data is read — a marketing training set is built <em>excluding</em> the customers whose flag says no, mechanically, every time. Two look-alike words matter here. <span class="term" data-t="anonymisation">Anonymisation</span> removes identity irreversibly — done properly, the data stops being personal. <span class="term" data-t="pseudonymisation">Pseudonymisation</span> swaps names for codes <em>while a key exists to map them back</em> — reversible, so still personal data, still carrying every obligation. Replacing names with customer IDs changes the label on the risk, not the risk.</p>',
+      standard:'<div class="kicker">First principles</div><h2>Enforcement at read time, scope defined by lineage</h2><p>Purpose and consent enforcement belongs in the query path — filters applied when extracts and training sets are built — because that is the only place it cannot be forgotten. Subject access and erasure are lineage queries: every derived copy (extracts, caches, downstream tables) must be findable to be corrected or deleted. Pseudonymised data remains personal data — the test is whether re-identification is reasonably possible, and a key in the next schema over means yes. Design as if every copy will one day need to be found: it will.</p>',
+      fast:'<div class="kicker">First principles</div><h2>Privacy as an invariant over the copy graph</h2><p>Model it as an invariant: for every copy of personal data, purpose ⊆ consented purposes, enforced at materialisation time; erasure = reachability over the same lineage graph the catalogue gave you. Anonymisation claims deserve adversarial scepticism — sparse high-dimensional data re-identifies with few attributes. Forward pointer: AI pipelines multiply copies (chunks, embeddings, prompt logs, outputs) — every one inherits these obligations, which is where this lesson meets retrieval and vector stores later in the journey.</p>'}));
+    questionBeat(add,{concept:"gov_privacy",k:"Trace · where the flag is enforced",flag:"w_policy_enforces",
+      q:"Where must the marketing consent flag actually be enforced for the churn-model incident to become impossible?",
+      opts:[{k:"a",t:"At signup — the form captured the flag correctly, so the system worked."},{k:"b",t:"In the privacy policy — it clearly states opted-out data is not used for marketing."},{k:"c",t:"<b>Inside the query that builds the training set — the flag filters the rows mechanically, every run.</b>"}],
+      correct:"c",
+      right:"Right — capture and policy are necessary and enforce nothing. The only place the promise cannot be forgotten is the read path that materialises the data.",
+      rightSay:"“Enforced at read time, not remembered at policy time” — that sentence wins technical evaluations.",
+      wrong:{a:"Capture is where the promise is made, not kept. A correctly stored flag that no pipeline reads is exactly what produced the incident.",b:"The policy creates the obligation; it has no mechanism. Eighteen months of pipeline runs never consulted the PDF — enforcement lives in the query path or nowhere."},
+      wrongDefault:"Consent must be enforced where data is read — inside the queries that build extracts and training sets — not just captured or declared."});
+    questionBeat(add,{concept:"gov_privacy",k:"Distinguish · IDs instead of names",flag:"w_pseudo_anon",
+      q:"A team replaces customer names with numeric IDs before analysis and declares the dataset anonymised. Is it?",
+      opts:[{k:"a",t:"Yes — no names means no personal data, so privacy rules no longer apply."},{k:"b",t:"<b>No — it is pseudonymised: the mapping key exists, re-identification is possible, and it remains personal data.</b>"},{k:"c",t:"Yes, provided the mapping key is stored in a different database from the data."}],
+      correct:"b",
+      right:"Right — reversibility is the test. While a key can map codes back to people, every privacy obligation still applies to the “anonymised” set.",
+      wrong:{a:"Names are one identifier of many — the key maps IDs straight back, and even without it, a few attributes (postcode, birth date, purchase pattern) re-identify. Obligations follow the person, not the name column.",c:"Separating the key is good hygiene that changes nothing legally — the data is pseudonymised, not anonymous, because re-identification remains possible. Distance between two databases is not irreversibility."},
+      wrongDefault:"Pseudonymised data is still personal data — the mapping key means re-identification is possible, and the obligations travel with it."});
+    questionBeat(add,{concept:"gov_privacy",k:"Apply · the erasure request",flag:"w_delete_source",
+      q:"A customer exercises their right to erasure. The team deletes their row from the customer database and closes the ticket. What did they miss?",
+      opts:[{k:"a",t:"Nothing — the source record was deleted, which is what erasure means."},{k:"b",t:"<b>Every derived copy — extracts, caches, downstream tables, training sets — which only lineage can enumerate.</b>"},{k:"c",t:"A confirmation email to the customer describing the deletion."}],
+      correct:"b",
+      right:"Right — erasure is a lineage query. The person lives on in every copy the pipelines made, and “we deleted the source” is an incomplete answer a regulator will test.",
+      wrong:{a:"The source row is one copy of many — last month’s extract, the analytics table and the training set still contain the person. Erasure that stops at the source is erasure in name only.",c:"Courtesy, not compliance — the finding is about the copies still holding the data, and no email fixes that. Enumerate the copies first; that is what lineage is for."},
+      wrongDefault:"Erasure means every copy — and finding every copy is a lineage problem, which is why this Act began with lineage."});
+    lensBeat(add);
+    add('<div class="kicker">One-page model</div><h2>What you’ll carry</h2><p><strong>Privacy is enforced in the pipeline or not at all.</strong> Consent travels as data and filters at read time; pseudonymised is still personal because reversibility is the test; erasure is a lineage query over every copy. The Act closes where it opened — if you cannot trace it, you cannot protect it either.</p><p class="whisper">Act A complete. The journey continues where governed data meets its guards: <a class="jump" data-k="security">Security & IAM</a>.</p>',
+      function(wrap,done){chooser(wrap,'You’ve finished Governing Data. Where next?');});
+    return b;}
+}
+});
+
+/* ---- 5 · briefs (first six with machine-readable LO contracts — P17 reference implementation) ---- */
+Object.assign(BRIEFS,{
+gov_catalog:{
+ lo:{clause:"trace a reported figure back to its source system and defend the organisation’s reporting",
+     claim:"Buyers now test catalogue and lineage as a named capability before any AI conversation starts.",
+     read:"Reader connects a failed audit question to the missing capability, then answers the trace-first question beat.",
+     coverage:"catalogue, lineage, technical vs business lineage all taught in lesson body before this brief."},
+ arg:["A recent public tender listed an uncertified catalogue tool as a disqualifying gap — before a single AI requirement was scored. The buyer’s logic is sound. An organisation that cannot say what data it holds, or how a reported figure was produced, cannot safely buy anything built on that data.",
+  "The commercial angle: catalogue and lineage work is unglamorous, so competitors under-scope it. Naming it, pricing it and sequencing it first reads as competence, not caution. It is also the cheapest de-risking available — every later workstream inherits it."],
+ roles:{
+  presales:{gov:"Catalogue and lineage are now procurement gates, not hygiene — scope them first and say so in the bid.",tell:"Listen for “we have the data, we just need the AI” — from an organisation that cannot tell you where its revenue figure comes from. That distance is your real scope.",move:"Open discovery with one figure from their latest board pack and ask to trace it together. The result — minutes or weeks — sizes the governance workstream better than any questionnaire.",thought:"A buyer disqualified a bid over an uncertified catalogue tool. What does that choice tell you about who is really writing technical requirements now?"},
+  cfo:{gov:"Untraceable reporting is unpriced audit risk — lineage spend converts three-week archaeology into a control the auditor accepts.",tell:"Listen for reporting teams that reconcile figures by meeting rather than by system — recurring reconciliation headcount is the visible cost of missing lineage.",move:"Ask internal audit for the figures they could not trace last cycle and what each cost to reconstruct. That list, priced, is the business case.",thought:"If a figure takes three weeks to trace, what is the real cost of every decision that waited on it?"}}},
+
+gov_quality:{
+ lo:{clause:"express a quality requirement as a measurable rule with a threshold, an owner and a remediation path",
+     claim:"A composite quality score hides the failing dimension, so controls must operate at rule level.",
+     read:"Reader compares the composite bar with the dimension bars, finds the outlier, then applies it in the 91%-table question.",
+     coverage:"six dimensions, composite score, rule anatomy all taught in lesson body before this chart appears."},
+ arg:["One number cannot manage six independent failure modes. The composite below reads as healthy while the dimension that decides daily deliveries is failing badly — which is how a quarter of green dashboards coexists with wrong numbers.",
+  "The buying signal: tenders have started asking for quality rules with owners and remediation paths, not quality scores. A bid that responds with dashboard screenshots answers a question nobody asked.",
+  "How to read the chart: seven bars, one metric each. The top bar is the composite the dashboard shows. The six below are its dimensions. Find the one the average is hiding."],
+ viz:function(){return VIZ.bars([
+   {label:"Composite score",v:91,hint:"the dashboard"},
+   {label:"Completeness",v:99,hint:""},
+   {label:"Accuracy",v:97,hint:""},
+   {label:"Consistency",v:95,hint:""},
+   {label:"Timeliness",v:58,hint:"the real problem",hi:true},
+   {label:"Uniqueness",v:96,hint:""},
+   {label:"Validity",v:98,hint:""}],{fmt:function(v){return v+"%";}});},
+ vizCap:"Timeliness at 58% disappears inside a 91% composite — the score reports, the rule controls.",
+ roles:{
+  presales:{gov:"Sell quality as contracts — rule, threshold, owner, remediation — because that is the shape buyers now write into scope.",tell:"Listen for a quality answer that cites a score with no owner attached. A number nobody must act on is reporting, not control — and the client usually knows it.",move:"In discovery, ask for their top three quality rules and what mechanically happens on breach. Silence after “what happens” is the gap you scope.",thought:"A rule with an owner costs more to run than a dashboard. What does a buyer learn about you from which one you propose?"},
+  cfo:{gov:"Quality without owners is a cost that books itself as rework, reconciliation and missed deliveries — fund rules, not dashboards.",tell:"Listen for teams that trust the score and still re-check the data by hand before using it — that duplicated checking is the quality budget, spent invisibly.",move:"Price one failing dimension end to end (the deliveries it broke, the rework it caused) and compare it with the cost of the rule that would have caught it.",thought:"If every team quietly re-verifies data before using it, what is the organisation’s real quality spend — and who is tracking it?"}}},
+
+gov_mdm:{
+ lo:{clause:"describe how match, merge and survivorship resolve duplicates and identify who arbitrates",
+     claim:"The golden record is a decision process with a human arbiter, not a product you install.",
+     read:"Reader takes the exposure question to the three question beats — cause, survivorship, arbitration — and answers all three.",
+     coverage:"matching, survivorship, steward role all taught in lesson body before this brief."},
+ arg:["“What is our total exposure to this group?” is a one-line query on mastered data and an unanswerable question without it. The capability gap that phrase describes was written, verbatim, into a real tender’s gap analysis — and it decided the bid before pricing was opened.",
+  "This is also the layer better models do not erase. A model can write every pipeline involved. Deciding which of five disagreeing records is the real customer stays a human capability, with a human arbiter. That is why this work keeps its price while build costs fall."],
+ roles:{
+  presales:{gov:"Master data is the highest-leverage gap to name in a bid — it is common, expensive to live with, and few competitors scope it honestly.",tell:"Listen for the same company named differently in two systems during discovery — then ask how they would count their exposure to it. The pause is the capability gap.",move:"Scope stewardship explicitly: named roles, arbitration authority, a review queue for uncertain matches. A bid that only prices the matching tool has priced half the capability.",thought:"Five records for one customer survived years of good engineering. What organisational force keeps duplication alive, and does your proposal address it or just its symptoms?"},
+  cfo:{gov:"Duplicate master data misstates exposure, credit and customer value — the golden record is a reporting-integrity investment, not an IT tidy-up.",tell:"Listen for exposure or customer-count figures that shift between reports without a stated reason — duplication is usually the quiet cause.",move:"Ask risk for one counterparty they suspect is duplicated and have both totals computed. The difference, annualised across the book, funds the programme.",thought:"If customer counts are inflated by duplicates, which of your unit economics are quietly wrong — and in which direction?"}}},
+
+gov_access:{
+ lo:{clause:"design access rules driven by data labels and explain why a new tier changes the architecture",
+     claim:"Classification bolted onto roles explodes; classification as attributes stays one reviewable policy.",
+     read:"Reader carries the roles-times-tiers argument into the design question and picks the query-time rule.",
+     coverage:"RBAC, ABAC, role explosion, label propagation all taught in lesson body before this brief."},
+ arg:["When a client adopts a classification scheme, the visible work is labelling documents. The structural work is that access decisions change shape: from “what is your role” to “what is your clearance, what is this data’s label, what is the context”. Quoting the visible work and inheriting the structural work is how access projects go underwater.",
+  "The forward-looking reason to get this right: every AI system the client builds later — search, assistants, retrieval — inherits this access model. Permission mistakes made here resurface as AI data-leak incidents there, at many times the remediation cost."],
+ roles:{
+  presales:{gov:"Scope classification as an access-architecture change with a labelling project inside it — never as labelling alone.",tell:"Listen for “we will apply the new tiers to our existing roles” — that sentence is the role explosion, announced in advance.",move:"Count their roles, multiply by proposed tiers, and put the number in the room. Then show the one-line attribute policy beside it. The comparison sells itself.",thought:"An access model is easiest to change before anything depends on it. What is the cost curve of delaying this decision by one platform generation?"},
+  cfo:{gov:"Role explosion is an administrative liability — hundreds of role variants nobody can review is how access audits fail years later.",tell:"Listen for access-review cycles that take quarters and still sign off with exceptions — review cost grows with role count, and role count is a design choice.",move:"Ask how many distinct roles exist today and who reviewed them last cycle. Multiply the review cost by the tier count the new scheme implies.",thought:"Access reviews exist to satisfy auditors that the right people see the right data. At what role count does that assurance become theatre?"}}},
+
+gov_records:{
+ lo:{clause:"distinguish storing a document from managing a record and state what schedule and hold oblige",
+     claim:"Retention obliges deletion as much as keeping, and legal hold overrides the schedule.",
+     read:"Reader applies the bidirectional obligation in the SharePoint and litigation questions.",
+     coverage:"record vs document, retention schedule, defensible disposal, legal hold all taught before this brief."},
+ arg:["Records management enters a tender as a quiet line item and returns at acceptance as a gating one. As-built documents, SOPs and configuration records are themselves records, and their absence blocks the final milestone. It is the least glamorous item in scope and among the most reliably under-priced.",
+  "The discipline is bidirectional. Keeping everything forever breaches destruction duties and accumulates discoverable liability; deleting by habit breaches keeping duties and, under a legal hold, becomes spoliation. Both failure modes come from the same cause — treating storage as management."],
+ roles:{
+  presales:{gov:"Price records management and acceptance documentation explicitly — they are cheap to include and expensive to discover at the final milestone.",tell:"Listen for “we archive everything, so we are covered” — a keep-everything posture signals no schedule, no defensible disposal, and an acceptance-phase surprise.",move:"Walk the tender’s acceptance clause and list every document it makes gating. Estimate that documentation set as its own line — it funds itself the first time it is not forgotten.",thought:"Document AI extracts value from records; records law limits what may be kept. Which of your current AI opportunities quietly assumes the second discipline does not exist?"},
+  cfo:{gov:"An unmanaged archive is un-priced legal exposure — every expired record kept “to be safe” is discoverable material with no offsetting value.",tell:"Listen for storage budgets that only ever grow and legal teams surprised by what discovery finds — the archive nobody manages is a liability nobody booked.",move:"Ask legal what the last discovery exercise cost and how much of what it surfaced should already have been destroyed on schedule. That gap is the case for disposal.",thought:"Storage is cheap and keeps getting cheaper. Why does that make records management more valuable, not less?"}}},
+
+gov_privacy:{
+ lo:{clause:"trace consent from capture to enforcement inside a query and classify pseudonymised data correctly",
+     claim:"Privacy is enforced in the read path of the pipeline or it is not enforced at all.",
+     read:"Reader traces the consent flag to the training-set query and applies reversibility in the pseudonymisation question.",
+     coverage:"purpose limitation, consent as data, anonymisation vs pseudonymisation, erasure all taught before this brief."},
+ arg:["The churn-model incident had no villain: the form worked, the policy was published, every pipeline did its job. The failure was architectural — consent existed as a stored value and a stated promise, but no query ever consulted it. Privacy that is not in the read path is a description of intentions.",
+  "Second-order effect worth pricing: AI pipelines multiply copies — extracts, embeddings, caches, logs — and every copy inherits the person’s rights. Erasure then depends on lineage, which means the privacy capability is only as good as the catalogue built at the start of this Act."],
+ roles:{
+  presales:{gov:"Sell privacy as pipeline engineering — consent enforced at read time, erasure as a lineage query — because that is what a technical evaluation actually tests.",tell:"Listen for “our privacy policy covers that” in answer to a data-flow question. A policy answer to an engineering question means the enforcement layer does not exist.",move:"Ask how last quarter’s erasure requests were executed, copy by copy. If the answer stops at the source database, you have found both the risk and the scope.",thought:"Pseudonymised data is still personal data. How much of your client’s “anonymised” analytics estate would survive that test — and what does remediation look like if it would not?"},
+  cfo:{gov:"Privacy failures are priced in fines, remediation and trust — enforcement in the pipeline is cheaper than any of the three.",tell:"Listen for privacy owned entirely by legal with no engineering budget attached — obligations without enforcement machinery are liabilities accruing interest.",move:"Ask what executing one erasure request actually costs today, end to end. Multiply by the request rate trend; compare with the one-off cost of consent-aware pipelines.",thought:"Consent rates are falling and request rates are rising. At what point does un-engineered privacy become the largest unbooked liability on the data estate?"}}}
+});
+
+/* ---- 6 · re-render so the map shows Act A immediately ---- */
+if(typeof renderGraph==='function')renderGraph();
 })();
 
 </script>
